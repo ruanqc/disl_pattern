@@ -1,0 +1,6 @@
+Applications:
+    disl_pattern:
+        app_types:
+            - disl_patternApp
+        content_directory: ${ROOT_DIR}/doc/content
+        log_default: WARNING
