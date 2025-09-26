@@ -84,6 +84,7 @@ temp_print_trace.*
 *.net
 .depend
 *.png
+!problems/**/*.png
 *.svg
 *.gif
 *.tif
