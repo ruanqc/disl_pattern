@@ -3,6 +3,7 @@
 //* Harbin Institute of Technology, Shenzhen
 //* Centre for Micro-mechanics Modelling and Characterisation
 //* 6 Jan 2024
+// ruanqc moified 25-09-09 for introducing a new parameter wb
 
 #pragma once
 
@@ -124,6 +125,7 @@ protected:
   const Real _dlamb;
   const Real _w1;
   const Real _w2;
+  const Real _wb;   //ruanqc 25-09-09 added wb
 
   DenseVector<Real> _backstress;
   DenseVector<Real> _backstress_total;
@@ -191,5 +193,6 @@ protected:
 
   const enum class TwoSlipCheck { yes, no } _is_two_slips;
 
-  const enum class MultiSlipsVersion { v_1, v_2, v_3 } _version_number;
+  // ruanqc-250909 modified changed version as paper parameter 'wb'
+  // const enum class MultiSlipsVersion { v_1, v_2, v_3 } _version_number;
 };

@@ -3,6 +3,7 @@
 //* Harbin Institute of Technology, Shenzhen
 //* Centre for Micro-mechanics Modelling and Characterisation
 //* 6 Jan 2024
+// ruanqc 250909 modified by introducing the wb in M matrix
 
 #include "CrystalPlasticityBussoUpdateMultiSlip.h"
 #include "libmesh/int_range.h"
@@ -30,6 +31,10 @@ CrystalPlasticityBussoUpdateMultiSlip::validParams()
   params.addParam<Real>("dlamb", 0.3, "initial slip rate");
   params.addParam<Real>("w1", 1.5, "cross-hardening constants, adopted from Cheong2004");
   params.addParam<Real>("w2", 1.2, "cross-hardening constants, adopted from Cheong2004");
+  // ruanqc-250909 modified changed version as paper parameter 'wb', and comment the following 
+  // line associatecd with version_number
+  params.addParam<Real>("wb", 0.25, "cross-hardening constants, adopted from 2024JMPS");
+  
 
   params.addCoupledVar(
       "edge_dislo_den_pos_1", 0.0, "Positive edge dislocation density: slip system 1");
@@ -43,9 +48,10 @@ CrystalPlasticityBussoUpdateMultiSlip::validParams()
   MooseEnum is_two_slips("yes no", "yes");
   params.addRequiredParam<MooseEnum>("is_two_slips", is_two_slips, "check two slips case.");
 
-  MooseEnum version_number("v_1 v_2 v_3", "v_3");
-  params.addRequiredParam<MooseEnum>(
-      "version_number", version_number, "turn to 3 types of multi slips case.");
+  // ruanqc-25-09-09 commented by introducing 'wb'
+  // MooseEnum version_number("v_1 v_2 v_3", "v_3");
+  // params.addRequiredParam<MooseEnum>(
+  //     "version_number", version_number, "turn to 3 types of multi slips case.");
 
   return params;
 }
@@ -69,6 +75,7 @@ CrystalPlasticityBussoUpdateMultiSlip::CrystalPlasticityBussoUpdateMultiSlip(
     _dlamb(getParam<Real>("dlamb")),
     _w1(getParam<Real>("w1")),
     _w2(getParam<Real>("w2")),
+    _wb(getParam<Real>("wb")), // ruanqc-250909 modified changed version as paper parameter 'wb'
 
     _backstress(_number_slip_systems),
     _backstress_total(_number_slip_systems),
@@ -105,9 +112,10 @@ CrystalPlasticityBussoUpdateMultiSlip::CrystalPlasticityBussoUpdateMultiSlip(
     _accumulated_equivalent_plastic_strain_old(
         getMaterialPropertyOld<Real>(_base_name + "accumulated_equivalent_plastic_strain")),
 
-    _is_two_slips(getParam<MooseEnum>("is_two_slips").getEnum<TwoSlipCheck>()),
-
-    _version_number(getParam<MooseEnum>("version_number").getEnum<MultiSlipsVersion>())
+    _is_two_slips(getParam<MooseEnum>("is_two_slips").getEnum<TwoSlipCheck>())
+    
+    // ruanqc-250909 modified changed version as paper parameter 'wb'
+    // _version_number(getParam<MooseEnum>("version_number").getEnum<MultiSlipsVersion>())
 
 {
 }
@@ -361,29 +369,35 @@ CrystalPlasticityBussoUpdateMultiSlip::calculateSlipRate()
     //                  RhoTotSlip;
   }
 
+  //********************************************************************************** */
   // the total backstress could be calculated with 3 versions
   // (Yefimov and Van Der Giessen 2005)
 
-  switch (_version_number)
-  {
-    case MultiSlipsVersion::v_1:
-      // version 1
-      _backstress_total(0) = _backstress(0) + 0.267 * _backstress(1);
-      _backstress_total(1) = 0.267 * _backstress(0) + _backstress(1);
-      break;
+  // switch (_version_number)
+  // {
+  //   case MultiSlipsVersion::v_1:
+  //     // version 1
+  //     _backstress_total(0) = _backstress(0) + 0.267 * _backstress(1);
+  //     _backstress_total(1) = 0.267 * _backstress(0) + _backstress(1);
+  //     break;
 
-    case MultiSlipsVersion::v_2:
-      // version 2
-      _backstress_total(0) = _backstress(0) - 0.466 * _backstress(1);
-      _backstress_total(1) = -0.466 * _backstress(0) + _backstress(1);
-      break;
+  //   case MultiSlipsVersion::v_2:
+  //     // version 2
+  //     _backstress_total(0) = _backstress(0) - 0.466 * _backstress(1);
+  //     _backstress_total(1) = -0.466 * _backstress(0) + _backstress(1);
+  //     break;
 
-    case MultiSlipsVersion::v_3:
-      // version 3
-      _backstress_total(0) = _backstress(0) + 0.5 * _backstress(1);
-      _backstress_total(1) = 0.5 * _backstress(0) + _backstress(1);
-      break;
-  }
+  //   case MultiSlipsVersion::v_3:
+  //     // version 3
+  //     _backstress_total(0) = _backstress(0) + 0.5 * _backstress(1);
+  //     _backstress_total(1) = 0.5 * _backstress(0) + _backstress(1);
+  //     break;
+  // }
+  //********************************************************************************** */
+  // ruanqc-250909 modified changed version as paper parameter 'wb'
+    _backstress_total(0) =       _backstress(0) + _wb * _backstress(1);
+    _backstress_total(1) = _wb * _backstress(0) +       _backstress(1);
+
 
   for (const auto i : make_range(_number_slip_systems))
   {
