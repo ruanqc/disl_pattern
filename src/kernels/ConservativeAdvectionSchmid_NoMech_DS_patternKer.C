@@ -6,7 +6,7 @@
 // ConservativeAdvectionSchmid_NoMech_DS.C
 // Used for 1/2D Patterning unCoupled with mechanics 
 
-registerMooseObject("cdf_updateApp", ConservativeAdvectionSchmid_NoMech_DS_patternKer);
+registerMooseObject("disl_patternApp", ConservativeAdvectionSchmid_NoMech_DS_patternKer);
 
 InputParameters
 ConservativeAdvectionSchmid_NoMech_DS_patternKer::validParams()
