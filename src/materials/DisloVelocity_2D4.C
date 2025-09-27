@@ -9,7 +9,7 @@
 #include <fstream>
 #include <cmath>
 
-registerMooseObject("cdf_updateApp", DisloVelocity_2D4);
+registerMooseObject("disl_patternApp", DisloVelocity_2D4);
 
 InputParameters
 DisloVelocity_2D4::validParams()

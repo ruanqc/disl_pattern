@@ -1,6 +1,6 @@
 #include "SSDUpdate.h"
 
-registerMooseObject("cdf_updateApp", SSDUpdate);
+registerMooseObject("disl_patternApp", SSDUpdate);
 
 InputParameters
 SSDUpdate::validParams()

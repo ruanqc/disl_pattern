@@ -13,7 +13,7 @@
 #include <fstream>
 #include <cmath>
 
-registerMooseObject("cdf_updateApp", DisloVelocity_DbSlip_patternMat);
+registerMooseObject("disl_patternApp", DisloVelocity_DbSlip_patternMat);
 
 InputParameters
 DisloVelocity_DbSlip_patternMat::validParams()
