@@ -2,7 +2,7 @@
 #include "SystemBase.h"
 #include "libmesh/utility.h"
 
-registerMooseObject("cdf_updateApp", ConservativeAdvectionSchmid_NoMech);
+registerMooseObject("disl_patternApp", ConservativeAdvectionSchmid_NoMech);
 
 InputParameters
 ConservativeAdvectionSchmid_NoMech::validParams()
