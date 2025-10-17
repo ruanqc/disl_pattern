@@ -756,35 +756,39 @@ CrystalPlasticityBussoUpdate_patternMat::calculateConstitutiveSlipDerivative(std
     else
     {
       u = driving_force_p / _tau_0;
-      
+      // clamp u to [0, 1-eps] to avoid negative base to fractional power
+      const Real eps = 1e-12;
+      if (u < 0.0)
+        u = 0.0;
+      if (u >= 1.0)
+        u = 1.0 - eps;
+
       vprime_p = std::pow((1.0 - std::pow(u, _p)), _q - 1.0);
       uprime_p = std::pow(u, _p - 1.0);
 
-      dslip_dtau_p =  std::copysign(1.0, (_tau[_qp][i] - _backstress(i) - _tau_d(i))) *
-                      _gdot0*std::exp(-_f0 / _boltzmann / theta * std::pow((1.0 - std::pow(u, _p)), _q)) *
-                      _q * _p * _f0 / _boltzmann / theta *
-                      vprime_p * uprime_p *  _substep_dt;
-                      
-                      
-      dslip_dtau_p =  std::copysign(1.0, _tau[_qp][i] - _backstress(i) -  _tau_d(i)) *  
+      dslip_dtau_p = std::copysign(1.0, _tau[_qp][i] - _backstress(i) -  _tau_d(i)) *  
                       _gdot0 * std::exp(-_f0 / _boltzmann / theta * std::pow((1.0 - std::pow(u, _p)), _q)) *  //dot_gamma_{e+}
                       _p * _q * _f0 / _boltzmann / theta * vprime_p * uprime_p *
                       1.0 / _tau_0 * std::copysign(1.0, _tau[_qp][i]) * _substep_dt;
-
     }
 
     if (driving_force_m < _zero_tol)
-      dslip_dtau_m= 0.0;
+      dslip_dtau_m = 0.0;
     else
     {
       u = driving_force_m / _tau_0;
-      
+      const Real eps = 1e-12;
+      if (u < 0.0)
+        u = 0.0;
+      if (u >= 1.0)
+        u = 1.0 - eps;
+
       vprime_m = std::pow((1.0 - std::pow(u, _p)), _q - 1.0);
       uprime_m = std::pow(u, _p - 1.0);
 
-      dslip_dtau_m =  std::copysign(1.0, _tau[_qp][i] - _backstress(i) +  _tau_d(i)) *  
+      dslip_dtau_m = std::copysign(1.0, _tau[_qp][i] - _backstress(i) +  _tau_d(i)) *  
                       _gdot0 * std::exp(-_f0 / _boltzmann / theta * std::pow((1.0 - std::pow(u, _p)), _q)) *  //dot_gamma_{e-}
-                      _p * _q * _f0 / _boltzmann / theta * vprime_p * uprime_p *
+                      _p * _q * _f0 / _boltzmann / theta * vprime_m * uprime_m *
                       1.0 / _tau_0 * std::copysign(1.0, _tau[_qp][i]) * _substep_dt;
     }
 
