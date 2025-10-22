@@ -35,22 +35,22 @@
   [./edge_dislo_den_pos_1]
     type = FunctionIC
     variable = 'edge_dislo_den_pos_1'
-    function = Gaussian_xy
+    function = Gaussian_x
   []
   [./edge_dislo_den_neg_1]
     type = FunctionIC
     variable = 'edge_dislo_den_neg_1'
-    function = Gaussian_xy
+    function = Gaussian_x
   []
   [./edge_dislo_den_pos_2]
     type = FunctionIC
     variable = 'edge_dislo_den_pos_2'
-    function = Gaussian_xy
+    function = Gaussian_y
   []
   [./edge_dislo_den_neg_2]
     type = FunctionIC
     variable = 'edge_dislo_den_neg_2'
-    function = Gaussian_xy
+    function = Gaussian_y
   []  
 []
 
@@ -59,7 +59,7 @@
     type = ParsedFunction
     # expression = '0.01*16000.0 *  exp(-((x-1.011)^2.0  / (2.0 * 0.0079^2.0))) + 8000.0'          # width = 1.0/sqrt(16000) um =  7.9 um
     expression = 'if(abs(x - 1.011) < 0.0079, 0.001*16000.0 * exp(-((x - 1.011)^2 / (2.0 * 0.0079^2))) + 8000.0, 8000.0)'
-  [../]
+  [../]                                                                                                                                                                                                               
 
   [./Gaussian_y]
     type = ParsedFunction
@@ -67,10 +67,11 @@
     expression = 'if(abs(y - 1.011) < 0.0079, 0.001*16000.0 * exp(-((y - 1.011)^2 / (2.0 * 0.0079^2))) + 8000.0, 8000.0)'
   [../]
 
-  [./Gaussian_xy]
-    type = ParsedFunction
-      expression = 'if((abs(x - 1.011) < 0.0079) * (abs(y - 1.011) < 0.0079), 0.001*16000.0 * exp(-((x - 1.011)^2 / (2.0 * 0.0079^2))) * exp(-((y - 1.011)^2 / (2.0 * 0.0079^2))) + 8000.0, 8000.0)'
-  [../]
+[./Gaussian_xy]
+  type = ParsedFunction
+  expression = 'if((abs(x - 1.011) < 0.0079) * (abs(y - 1.011) < 0.0079), 0.001 * 16000.0 * exp(-((x - 1.011)^2 / (2.0 * 0.0079^2))) * exp(-((y - 1.011)^2 / (2.0 * 0.0079^2))) + 8000.0, 8000.0)'
+[../]
+
 
 []
 
@@ -93,7 +94,7 @@
   []
   [Edge_Pos_Flux_1]
     implicit = false
-    type = ConservativeAdvectionSchmid_NoMech_DS
+    type = ConservativeAdvectionSchmid_NoMech_DS_patternKer #ConservativeAdvectionSchmid_NoMech_DS_patternKer
     variable = edge_dislo_den_pos_1
     upwinding_type = full
       dislo_character = edge_00
@@ -107,7 +108,7 @@
   []
   [Edge_Neg_Flux_1]
     implicit = false
-    type = ConservativeAdvectionSchmid_NoMech_DS
+    type = ConservativeAdvectionSchmid_NoMech_DS_patternKer #ConservativeAdvectionSchmid_NoMech_DS_patternKer
     variable = edge_dislo_den_neg_1
     upwinding_type = full
       dislo_character = edge_00
@@ -121,7 +122,7 @@
   []
   [Edge_Pos_Flux_2]
     implicit = false
-    type = ConservativeAdvectionSchmid_NoMech_DS
+    type = ConservativeAdvectionSchmid_NoMech_DS_patternKer #ConservativeAdvectionSchmid_NoMech_DS_patternKer
     variable = edge_dislo_den_pos_2
     upwinding_type = full
       dislo_character = edge_90
@@ -135,49 +136,9 @@
   []
   [Edge_Neg_Flux_2]
     implicit = false
-    type = ConservativeAdvectionSchmid_NoMech_DS
+    type = ConservativeAdvectionSchmid_NoMech_DS_patternKer #ConservativeAdvectionSchmid_NoMech_DS_patternKer
     variable = edge_dislo_den_neg_2
     upwinding_type = full
-      dislo_character = edge_90
-      dislo_sign = negative
-      slip_sys_index = 1
-  []
-
-[]
-
-[DGKernels]
-
-  [dg_edge_pos_1]
-    implicit = false
-    type = DGAdvectionCoupled_NoMech_DS
-    variable = edge_dislo_den_pos_1
-      dislo_character = edge_00
-      dislo_sign = positive
-      slip_sys_index = 0
-  []
-
-  [dg_edge_neg_1]
-    implicit = false
-    type = DGAdvectionCoupled_NoMech_DS
-    variable = edge_dislo_den_neg_1
-      dislo_character = edge_00
-      dislo_sign = negative
-      slip_sys_index = 0
-  []
-
-  [dg_edge_pos_2]
-    implicit = false
-    type = DGAdvectionCoupled_NoMech_DS
-    variable = edge_dislo_den_pos_2
-      dislo_character = edge_90
-      dislo_sign = positive
-      slip_sys_index = 1
-  []
-
-  [dg_edge_neg_2]
-    implicit = false
-    type = DGAdvectionCoupled_NoMech_DS
-    variable = edge_dislo_den_neg_2
       dislo_character = edge_90
       dislo_sign = negative
       slip_sys_index = 1
@@ -206,7 +167,7 @@
 
 [Materials]
   [vel]
-    type = DisloVelocity_DbSlip
+    type = DisloVelocity_DbSlip_patternMat #DisloVelocity_DbSlip
     nss = 2
     taualpha = 0.483
     gdot0 = 1.0e6
@@ -358,7 +319,7 @@
 
 [Outputs]
   exodus = true
-  time_step_interval = 200
+  time_step_interval = 10
   [csv]
     type = CSV
     file_base = patterning_test_x_out_l1e-1

@@ -128,7 +128,7 @@
 
   [./disp_load]
     type = ParsedFunction
-    expression = '0.1*1.011*t'
+    expression = '0.05*2.022*t'
   [../]
 
   [./pressue_piecewise]
@@ -139,32 +139,21 @@
 []
 
 [BCs]
-  # [right_x]
-  #   type = Pressure
-  #   variable = disp_x
-  #   boundary = 'right'
-  #   factor = -0.966 #-0.683
-  #   function = pressue_piecewise
-  # []
+  [right_x]
+    type = Pressure
+    variable = disp_x
+    boundary = 'right'
+    factor = -0.966 #-0.683
+    function = pressue_piecewise
+  []
 
-  [top_x]
-    type = FunctionDirichletBC
-    variable = disp_x
-    boundary = 'top'
-    function = disp_load
-  []
-  [top_y]
-    type = DirichletBC
-    variable = disp_y
-    boundary = 'top'
-    value = 0.0
-  []  
-  [bottom_x]
+  [left_x]
     type = DirichletBC
     variable = disp_x
-    boundary = 'bottom'
+    boundary = 'left'
     value = 0.0
   []
+
   [bottom_y]
     type = DirichletBC
     variable = disp_y
@@ -172,17 +161,16 @@
     value = 0.0
   []
 
-
   [./Periodic]
-    [./auto_boundary_x]
-    variable = disp_x
-      auto_direction = 'x'
-    [../]
+    # [./auto_boundary_x]
+    # variable = disp_x
+    #   auto_direction = 'x'
+    # [../]
 
-    [./auto_boundary_y]
-    variable = disp_y
-      auto_direction = 'y'
-    [../]
+    # [./auto_boundary_y]
+    # variable = disp_y
+    #   auto_direction = 'y'
+    # [../]
 
     [./auto_rho_edge_pos_boundary_x_1]
     variable = rho_edge_pos_1
@@ -222,7 +210,12 @@
     family = MONOMIAL
     block = '0'
   [../]
-  [./slip_increment]
+  [./slip_increment1]
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
+  [../]
+  [./slip_increment2]
    order = CONSTANT
    family = MONOMIAL
    block = '0'
@@ -236,19 +229,7 @@
    order = CONSTANT
    family = MONOMIAL
    block = '0'
-  [../]
-
-  [./slip_increment1]
-   order = CONSTANT
-   family = MONOMIAL
-   block = '0'
-  [../]
-  [./slip_increment2]
-   order = CONSTANT
-   family = MONOMIAL
-   block = '0'
-  [../]   
-
+  [../]    
   [./rss_1]                 #Name shown in Paraview
    order = CONSTANT
    family = MONOMIAL
@@ -324,7 +305,6 @@
       slip_sys_index = 1
       dislo_character = edge
   []
-
 []
 
 [AuxKernels]
@@ -425,7 +405,7 @@
   [./trial_xtalpl]
     type = CrystalPlasticityBussoUpdate_patternMat
     number_slip_systems = 2
-    slip_sys_file_name  = input_2slip_sys_al_4545_001.txt
+    slip_sys_file_name  = input_2slip_sys_al_4545.txt
       gdot0             = 1.0e6
       f0                = 2.77e-19
       boltzmann         = 1.38065e-23
@@ -501,17 +481,6 @@
     variable = exy
     block = '0'
   [../]
-  [./slip_increment1]
-   type = ElementAverageValue
-   variable = slip_increment1
-   block = '0'
-  [../]
-    [./slip_increment2]
-   type = ElementAverageValue
-   variable = slip_increment2
-   block = '0'
-  [../]
-
   [./dislo_velocity]
    type = ElementAverageValue
    variable = dislo_velocity
@@ -547,6 +516,16 @@
      variable = rss_2
      block = '0'
   [../]
+    [./slip_increment1]
+   type = ElementAverageValue
+   variable = slip_increment1
+   block = '0'
+  [../]
+    [./slip_increment2]
+   type = ElementAverageValue
+   variable = slip_increment2
+   block = '0'
+  [../]
 []
 
 [VectorPostprocessors]
@@ -561,3 +540,4 @@
     execute_on = final
   []
 []
+

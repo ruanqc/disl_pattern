@@ -90,7 +90,7 @@
   []
   [Edge_Pos_Flux_1]
     implicit = false
-    type = ConservativeAdvectionSchmid_NoMech_DS
+    type = ConservativeAdvectionSchmid_NoMech_DS_patternKer
     variable = edge_dislo_den_pos_1
     upwinding_type = full
       dislo_character = edge_00
@@ -104,7 +104,7 @@
   []
   [Edge_Neg_Flux_1]
     implicit = false
-    type = ConservativeAdvectionSchmid_NoMech_DS
+    type = ConservativeAdvectionSchmid_NoMech_DS_patternKer
     variable = edge_dislo_den_neg_1
     upwinding_type = full
       dislo_character = edge_00
@@ -118,7 +118,7 @@
   # []
   # [Edge_Pos_Flux_2]
   #   implicit = false
-  #   type = ConservativeAdvectionSchmid_NoMech_DS
+  #   type = ConservativeAdvectionSchmid_NoMech_DS_patternKer
   #   variable = edge_dislo_den_pos_2
   #   upwinding_type = none
   #     dislo_character = edge_90
@@ -132,7 +132,7 @@
   # []
   # [Edge_Neg_Flux_2]
   #   implicit = false
-  #   type = ConservativeAdvectionSchmid_NoMech_DS
+  #   type = ConservativeAdvectionSchmid_NoMech_DS_patternKer
   #   variable = edge_dislo_den_neg_2
   #   upwinding_type = none
   #     dislo_character = edge_90
@@ -144,23 +144,23 @@
 
 [DGKernels]
 
-  [dg_edge_pos_1]
-    implicit = false
-    type = DGAdvectionCoupled_NoMech_DS
-    variable = edge_dislo_den_pos_1
-      dislo_character = edge_00
-      dislo_sign = positive
-      slip_sys_index = 0
-  []
+  # [dg_edge_pos_1]
+  #   implicit = false
+  #   type = DGAdvectionCoupled_NoMech_DS
+  #   variable = edge_dislo_den_pos_1
+  #     dislo_character = edge_00
+  #     dislo_sign = positive
+  #     slip_sys_index = 0
+  # []
 
-  [dg_edge_neg_1]
-    implicit = false
-    type = DGAdvectionCoupled_NoMech_DS
-    variable = edge_dislo_den_neg_1
-      dislo_character = edge_00
-      dislo_sign = negative
-      slip_sys_index = 0
-  []
+  # [dg_edge_neg_1]
+  #   implicit = false
+  #   type = DGAdvectionCoupled_NoMech_DS
+  #   variable = edge_dislo_den_neg_1
+  #     dislo_character = edge_00
+  #     dislo_sign = negative
+  #     slip_sys_index = 0
+  # []
 
   # [dg_edge_pos_2]
   #   implicit = false
@@ -203,7 +203,7 @@
 
 [Materials]
   [vel]
-    type = DisloVelocity_DbSlip
+    type = DisloVelocity_DbSlip_patternMat
     nss = 1
     taualpha = 0.483
     gdot0 = 1.0e6
