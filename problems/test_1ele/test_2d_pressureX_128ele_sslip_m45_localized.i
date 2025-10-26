@@ -11,8 +11,8 @@
   [gen]
     type = GeneratedMeshGenerator
     dim = 2
-    nx = 200
-    ny = 200
+    nx = 128
+    ny = 128
     xmin = 0.0
     ymin = 0.0
     xmax = 1.011
@@ -60,7 +60,7 @@
   [./rho_edge_pos_1]
     type = FunctionIC
     variable = 'rho_edge_pos_1'
-    function = Gaussian_pxy
+    function = Gaussian_mxy
   []
   [./rho_edge_neg_1]
     type = FunctionIC
@@ -117,14 +117,16 @@
 
   [./Gaussian_pxy]
     type = ParsedFunction
-    expression = 'if(y=x, 0.001*16000.0 * exp(-((x-y)^2 / (2.0 * 0.0079^2)))  + 8000.0, 8000.0)'
-
-      # expression = 'if(, 0.001*16000.0 * exp(-((x-y)^2 / (2.0 * 0.0079^2)))  + 8000.0, 8000.0)'
+    # smooth Gaussian along the x=y diagonal (perp half-width = 0.0079)
+    # use (x-y) as rotated coordinate; exponent denominator uses 4*w^2 to give
+    # exp(-d_perp^2/(2*w^2)) where d_perp = |x-y|/sqrt(2)
+    expression = '0.001*16000.0 * exp(-((x - y)^2 / (4*0.0079^2))) + 8000.0'
   [../]
 
   [./Gaussian_mxy]
     type = ParsedFunction
-      expression = 'if(y=-x+1.011, 0.001*16000.0 * exp(-((x+y - 1.011)^2 / (2.0 * 0.0079^2)))  + 8000.0, 8000.0)'
+    # smooth Gaussian along the x+y=1.011 diagonal (perp half-width = 0.0079)
+    expression = '0.001*16000.0 * exp(-((x + y - 1.011)^2 / (4*0.0079^2))) + 8000.0'
   [../]
 
   [./Gaussian_along_p45]
@@ -154,30 +156,17 @@
 []
 
 [BCs]
-  # [right_x]
-  #   type = Pressure
-  #   variable = disp_x
-  #   boundary = 'right'
-  #   factor = -0.966 #-0.683
-  #   function = pressue_piecewise
-  # []
-
-  [top_x]
-    type = FunctionDirichletBC
+  [right_x]
+    type = Pressure
     variable = disp_x
-    boundary = 'top'
-    function = disp_load
+    boundary = 'right'
+    factor = -0.966 #-0.683
+    function = pressue_piecewise
   []
-  [top_y]
-    type = DirichletBC
-    variable = disp_y
-    boundary = 'top'
-    value = 0.0
-  []  
-  [bottom_x]
+  [left_x]
     type = DirichletBC
     variable = disp_x
-    boundary = 'bottom'
+    boundary = 'left'
     value = 0.0
   []
   [bottom_y]
@@ -186,19 +175,7 @@
     boundary = 'bottom'
     value = 0.0
   []
-
-
   [./Periodic]
-    [./auto_boundary_x]
-    variable = disp_x
-      auto_direction = 'x'
-    [../]
-
-    [./auto_boundary_y]
-    variable = disp_y
-      auto_direction = 'y'
-    [../]
-
     [./auto_rho_edge_pos_boundary_x_1]
     variable = rho_edge_pos_1
     auto_direction = 'x y'
@@ -438,7 +415,7 @@
   [./trial_xtalpl]
     type = CrystalPlasticityBussoUpdate_patternMat
     number_slip_systems = 1
-    slip_sys_file_name  = input_sslip_sys_al_p45.txt
+    slip_sys_file_name  = input_sslip_sys_al_m45.txt
       gdot0             = 1.0e6
       f0                = 2.77e-19
       boltzmann         = 1.38065e-23
@@ -567,7 +544,7 @@
 
 [Outputs]
   exodus = true
-  time_step_interval = 100
+  time_step_interval = 5
   [csv]
     type = CSV
     file_base = rhoe_x_out_h5

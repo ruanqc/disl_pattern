@@ -236,7 +236,6 @@
     boundary = 'bottom'
     value = 0.0
   []
-
   [top_x]
     type = FunctionDirichletBC
     variable = disp_x
@@ -250,13 +249,11 @@
     boundary = 'top'
     value = 0.0
   []
-
   [./Periodic]
     [./auto_boundary_x]
       variable = disp_x
       auto_direction = 'x'
     [../]
-
     [./auto_boundary_y]
       variable = disp_y
       auto_direction = 'x'
