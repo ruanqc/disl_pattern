@@ -5,7 +5,7 @@
 //* 6 Jan 2024
 
 // ruanqc 2025-08/09 modified for 2d patterning from CrystalPlasticityBussoUpdate.C 
-// temp version, updated 25-09-16
+// V251031
 
 #include "CrystalPlasticityBussoUpdate_patternMat.h"
 #include "libmesh/int_range.h"
@@ -434,14 +434,14 @@ CrystalPlasticityBussoUpdate_patternMat::calculateSlipRate()
 
 
     Real driving_force_p = std::abs(_tau[_qp][i] - _backstress(i) - _tau_d(i)) - _slip_resistance[_qp][i] * 
-                      (1.0 - _tauF_on * (rho_edge_pos[i] - rho_edge_neg[i]) / 
-                                                              std::max((rho_edge_pos[i] + rho_edge_neg[i]), _zero_tol)  //ruanqc avoid zero division  
-                      );    
+                                                            (1.0 - _tauF_on * (rho_edge_pos[i] - rho_edge_neg[i]) / 
+                                                            std::max((rho_edge_pos[i] + rho_edge_neg[i]), _zero_tol)  //ruanqc avoid zero division  
+                                                            );    
                       
     Real driving_force_m = std::abs(_tau[_qp][i] - _backstress(i) + _tau_d(i)) - _slip_resistance[_qp][i] * 
-                      (1.0 + _tauF_on * (rho_edge_pos[i] - rho_edge_neg[i]) / 
-                                                              std::max((rho_edge_pos[i] + rho_edge_neg[i]), _zero_tol)   //ruanqc avoid zero division
-                      );                          
+                                                            (1.0 + _tauF_on * (rho_edge_pos[i] - rho_edge_neg[i]) / 
+                                                            std::max((rho_edge_pos[i] + rho_edge_neg[i]), _zero_tol)   //ruanqc avoid zero division
+                                                            );                          
 
     // Real slip_increment_p = 0.0;
     // Real slip_increment_m = 0.0;
@@ -477,7 +477,7 @@ CrystalPlasticityBussoUpdate_patternMat::calculateSlipRate()
     // _slip_increment_p[_qp][i] = slip_increment_p;
     // _slip_increment_m[_qp][i] = slip_increment_m;
 
-    _slip_increment[_qp][i] = ( _slip_increment_p[_qp][i] +  _slip_increment_m[_qp][i]) ;
+    _slip_increment[_qp][i] = 0.5*( _slip_increment_p[_qp][i] +  _slip_increment_m[_qp][i]) ;
 
     if (std::abs(_slip_increment[_qp][i]) * _substep_dt > _slip_incr_tol)
     {
@@ -693,8 +693,23 @@ CrystalPlasticityBussoUpdate_patternMat::calculateConstitutiveSlipDerivative(std
 
   for (const auto i : make_range(_number_slip_systems))  //ruanqc added
   {
-    rho_edge_pos[i] = _edge_dislo_den_pos_1[_qp]; // Coupled rhoep
-    rho_edge_neg[i] = _edge_dislo_den_neg_1[_qp]; // Coupled rhoen
+    // assign the correct coupled variables per slip system
+    if (i == 0)
+    {
+      rho_edge_pos[i] = _edge_dislo_den_pos_1[_qp]; // Coupled rhoep
+      rho_edge_neg[i] = _edge_dislo_den_neg_1[_qp]; // Coupled rhoen
+    }
+    else if (i == 1)
+    {
+      rho_edge_pos[i] = _edge_dislo_den_pos_2[_qp]; // Coupled rhoep
+      rho_edge_neg[i] = _edge_dislo_den_neg_2[_qp]; // Coupled rhoen
+    }
+    else
+    {
+      // Future slip systems: default to zero (or extend if more coupled vars are added)
+      rho_edge_pos[i] = 0.0;
+      rho_edge_neg[i] = 0.0;
+    }
 
     if (rho_edge_pos[i] <= _zero_tol)
       rho_edge_pos[i] = 0.0;
@@ -710,29 +725,6 @@ CrystalPlasticityBussoUpdate_patternMat::calculateConstitutiveSlipDerivative(std
   Real theta = _temperature + 273.15;
   for (const auto i : make_range(_number_slip_systems))
   {
-    // Real driving_force = std::abs(_tau[_qp][i] - _backstress(i)) - _slip_resistance[_qp][i];
-    // // Real driving_force = std::abs(_tau[_qp][i] - _backstress(i) - _tau_d(i)) - _slip_resistance[_qp][i] * 
-    // //                   (1.0 - _tauF_on * (rho_edge_pos[i] - rho_edge_neg[i]) / (rho_edge_pos[i] + rho_edge_neg[i]) );   
-
-    // Real u = 0.0, uprime = 0.0, vprime = 0.0;
-    // if (driving_force < _zero_tol)
-    //   dslip_dtau[i] = 0.0;
-    // else
-    // {
-    //   u = driving_force / _tau_0;
-      
-    //   uprime = std::pow(u, _p - 1.0) * std::copysign(1.0, (_tau[_qp][i] - _backstress(i)));
-    //   // uprime = std::pow(u, _p - 1.0) * std::copysign(1.0, (_tau[_qp][i] - _backstress(i) - _tau_d(i)));
-    //   vprime = std::pow((1.0 - std::pow(u, _p)), _q - 1.0);
-
-    //   dslip_dtau[i] = _gdot0*std::exp(-_f0 / _boltzmann / theta * std::pow((1.0 - std::pow(u, _p)), _q)) *
-    //                   _p * _q * _f0 / _boltzmann / theta *
-    //                   vprime * uprime *  _substep_dt;
-
-    // }
-    // // mooseWarning("tau=",_tau[_qp][i]);
-
-
     Real driving_force_p = std::abs(_tau[_qp][i] - _backstress(i) - _tau_d(i)) - _slip_resistance[_qp][i] * 
                       (1.0 - _tauF_on * (rho_edge_pos[i] - rho_edge_neg[i]) / 
                                         std::max((rho_edge_pos[i] + rho_edge_neg[i]), _zero_tol) 

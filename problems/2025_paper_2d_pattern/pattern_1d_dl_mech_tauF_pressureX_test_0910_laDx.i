@@ -11,8 +11,8 @@
   [gen]
     type = GeneratedMeshGenerator
     dim = 2
-    nx = 1
-    ny = 1
+    nx = 50
+    ny = 50
     xmin = 0.0
     ymin = 0.0
     xmax = 1.011
@@ -34,25 +34,21 @@
   [rho_edge_pos_1]
     order = FIRST
     family = LAGRANGE
-    initial_condition = 4000.0
     block = '0'
   []
   [rho_edge_neg_1]
     order = FIRST
     family = LAGRANGE
-    initial_condition = 4000.0
     block = '0'
   []
     [rho_edge_pos_2]
     order = FIRST
     family = LAGRANGE
-    initial_condition = 4000.0
     block = '0'
   []
   [rho_edge_neg_2]
     order = FIRST
     family = LAGRANGE
-    initial_condition = 4000.0
     block = '0'
   []
 []
@@ -79,35 +75,34 @@
   #   function = Gaussian_xy
   # []  
 
-  # [./rho_edge_pos_1]
-  #   type = RandomIC
-  #   variable = 'rho_edge_pos_1'
-  #   min = ${fparse 4000.0 - 4000.0*1.732*0.01}
-  #   max = ${fparse 4000.0 + 4000.0*1.732*0.01}
-  #   seed = 128
-  # []
-  # [./rho_edge_neg_1]
-  #   type = RandomIC
-  #   variable = 'rho_edge_neg_1'
-  #   min = ${fparse 4000.0 - 4000.0*1.732*0.01}
-  #   max = ${fparse 4000.0 + 4000.0*1.732*0.01}
-  #   seed = 128
-  # []
-  # [./rho_edge_pos_2]
-  #   type = RandomIC
-  #   variable = 'rho_edge_pos_2'
-  #   min = ${fparse 4000.0 - 4000.0*1.732*0.01}
-  #   max = ${fparse 4000.0 + 4000.0*1.732*0.01}
-  #   seed = 128
-  # []
-  # [./rho_edge_neg_2]
-  #   type = RandomIC
-  #   variable = 'rho_edge_neg_2'
-  #   min = ${fparse 4000.0 - 4000.0*1.732*0.01}
-  #   max = ${fparse 4000.0 + 4000.0*1.732*0.01}
-  #   seed = 128
-  # []  
-
+  [./rho_edge_pos_1]
+    type = RandomIC
+    variable = 'rho_edge_pos_1'
+    min = ${fparse 4000.0 - 4000.0*1.732*0.01}
+    max = ${fparse 4000.0 + 4000.0*1.732*0.01}
+    seed = 41
+  []
+  [./rho_edge_neg_1]
+    type = RandomIC
+    variable = 'rho_edge_neg_1'
+    min = ${fparse 4000.0 - 4000.0*1.732*0.01}
+    max = ${fparse 4000.0 + 4000.0*1.732*0.01}
+    seed = 41
+  []
+  [./rho_edge_pos_2]
+    type = RandomIC
+    variable = 'rho_edge_pos_2'
+    min = ${fparse 4000.0 - 4000.0*1.732*0.01}
+    max = ${fparse 4000.0 + 4000.0*1.732*0.01}
+    seed = 42
+  []
+  [./rho_edge_neg_2]
+    type = RandomIC
+    variable = 'rho_edge_neg_2'
+    min = ${fparse 4000.0 - 4000.0*1.732*0.01}
+    max = ${fparse 4000.0 + 4000.0*1.732*0.01}
+    seed = 42
+  []  
 []
 
 [Functions]
@@ -139,26 +134,25 @@
 []
 
 [BCs]
-  [right_x]
-    type = Pressure
-    variable = disp_x
-    boundary = 'right'
-    factor = -0.966 #-0.683
-    function = pressue_piecewise
-  []
-
   [left_x]
     type = DirichletBC
     variable = disp_x
     boundary = 'left'
     value = 0.0
   []
-
   [bottom_y]
     type = DirichletBC
     variable = disp_y
     boundary = 'bottom'
     value = 0.0
+  []
+
+  [right_x]
+    type = Pressure
+    variable = disp_x
+    boundary = 'right'
+    factor = -0.966 #-0.683
+    function = pressue_piecewise
   []
 
   [./Periodic]
@@ -189,8 +183,6 @@
      variable = rho_edge_neg_2
     auto_direction = 'x y'
     [../]
-
-
   [../]
 []
 
@@ -210,12 +202,7 @@
     family = MONOMIAL
     block = '0'
   [../]
-  [./slip_increment1]
-   order = CONSTANT
-   family = MONOMIAL
-   block = '0'
-  [../]
-  [./slip_increment2]
+  [./slip_increment]
    order = CONSTANT
    family = MONOMIAL
    block = '0'
@@ -229,19 +216,7 @@
    order = CONSTANT
    family = MONOMIAL
    block = '0'
-  [../]    
-  [./rss_1]                 #Name shown in Paraview
-   order = CONSTANT
-   family = MONOMIAL
-   block = '0'
   [../]
-
-  [./rss_2]                 #Name shown in Paraview
-   order = CONSTANT
-   family = MONOMIAL
-   block = '0'
-  [../]
-
 []
 
 
@@ -253,7 +228,6 @@
 []
 
 [Kernels]
-
   [Edeg_Pos_Time_Deri_1]
     type = MassLumpedTimeDerivative
     variable = rho_edge_pos_1
@@ -266,7 +240,6 @@
       slip_sys_index = 0
       dislo_character = edge
   []
-
   [Edeg_Neg_Time_Deri_1]
     type = MassLumpedTimeDerivative
     variable = rho_edge_neg_1
@@ -279,7 +252,6 @@
       slip_sys_index = 0
       dislo_character = edge
   []
-
   [Edeg_Pos_Time_Deri_2]
     type = MassLumpedTimeDerivative
     variable = rho_edge_pos_2
@@ -305,6 +277,7 @@
       slip_sys_index = 1
       dislo_character = edge
   []
+
 []
 
 [AuxKernels]
@@ -335,24 +308,14 @@
     execute_on = timestep_end
     block = '0'
   [../]
-  [./slip_increment1]
+  [./slip_inc]
    type = MaterialStdVectorAux
-   variable = slip_increment1
+   variable = slip_increment
    property = slip_increment
    index = 0
    execute_on = timestep_end
    block = '0'
   [../]
-
-  [./slip_increment2]
-   type = MaterialStdVectorAux
-   variable = slip_increment2
-   property = slip_increment
-   index = 1
-   execute_on = timestep_end
-   block = '0'
-  [../]
-
   [./dislo_vel]
    type = MaterialStdVectorAux
    variable = dislo_velocity
@@ -367,23 +330,7 @@
    property = accumulated_equivalent_plastic_strain
    execute_on = timestep_end
    block = '0'
-  [../]  
-
-  [./rss_1]                     #Name arbiarbitrary
-   type = MaterialStdVectorAux  #Use this for std::vector p
-   variable = rss_1             #Consistant with AuxVaribles
-   property = rss_qc         
-   index = 0
-   block = '0'
   [../]
-  [./rss_2]                     #Name arbiarbitrary
-   type = MaterialStdVectorAux  #Use this for std::vector p
-   variable = rss_2             #Consistant with AuxVaribles
-   property = rss_qc         
-   index = 1
-   block = '0'
-  [../]
-
 []
 
 [Materials]
@@ -405,7 +352,7 @@
   [./trial_xtalpl]
     type = CrystalPlasticityBussoUpdate_patternMat
     number_slip_systems = 2
-    slip_sys_file_name  = input_2slip_sys_al_4545.txt
+    slip_sys_file_name  = input_2slip_sys_al_45.txt
       gdot0             = 1.0e6
       f0                = 2.77e-19
       boltzmann         = 1.38065e-23
@@ -456,7 +403,7 @@
 
   start_time = 0.0
   end_time = 0.3 #0.01
-  dt = 5.e-6
+  dt = 1.e-8
   dtmin = 1.e-12
 []
 
@@ -481,6 +428,11 @@
     variable = exy
     block = '0'
   [../]
+  [./slip_increment]
+   type = ElementAverageValue
+   variable = slip_increment
+   block = '0'
+  [../]
   [./dislo_velocity]
    type = ElementAverageValue
    variable = dislo_velocity
@@ -504,27 +456,7 @@
   [./disp_x]
      type = NodalVariableValue
      variable = disp_x
-     nodeid = 1 #101
-  [../]
-  [./rss_1]
-     type = ElementAverageValue
-     variable = rss_1
-     block = '0'
-  [../]
-  [./rss_2]
-     type = ElementAverageValue
-     variable = rss_2
-     block = '0'
-  [../]
-    [./slip_increment1]
-   type = ElementAverageValue
-   variable = slip_increment1
-   block = '0'
-  [../]
-    [./slip_increment2]
-   type = ElementAverageValue
-   variable = slip_increment2
-   block = '0'
+     nodeid = 101
   [../]
 []
 
@@ -533,11 +465,10 @@
 
 [Outputs]
   exodus = true
-  time_step_interval = 100
+  time_step_interval = 200
   [csv]
     type = CSV
     file_base = rhoe_x_out_h5
     execute_on = final
   []
 []
-

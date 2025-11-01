@@ -11,8 +11,8 @@
   [gen]
     type = GeneratedMeshGenerator
     dim = 2
-    nx = 128
-    ny = 128
+    nx = 1
+    ny = 1
     xmin = 0.0
     ymin = 0.0
     xmax = 1.011
@@ -34,13 +34,13 @@
     order = FIRST
     family = LAGRANGE
     block = '0'
-    # initial_condition = 4000.0
+    initial_condition = 4000.0
   []
   [rho_edge_neg_1]
     order = FIRST
     family = LAGRANGE
     block = '0'
-    # initial_condition = 4000.0
+    initial_condition = 4000.0
   []
   #   [rho_edge_pos_2]
   #   order = SECOND
@@ -54,59 +54,6 @@
   #   # initial_condition = 4000.0
   #   block = '0'
   # []
-[]
-
-[ICs]
-  [./rho_edge_pos_1]
-    type = FunctionIC
-    variable = 'rho_edge_pos_1'
-    function = Gaussian_mxy
-  []
-  [./rho_edge_neg_1]
-    type = FunctionIC
-    variable = 'rho_edge_neg_1'
-    function = Gaussian_mxy
-  []
-  # [./rho_edge_pos_2]
-  #   type = FunctionIC
-  #   variable = 'rho_edge_pos_2'
-  #   function = Gaussian_xy
-  # []
-  # [./rho_edge_neg_2]
-  #   type = FunctionIC
-  #   variable = 'rho_edge_neg_2'
-  #   function = Gaussian_xy
-  # []  
-
-  # [./rho_edge_pos_1]
-  #   type = RandomIC
-  #   variable = 'rho_edge_pos_1'
-  #   min = ${fparse 4000.0 - 4000.0*1.732*0.01}
-  #   max = ${fparse 4000.0 + 4000.0*1.732*0.01}
-  #   seed = 128
-  # []
-  # [./rho_edge_neg_1]
-  #   type = RandomIC
-  #   variable = 'rho_edge_neg_1'
-  #   min = ${fparse 4000.0 - 4000.0*1.732*0.01}
-  #   max = ${fparse 4000.0 + 4000.0*1.732*0.01}
-  #   seed = 128
-  # []
-  # [./rho_edge_pos_2]
-  #   type = RandomIC
-  #   variable = 'rho_edge_pos_2'
-  #   min = ${fparse 4000.0 - 4000.0*1.732*0.01}
-  #   max = ${fparse 4000.0 + 4000.0*1.732*0.01}
-  #   seed = 128
-  # []
-  # [./rho_edge_neg_2]
-  #   type = RandomIC
-  #   variable = 'rho_edge_neg_2'
-  #   min = ${fparse 4000.0 - 4000.0*1.732*0.01}
-  #   max = ${fparse 4000.0 + 4000.0*1.732*0.01}
-  #   seed = 128
-  # []  
-
 []
 
 [Functions]
@@ -160,7 +107,7 @@
     type = Pressure
     variable = disp_x
     boundary = 'right'
-    factor = -0.966 #-0.683
+    factor = -0.683 #-0.683 -0.966
     function = pressue_piecewise
   []
   [left_x]
@@ -197,7 +144,12 @@
 []
 
 [AuxVariables]
-  [./pk2]
+  [./pk2_xx]
+    order = CONSTANT
+    family = MONOMIAL
+    block = '0'
+  [../]
+  [./pk2_xy]
     order = CONSTANT
     family = MONOMIAL
     block = '0'
@@ -465,7 +417,7 @@
   l_tol = 1e-3  #1e-5 
 
   start_time = 0.0
-  end_time = 0.3 #0.01
+  end_time = 0.10 #0.01
   dt = 5.e-6
   dtmin = 1.e-12
 []
@@ -544,7 +496,7 @@
 
 [Outputs]
   exodus = true
-  time_step_interval = 5
+  time_step_interval = 200
   [csv]
     type = CSV
     file_base = rhoe_x_out_h5

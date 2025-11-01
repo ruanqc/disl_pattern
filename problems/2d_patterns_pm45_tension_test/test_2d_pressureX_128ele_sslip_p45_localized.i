@@ -11,8 +11,8 @@
   [gen]
     type = GeneratedMeshGenerator
     dim = 2
-    nx = 128
-    ny = 128
+    nx = 60
+    ny = 60
     xmin = 0.0
     ymin = 0.0
     xmax = 1.011
@@ -160,7 +160,7 @@
     type = Pressure
     variable = disp_x
     boundary = 'right'
-    factor = -0.966 #-0.683
+    factor = -0.683 #-0.683 0.966
     function = pressue_piecewise
   []
  
