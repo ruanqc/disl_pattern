@@ -221,29 +221,22 @@
 
 [BCs]
   [./Periodic]
-    [./auto_boundary_edge_pos_1_x]
+    [./auto_boundary_edge_pos_1]
       variable = edge_dislo_den_pos_1
-      auto_direction = 'x'
+      auto_direction = 'x y'
     [../]
-    [./auto_boundary_edge_neg_1_x]
+    [./auto_boundary_edge_neg_1]
       variable = edge_dislo_den_neg_1
-      auto_direction = 'x'
+      auto_direction = 'x y'
     [../]
-    [./auto_boundary_edge_pos_1_y]
-      variable = edge_dislo_den_pos_1
-      auto_direction = 'y'
-    [../]
-    [./auto_boundary_edge_neg_1_y]
-      variable = edge_dislo_den_neg_1
-      auto_direction = 'y'
-    [../]
-    # [./auto_boundary_edge_pos_2]
+
+    # [./auto_boundary_edge_pos_1]
     #   variable = edge_dislo_den_pos_2
-    #   auto_direction = 'y'
+    #   auto_direction = 'x y'
     # [../]
-    # [./auto_boundary_edge_neg_2]
+    # [./auto_boundary_edge_neg_1]
     #   variable = edge_dislo_den_neg_2
-    #   auto_direction = 'y'
+    #   auto_direction = 'x y'
     # [../]
   [../]
 []

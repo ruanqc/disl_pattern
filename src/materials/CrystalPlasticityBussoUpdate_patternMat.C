@@ -5,7 +5,7 @@
 //* 6 Jan 2024
 
 // ruanqc 2025-08/09 modified for 2d patterning from CrystalPlasticityBussoUpdate.C 
-// V251031
+// V251031, temp version 251105
 
 #include "CrystalPlasticityBussoUpdate_patternMat.h"
 #include "libmesh/int_range.h"
@@ -140,8 +140,8 @@ CrystalPlasticityBussoUpdate_patternMat::CrystalPlasticityBussoUpdate_patternMat
     _dislo_velocity(declareProperty<std::vector<Real>>("dislo_velocity")), // used for Kernals updated, ruanqc added info
 
     // ruanqc 2025-08/09 for patterning
-    _dislo_velocity_p(declareProperty<std::vector<Real>>("dislo_velocity_p")), // Dislocation velocity
-    _dislo_velocity_m(declareProperty<std::vector<Real>>("dislo_velocity_m")), // Dislocation velocity
+    _dislo_velocity_p(declareProperty<std::vector<Real>>("dislo_velocity_p")), // Dislocation velocity_p
+    _dislo_velocity_m(declareProperty<std::vector<Real>>("dislo_velocity_m")), // Dislocation velocity_m
 
     // ruanqc 2025-08/09 for patterning 
     _slip_increment_p(declareProperty<std::vector<Real>>("slip_increment_p")),
@@ -443,12 +443,11 @@ CrystalPlasticityBussoUpdate_patternMat::calculateSlipRate()
                                                             std::max((rho_edge_pos[i] + rho_edge_neg[i]), _zero_tol)   //ruanqc avoid zero division
                                                             );                          
 
-    // Real slip_increment_p = 0.0;
-    // Real slip_increment_m = 0.0;
+    Real _slip_increment_p[_qp][i] = 0.0;
+    Real _slip_increment_m[_qp][i] = 0.0;
                       
     if (driving_force_p < _zero_tol)
     {
-      // slip_increment_p = 0.0;
       _slip_increment_p[_qp][i] = 0.0;
     }
     else
@@ -462,7 +461,6 @@ CrystalPlasticityBussoUpdate_patternMat::calculateSlipRate()
 
     if (driving_force_m < _zero_tol)
     {
-      // slip_increment_m = 0.0;
       _slip_increment_m[_qp][i] = 0.0;
     }
     else
@@ -474,9 +472,7 @@ CrystalPlasticityBussoUpdate_patternMat::calculateSlipRate()
           std::copysign(1.0, _tau[_qp][i] - _backstress(i) +  _tau_d(i));
     }
 
-    // _slip_increment_p[_qp][i] = slip_increment_p;
-    // _slip_increment_m[_qp][i] = slip_increment_m;
-
+    // total contribution from positive and negative dislocations to slip increment in Lp
     _slip_increment[_qp][i] = 0.5*( _slip_increment_p[_qp][i] +  _slip_increment_m[_qp][i]) ;
 
     if (std::abs(_slip_increment[_qp][i]) * _substep_dt > _slip_incr_tol)
@@ -622,26 +618,22 @@ CrystalPlasticityBussoUpdate_patternMat::calculateDislocationVelocity()
 
     if (driving_force_p > _zero_tol)
     {  
-      // _dislo_velocity[_qp][i] = _slip_increment[_qp][i] / _burgers / total_dislocation_density;
       _dislo_velocity_p[_qp][i] =  _slip_increment_p[_qp][i] / _burgers / 
-                                                              std::max((rho_edge_pos[i] + rho_edge_neg[i]), _zero_tol );    //ruanqc avoid zero division
+                                                              std::max((rho_edge_pos[i] + rho_edge_neg[i]), _zero_tol );    //zero_tol -ruanqc avoid zero division
     }
     else
     {  
-      // _dislo_velocity[_qp][i] = 0.0;
       _dislo_velocity_p[_qp][i] = 0.0;
     }
 
 
     if (driving_force_m > _zero_tol)
     {  
-      // _dislo_velocity[_qp][i] = _slip_increment[_qp][i] / _burgers / total_dislocation_density;
       _dislo_velocity_m[_qp][i] = _slip_increment_m[_qp][i] / _burgers / 
-                                                              std::max((rho_edge_pos[i] + rho_edge_neg[i]), _zero_tol );    // ruanqc modified to avoid zero division in denominator      
+                                                              std::max((rho_edge_pos[i] + rho_edge_neg[i]), _zero_tol );         
     }
     else
     {  
-      // _dislo_velocity[_qp][i] = 0.0;
       _dislo_velocity_m[_qp][i] = 0.0;
     }
   }

@@ -11,99 +11,49 @@
   [gen]
     type = GeneratedMeshGenerator
     dim = 2
-    nx = 60
-    ny = 60
+    nx = 1
+    ny = 1
     xmin = 0.0
     ymin = 0.0
     xmax = 1.011
     ymax = 1.011
-    elem_type = 'QUAD4'
+    elem_type = 'QUAD9'   #QUAD4
   []
 []
 
-
 [Variables]
   [disp_x]
-    order = FIRST
+    order = SECOND
       family = LAGRANGE
   []
   [disp_y]
-    order = FIRST
+    order = SECOND
       family = LAGRANGE
   []
   [rho_edge_pos_1]
     order = FIRST
     family = LAGRANGE
     block = '0'
+    initial_condition = 4000.0
   []
   [rho_edge_neg_1]
     order = FIRST
     family = LAGRANGE
     block = '0'
+    initial_condition = 4000.0
   []
-    [rho_edge_pos_2]
-    order = FIRST
-    family = LAGRANGE
-    block = '0'
-  []
-  [rho_edge_neg_2]
-    order = FIRST
-    family = LAGRANGE
-    block = '0'
-  []
-[]
-
-[ICs]
-  # [./rho_edge_pos_1]
-  #   type = FunctionIC
-  #   variable = 'rho_edge_pos_1'
-  #   function = Gaussian_xy
+  #   [rho_edge_pos_2]
+  #   order = SECOND
+  #   family = LAGRANGE
+  #   # initial_condition = 4000.0
+  #   block = '0'
   # []
-  # [./rho_edge_neg_1]
-  #   type = FunctionIC
-  #   variable = 'rho_edge_neg_1'
-  #   function = Gaussian_xy
+  # [rho_edge_neg_2]
+  #   order = SECOND
+  #   family = LAGRANGE
+  #   # initial_condition = 4000.0
+  #   block = '0'
   # []
-  # [./rho_edge_pos_2]
-  #   type = FunctionIC
-  #   variable = 'rho_edge_pos_2'
-  #   function = Gaussian_xy
-  # []
-  # [./rho_edge_neg_2]
-  #   type = FunctionIC
-  #   variable = 'rho_edge_neg_2'
-  #   function = Gaussian_xy
-  # []  
-
-  [./rho_edge_pos_1]
-    type = RandomIC
-    variable = 'rho_edge_pos_1'
-    min = ${fparse 4000.0 - 4000.0*1.732*0.01}
-    max = ${fparse 4000.0 + 4000.0*1.732*0.01}
-    seed = 128
-  []
-  [./rho_edge_neg_1]
-    type = RandomIC
-    variable = 'rho_edge_neg_1'
-    min = ${fparse 4000.0 - 4000.0*1.732*0.01}
-    max = ${fparse 4000.0 + 4000.0*1.732*0.01}
-    seed = 128
-  []
-  [./rho_edge_pos_2]
-    type = RandomIC
-    variable = 'rho_edge_pos_2'
-    min = ${fparse 4000.0 - 4000.0*1.732*0.01}
-    max = ${fparse 4000.0 + 4000.0*1.732*0.01}
-    seed = 128
-  []
-  [./rho_edge_neg_2]
-    type = RandomIC
-    variable = 'rho_edge_neg_2'
-    min = ${fparse 4000.0 - 4000.0*1.732*0.01}
-    max = ${fparse 4000.0 + 4000.0*1.732*0.01}
-    seed = 128
-  []  
-
 []
 
 [Functions]
@@ -112,19 +62,37 @@
     expression = 'if(abs(x - 1.011) < 0.0079, 0.001*16000.0 * exp(-((x - 1.011)^2 / (2.0 * 0.0079^2))) + 8000.0, 8000.0)'
   [../]
 
-  [./Gaussian_y]
+  [./Gaussian_pxy]
     type = ParsedFunction
-    expression = 'if(abs(y - 1.011) < 0.0079, 0.001*16000.0 * exp(-((y - 1.011)^2 / (2.0 * 0.0079^2))) + 8000.0, 8000.0)'
+    # smooth Gaussian along the x=y diagonal (perp half-width = 0.0079)
+    # use (x-y) as rotated coordinate; exponent denominator uses 4*w^2 to give
+    # exp(-d_perp^2/(2*w^2)) where d_perp = |x-y|/sqrt(2)
+    expression = '0.001*16000.0 * exp(-((x - y)^2 / (4*0.0079^2))) + 8000.0'
   [../]
 
-  [./Gaussian_xy]
+  [./Gaussian_mxy]
     type = ParsedFunction
-      expression = 'if((abs(x - 1.011) < 0.0079) * (abs(y - 1.011) < 0.0079), 0.001*16000.0 * exp(-((x - 1.011)^2 / (2.0 * 0.0079^2))) * exp(-((y - 1.011)^2 / (2.0 * 0.0079^2))) + 8000.0, 8000.0)'
+    # smooth Gaussian along the x+y=1.011 diagonal (perp half-width = 0.0079)
+    expression = '0.001*16000.0 * exp(-((x + y - 1.011)^2 / (4*0.0079^2))) + 8000.0'
+  [../]
+
+  [./Gaussian_along_p45]
+    type = ParsedFunction
+    # +45 deg: long axis along (1,1), short axis along (1,-1)
+    # short-axis width set to ~0.0079, long-axis extended to ~0.02
+    expression = 'if((abs((x - 1.011) + (y - 1.011)) < 0.02) * (abs((x - 1.011) - (y - 1.011)) < 0.0079), 0.001*16000.0 * exp(- ( ((x - 1.011 + (y - 1.011))^2) / (4*0.02^2) + ((x - 1.011 - (y - 1.011))^2) / (4*0.0079^2) ) ) + 8000.0, 8000.0)'
+  [../]
+
+  [./Gaussian_along_m45]
+    type = ParsedFunction
+    # -45 deg: long axis along (1,-1), short axis along (1,1)
+    # short-axis width set to ~0.0079, long-axis extended to ~0.02
+    expression = 'if((abs((x - 1.011) - (y - 1.011)) < 0.02) * (abs((x - 1.011) + (y - 1.011)) < 0.0079), 0.001*16000.0 * exp(- ( ((x - 1.011 - (y - 1.011))^2) / (4*0.02^2) + ((x - 1.011 + (y - 1.011))^2) / (4*0.0079^2) ) ) + 8000.0, 8000.0)'
   [../]
 
   [./disp_load]
     type = ParsedFunction
-    expression = '0.05*2.022*t'
+    expression = '0.1*1.011*t'
   [../]
 
   [./pressue_piecewise]
@@ -135,39 +103,39 @@
 []
 
 [BCs]
-  [right_x]
-    type = Pressure
+  [top_x]
+    type = FunctionDirichletBC
     variable = disp_x
-    boundary = 'right'
-    factor = -0.966 #-0.683
-    function = pressue_piecewise
+    boundary = 'top'
+    function = disp_load
   []
-
-  [left_x]
+  [top_y]
+    type = DirichletBC
+    variable = disp_y
+    boundary = 'top'
+    value = 0.0
+  []  
+  [bottom_x]
     type = DirichletBC
     variable = disp_x
-    boundary = 'left'
+    boundary = 'bottom'
     value = 0.0
   []
-
   [bottom_y]
     type = DirichletBC
     variable = disp_y
     boundary = 'bottom'
     value = 0.0
   []
-
   [./Periodic]
     # [./auto_boundary_x]
     # variable = disp_x
     #   auto_direction = 'x'
     # [../]
-
     # [./auto_boundary_y]
     # variable = disp_y
     #   auto_direction = 'y'
     # [../]
-
     [./auto_rho_edge_pos_boundary_x_1]
     variable = rho_edge_pos_1
     auto_direction = 'x y'
@@ -176,22 +144,24 @@
      variable = rho_edge_neg_1
     auto_direction = 'x y'
     [../]
-
-    [./auto_rho_edge_pos_boundary_x_2]
-    variable = rho_edge_pos_2
-    auto_direction = 'x y'
-    [../]
-    [./auto_rho_edge_neg_boundary_x_2]
-     variable = rho_edge_neg_2
-    auto_direction = 'x y'
-    [../]
-
-
+    # [./auto_rho_edge_pos_boundary_x_2]
+    # variable = rho_edge_pos_2
+    # auto_direction = 'x y'
+    # [../]
+    # [./auto_rho_edge_neg_boundary_x_2]
+    #  variable = rho_edge_neg_2
+    # auto_direction = 'x y'
+    # [../]
   [../]
 []
 
 [AuxVariables]
-  [./pk2]
+  [./pk2_xx]
+    order = CONSTANT
+    family = MONOMIAL
+    block = '0'
+  [../]
+  [./pk2_xy]
     order = CONSTANT
     family = MONOMIAL
     block = '0'
@@ -222,34 +192,24 @@
    block = '0'
   [../]
 
-  [./slipInc0_p45]
+  [./slip_increment1]
    order = CONSTANT
    family = MONOMIAL
    block = '0'
   [../]
-  [./slipInc0_m45]
-   order = CONSTANT
-   family = MONOMIAL
-   block = '0'
-  [../]    
-  [./slipInc1_p45]
-   order = CONSTANT
-   family = MONOMIAL
-   block = '0'
-  [../]
-  [./slipInc1_m45]
+  [./slip_increment2]
    order = CONSTANT
    family = MONOMIAL
    block = '0'
   [../]   
 
-  [./rss_0]                 #Name shown in Paraview
+  [./rss_1]                 #Name shown in Paraview
    order = CONSTANT
    family = MONOMIAL
    block = '0'
   [../]
 
-  [./rss_1]                 #Name shown in Paraview
+  [./rss_2]                 #Name shown in Paraview
    order = CONSTANT
    family = MONOMIAL
    block = '0'
@@ -293,41 +253,50 @@
       dislo_character = edge
   []
 
-  [Edeg_Pos_Time_Deri_2]
-    type = MassLumpedTimeDerivative
-    variable = rho_edge_pos_2
-  []
-  [Edge_Pos_Flux_2]
-    type = ConservativeAdvectionSchmidNoSSD_patternKer
-    variable = rho_edge_pos_2
-    upwinding_type = full
-      dislo_sign = positive
-      slip_sys_index = 1
-      dislo_character = edge
-  []
+  # [Edeg_Pos_Time_Deri_2]
+  #   type = MassLumpedTimeDerivative
+  #   variable = rho_edge_pos_2
+  # []
+  # [Edge_Pos_Flux_2]
+  #   type = ConservativeAdvectionSchmidNoSSD_patternKer
+  #   variable = rho_edge_pos_2
+  #   upwinding_type = full
+  #     dislo_sign = positive
+  #     slip_sys_index = 1
+  #     dislo_character = edge
+  # []
 
-  [Edeg_Neg_Time_Deri_2]
-    type = MassLumpedTimeDerivative
-    variable = rho_edge_neg_2
-  []
-  [Edge_Neg_Flux_2]
-    type = ConservativeAdvectionSchmidNoSSD_patternKer
-    variable = rho_edge_neg_2
-    upwinding_type = full
-      dislo_sign = negative
-      slip_sys_index = 1
-      dislo_character = edge
-  []
+  # [Edeg_Neg_Time_Deri_2]
+  #   type = MassLumpedTimeDerivative
+  #   variable = rho_edge_neg_2
+  # []
+  # [Edge_Neg_Flux_2]
+  #   type = ConservativeAdvectionSchmidNoSSD_patternKer
+  #   variable = rho_edge_neg_2
+  #   upwinding_type = full
+  #     dislo_sign = negative
+  #     slip_sys_index = 1
+  #     dislo_character = edge
+  # []
 
 []
 
 [AuxKernels]
-  [./pk2]
+  [./pk2_xx]
    type = RankTwoAux
-   variable = pk2
+   variable = pk2_xx
    rank_two_tensor = second_piola_kirchhoff_stress
    index_j = 0
    index_i = 0
+   execute_on = timestep_end
+   block = '0'
+  [../]
+  [./pk2_xy]
+   type = RankTwoAux
+   variable = pk2_xy
+   rank_two_tensor = second_piola_kirchhoff_stress
+   index_j = 0
+   index_i = 1
    execute_on = timestep_end
    block = '0'
   [../]
@@ -349,14 +318,24 @@
     execute_on = timestep_end
     block = '0'
   [../]
-  [./slip_inc]
+  [./slip_increment1]
    type = MaterialStdVectorAux
-   variable = slip_increment
+   variable = slip_increment1
    property = slip_increment
    index = 0
    execute_on = timestep_end
    block = '0'
   [../]
+
+  [./slip_increment2]
+   type = MaterialStdVectorAux
+   variable = slip_increment2
+   property = slip_increment
+   index = 1
+   execute_on = timestep_end
+   block = '0'
+  [../]
+
   [./dislo_vel]
    type = MaterialStdVectorAux
    variable = dislo_velocity
@@ -373,49 +352,16 @@
    block = '0'
   [../]  
 
-  [./slip_out0]
-   type = MaterialStdVectorAux
-   variable = slipInc0_p45
-   property = slip_increment_p
-   index = '0'
-   execute_on = timestep_end
-   block = '0'
-  [../]
-  [./slip_out1]
-   type = MaterialStdVectorAux
-   variable = slipInc0_m45
-   property = slip_increment_m
-   index = '0'
-   execute_on = timestep_end
-   block = '0'
-  [../]
-  [./slip_out3]
-   type = MaterialStdVectorAux
-   variable = slipInc1_p45
-   property = slip_increment_p
-   index = '1'
-   execute_on = timestep_end
-   block = '0'
-  [../]
-  [./slip_out4]
-   type = MaterialStdVectorAux
-   variable = slipInc1_m45
-   property = slip_increment_m
-   index = '1'
-   execute_on = timestep_end
-   block = '0'
-  [../]
-
-  [./rss_0]                     #Name arbiarbitrary
+  [./rss_1]                     #Name arbiarbitrary
    type = MaterialStdVectorAux  #Use this for std::vector p
-   variable = rss_0             #Consistant with AuxVaribles
+   variable = rss_1             #Consistant with AuxVaribles
    property = rss_qc         
    index = 0
    block = '0'
   [../]
-  [./rss_1]                     #Name arbiarbitrary
+  [./rss_2]                     #Name arbiarbitrary
    type = MaterialStdVectorAux  #Use this for std::vector p
-   variable = rss_1             #Consistant with AuxVaribles
+   variable = rss_2             #Consistant with AuxVaribles
    property = rss_qc         
    index = 1
    block = '0'
@@ -426,7 +372,8 @@
 [Materials]
   [./elasticity_tensor]
     type = ComputeElasticityTensorCP
-    C_ijkl = '168.5e3 121.5e3 121.5e3 168.5e3 121.5e3 168.5e3 75.6e3 75.6e3 75.6e3'
+    # C_ijkl = '168.5e3 121.5e3 121.5e3 168.5e3 121.5e3 168.5e3 75.6e3 75.6e3 75.6e3'
+    C_ijkl = '151.5e3 113.5e3 113.5e3 151.5e3 113.5e3 151.5e3 63.6e3 63.6e3 63.6e3'  #Cu-750K, from Y.A. Chang(1966)JAP
     fill_method = symmetric9
     euler_angle_1 = 0.0
     euler_angle_2 = 0.0 
@@ -441,8 +388,8 @@
   [../]
   [./trial_xtalpl]
     type = CrystalPlasticityBussoUpdate_patternMat
-    number_slip_systems = 2
-    slip_sys_file_name  = input_2slip_sys_al_4545.txt
+    number_slip_systems = 1
+    slip_sys_file_name  = input_sslip_sys_al_p45.txt
       gdot0             = 1.0e6
       f0                = 2.77e-19
       boltzmann         = 1.38065e-23
@@ -461,8 +408,8 @@
 
     edge_dislo_den_pos_1 = rho_edge_pos_1
     edge_dislo_den_neg_1 = rho_edge_neg_1
-    edge_dislo_den_pos_2 = rho_edge_pos_2
-    edge_dislo_den_neg_2 = rho_edge_neg_2
+    # edge_dislo_den_pos_2 = rho_edge_pos_2
+    # edge_dislo_den_neg_2 = rho_edge_neg_2
     block = '0'
   [../]
 
@@ -492,8 +439,8 @@
   l_tol = 1e-3  #1e-5 
 
   start_time = 0.0
-  end_time = 0.3 #0.01
-  dt = 5.e-7
+  end_time = 0.30 #0.01
+  dt = 5.e-6
   dtmin = 1.e-12
 []
 
@@ -503,9 +450,14 @@
     variable = stress_xy
     block = '0'
   [../]
-  [./pk2]
+  [./pk2_xx]
    type = ElementAverageValue
-   variable = pk2
+   variable = pk2_xx
+   block = '0'
+  [../]
+  [./pk2_xy]
+   type = ElementAverageValue
+   variable = pk2_xy
    block = '0'
   [../]
   [./fp_xy]
@@ -518,11 +470,17 @@
     variable = exy
     block = '0'
   [../]
-  [./slip_increment]
+  [./slip_increment1]
    type = ElementAverageValue
-   variable = slip_increment
+   variable = slip_increment1
    block = '0'
   [../]
+    [./slip_increment2]
+   type = ElementAverageValue
+   variable = slip_increment2
+   block = '0'
+  [../]
+
   [./dislo_velocity]
    type = ElementAverageValue
    variable = dislo_velocity
@@ -546,16 +504,16 @@
   [./disp_x]
      type = NodalVariableValue
      variable = disp_x
-     nodeid = 101
-  [../]
-  [./rss_0]
-     type = ElementAverageValue
-     variable = rss_0
-     block = '0'
+     nodeid = 1 #101
   [../]
   [./rss_1]
      type = ElementAverageValue
      variable = rss_1
+     block = '0'
+  [../]
+  [./rss_2]
+     type = ElementAverageValue
+     variable = rss_2
      block = '0'
   [../]
 []
@@ -565,7 +523,7 @@
 
 [Outputs]
   exodus = true
-  time_step_interval = 10
+  time_step_interval = 200
   [csv]
     type = CSV
     file_base = rhoe_x_out_h5

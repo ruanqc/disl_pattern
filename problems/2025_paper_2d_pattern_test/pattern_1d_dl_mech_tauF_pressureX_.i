@@ -11,24 +11,30 @@
   [gen]
     type = GeneratedMeshGenerator
     dim = 2
-    nx = 50
-    ny = 50
+    nx = 60
+    ny = 60
     xmin = 0.0
     ymin = 0.0
     xmax = 1.011
     ymax = 1.011
-    elem_type = 'QUAD4'
+    elem_type = 'QUAD9'
   []
+  [./c_node]
+    type = ExtraNodesetGenerator
+    new_boundary = 'pinned_node'
+    nodes = '7257'
+    input = gen
+  [../]
 []
 
 
 [Variables]
   [disp_x]
-    order = FIRST
+    order = SECOND
       family = LAGRANGE
   []
   [disp_y]
-    order = FIRST
+    order = SECOND
       family = LAGRANGE
   []
   [rho_edge_pos_1]
@@ -54,27 +60,6 @@
 []
 
 [ICs]
-  # [./rho_edge_pos_1]
-  #   type = FunctionIC
-  #   variable = 'rho_edge_pos_1'
-  #   function = Gaussian_xy
-  # []
-  # [./rho_edge_neg_1]
-  #   type = FunctionIC
-  #   variable = 'rho_edge_neg_1'
-  #   function = Gaussian_xy
-  # []
-  # [./rho_edge_pos_2]
-  #   type = FunctionIC
-  #   variable = 'rho_edge_pos_2'
-  #   function = Gaussian_xy
-  # []
-  # [./rho_edge_neg_2]
-  #   type = FunctionIC
-  #   variable = 'rho_edge_neg_2'
-  #   function = Gaussian_xy
-  # []  
-
   [./rho_edge_pos_1]
     type = RandomIC
     variable = 'rho_edge_pos_1'
@@ -94,14 +79,14 @@
     variable = 'rho_edge_pos_2'
     min = ${fparse 4000.0 - 4000.0*1.732*0.01}
     max = ${fparse 4000.0 + 4000.0*1.732*0.01}
-    seed = 42
+    seed = 41
   []
   [./rho_edge_neg_2]
     type = RandomIC
     variable = 'rho_edge_neg_2'
     min = ${fparse 4000.0 - 4000.0*1.732*0.01}
     max = ${fparse 4000.0 + 4000.0*1.732*0.01}
-    seed = 42
+    seed = 41
   []  
 []
 
@@ -135,18 +120,12 @@
 
 [BCs]
   [left_x]
-    type = DirichletBC
+    type = Pressure
     variable = disp_x
     boundary = 'left'
-    value = 0.0
+    factor = -0.966 #-0.683
+    function = pressue_piecewise
   []
-  [bottom_y]
-    type = DirichletBC
-    variable = disp_y
-    boundary = 'bottom'
-    value = 0.0
-  []
-
   [right_x]
     type = Pressure
     variable = disp_x
@@ -154,17 +133,35 @@
     factor = -0.966 #-0.683
     function = pressue_piecewise
   []
+    [bottom_y]
+    type = DirichletBC
+    variable = disp_y
+    boundary = 'bottom'
+    value = 0.0
+  []
+#  [pin_center_x]
+#     type = DirichletBC
+#     variable = disp_x
+#     boundary = 'pinned_node'
+#     value = 0.0
+#   []
+#   [pin_center_y]
+#     type = DirichletBC
+#     variable = disp_y
+#     boundary = 'pinned_node'
+#     value = 0.0
+#   []
 
   [./Periodic]
-    # [./auto_boundary_x]
-    # variable = disp_x
-    #   auto_direction = 'x'
-    # [../]
+    [./auto_boundary_x]
+    variable = disp_x
+      auto_direction = 'x'
+    [../]
 
-    # [./auto_boundary_y]
-    # variable = disp_y
-    #   auto_direction = 'y'
-    # [../]
+    [./auto_boundary_y]
+    variable = disp_y
+      auto_direction = 'y'
+    [../]
 
     [./auto_rho_edge_pos_boundary_x_1]
     variable = rho_edge_pos_1
@@ -465,7 +462,7 @@
 
 [Outputs]
   exodus = true
-  time_step_interval = 200
+  time_step_interval = 2
   [csv]
     type = CSV
     file_base = rhoe_x_out_h5

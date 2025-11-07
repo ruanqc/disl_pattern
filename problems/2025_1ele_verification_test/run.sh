@@ -3,7 +3,7 @@
 #mpiexec -n "$nproc" ../../disl_pattern-opt -i "$input"
 
 
-read -e -p "Enter input   .i : " input
+read -e -p "Enter input( .i ): " input
 mpiexec -n 3  ../../disl_pattern-opt -i "$input"
 
 
