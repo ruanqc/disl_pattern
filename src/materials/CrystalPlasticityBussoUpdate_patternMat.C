@@ -443,8 +443,8 @@ CrystalPlasticityBussoUpdate_patternMat::calculateSlipRate()
                                                             std::max((rho_edge_pos[i] + rho_edge_neg[i]), _zero_tol)   //ruanqc avoid zero division
                                                             );                          
 
-    Real _slip_increment_p[_qp][i] = 0.0;
-    Real _slip_increment_m[_qp][i] = 0.0;
+    // Real _slip_increment_p[_qp][i] = 0.0;
+    // Real _slip_increment_m[_qp][i] = 0.0;
                       
     if (driving_force_p < _zero_tol)
     {
