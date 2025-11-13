@@ -42,18 +42,18 @@
     block = '0'
     initial_condition = 4000.0
   []
-  #   [rho_edge_pos_2]
-  #   order = SECOND
-  #   family = LAGRANGE
-  #   # initial_condition = 4000.0
-  #   block = '0'
-  # []
-  # [rho_edge_neg_2]
-  #   order = SECOND
-  #   family = LAGRANGE
-  #   # initial_condition = 4000.0
-  #   block = '0'
-  # []
+    [rho_edge_pos_2]
+    order = FIRST
+    family = LAGRANGE
+    initial_condition = 4000.0
+    block = '0'
+  []
+  [rho_edge_neg_2]
+    order = FIRST
+    family = LAGRANGE
+    initial_condition = 4000.0
+    block = '0'
+  []
 []
 
 [Functions]
@@ -103,22 +103,17 @@
 []
 
 [BCs]
-  [top_x]
-    type = FunctionDirichletBC
+  [right_x]
+    type = Pressure
     variable = disp_x
-    boundary = 'top'
-    function = disp_load
+    boundary = 'right'
+    factor = -0.683 #-0.683 -0.966
+    function = pressue_piecewise
   []
-  [top_y]
-    type = DirichletBC
-    variable = disp_y
-    boundary = 'top'
-    value = 0.0
-  []  
-  [bottom_x]
+  [left_x]
     type = DirichletBC
     variable = disp_x
-    boundary = 'bottom'
+    boundary = 'left'
     value = 0.0
   []
   [bottom_y]
@@ -128,14 +123,6 @@
     value = 0.0
   []
   [./Periodic]
-    # [./auto_boundary_x]
-    # variable = disp_x
-    #   auto_direction = 'x'
-    # [../]
-    # [./auto_boundary_y]
-    # variable = disp_y
-    #   auto_direction = 'y'
-    # [../]
     [./auto_rho_edge_pos_boundary_x_1]
     variable = rho_edge_pos_1
     auto_direction = 'x y'
@@ -144,24 +131,20 @@
      variable = rho_edge_neg_1
     auto_direction = 'x y'
     [../]
-    # [./auto_rho_edge_pos_boundary_x_2]
-    # variable = rho_edge_pos_2
-    # auto_direction = 'x y'
-    # [../]
-    # [./auto_rho_edge_neg_boundary_x_2]
-    #  variable = rho_edge_neg_2
-    # auto_direction = 'x y'
-    # [../]
+
+    [./auto_rho_edge_pos_boundary_x_2]
+    variable = rho_edge_pos_2
+    auto_direction = 'x y'
+    [../]
+    [./auto_rho_edge_neg_boundary_x_2]
+     variable = rho_edge_neg_2
+    auto_direction = 'x y'
+    [../]
   [../]
 []
 
 [AuxVariables]
-  [./pk2_xx]
-    order = CONSTANT
-    family = MONOMIAL
-    block = '0'
-  [../]
-  [./pk2_xy]
+  [./pk2]
     order = CONSTANT
     family = MONOMIAL
     block = '0'
@@ -253,50 +236,41 @@
       dislo_character = edge
   []
 
-  # [Edeg_Pos_Time_Deri_2]
-  #   type = MassLumpedTimeDerivative
-  #   variable = rho_edge_pos_2
-  # []
-  # [Edge_Pos_Flux_2]
-  #   type = ConservativeAdvectionSchmidNoSSD_patternKer
-  #   variable = rho_edge_pos_2
-  #   upwinding_type = full
-  #     dislo_sign = positive
-  #     slip_sys_index = 1
-  #     dislo_character = edge
-  # []
+  [Edeg_Pos_Time_Deri_2]
+    type = MassLumpedTimeDerivative
+    variable = rho_edge_pos_2
+  []
+  [Edge_Pos_Flux_2]
+    type = ConservativeAdvectionSchmidNoSSD_patternKer
+    variable = rho_edge_pos_2
+    upwinding_type = full
+      dislo_sign = positive
+      slip_sys_index = 1
+      dislo_character = edge
+  []
 
-  # [Edeg_Neg_Time_Deri_2]
-  #   type = MassLumpedTimeDerivative
-  #   variable = rho_edge_neg_2
-  # []
-  # [Edge_Neg_Flux_2]
-  #   type = ConservativeAdvectionSchmidNoSSD_patternKer
-  #   variable = rho_edge_neg_2
-  #   upwinding_type = full
-  #     dislo_sign = negative
-  #     slip_sys_index = 1
-  #     dislo_character = edge
-  # []
+  [Edeg_Neg_Time_Deri_2]
+    type = MassLumpedTimeDerivative
+    variable = rho_edge_neg_2
+  []
+  [Edge_Neg_Flux_2]
+    type = ConservativeAdvectionSchmidNoSSD_patternKer
+    variable = rho_edge_neg_2
+    upwinding_type = full
+      dislo_sign = negative
+      slip_sys_index = 1
+      dislo_character = edge
+  []
 
 []
 
 [AuxKernels]
-  [./pk2_xx]
+  [./pk2]
    type = RankTwoAux
-   variable = pk2_xx
+   variable = pk2
    rank_two_tensor = second_piola_kirchhoff_stress
    index_j = 0
    index_i = 0
-   execute_on = timestep_end
-   block = '0'
-  [../]
-  [./pk2_xy]
-   type = RankTwoAux
-   variable = pk2_xy
-   rank_two_tensor = second_piola_kirchhoff_stress
-   index_j = 0
-   index_i = 1
    execute_on = timestep_end
    block = '0'
   [../]
@@ -372,8 +346,7 @@
 [Materials]
   [./elasticity_tensor]
     type = ComputeElasticityTensorCP
-    # C_ijkl = '168.5e3 121.5e3 121.5e3 168.5e3 121.5e3 168.5e3 75.6e3 75.6e3 75.6e3'
-    C_ijkl = '151.5e3 113.5e3 113.5e3 151.5e3 113.5e3 151.5e3 63.6e3 63.6e3 63.6e3'  #Cu-750K, from Y.A. Chang(1966)JAP
+    C_ijkl = '168.5e3 121.5e3 121.5e3 168.5e3 121.5e3 168.5e3 75.6e3 75.6e3 75.6e3'
     fill_method = symmetric9
     euler_angle_1 = 0.0
     euler_angle_2 = 0.0 
@@ -388,8 +361,8 @@
   [../]
   [./trial_xtalpl]
     type = CrystalPlasticityBussoUpdate_patternMat
-    number_slip_systems = 1
-    slip_sys_file_name  = input_sslip_sys_al_p45.txt
+    number_slip_systems = 2
+    slip_sys_file_name  = input_dslip_sys_al_pm45.txt
       gdot0             = 1.0e6
       f0                = 2.77e-19
       boltzmann         = 1.38065e-23
@@ -408,8 +381,8 @@
 
     edge_dislo_den_pos_1 = rho_edge_pos_1
     edge_dislo_den_neg_1 = rho_edge_neg_1
-    # edge_dislo_den_pos_2 = rho_edge_pos_2
-    # edge_dislo_den_neg_2 = rho_edge_neg_2
+    edge_dislo_den_pos_2 = rho_edge_pos_2
+    edge_dislo_den_neg_2 = rho_edge_neg_2
     block = '0'
   [../]
 
@@ -439,7 +412,7 @@
   l_tol = 1e-3  #1e-5 
 
   start_time = 0.0
-  end_time = 0.30 #0.01
+  end_time = 0.10 #0.01
   dt = 5.e-6
   dtmin = 1.e-12
 []
@@ -450,14 +423,9 @@
     variable = stress_xy
     block = '0'
   [../]
-  [./pk2_xx]
+  [./pk2]
    type = ElementAverageValue
-   variable = pk2_xx
-   block = '0'
-  [../]
-  [./pk2_xy]
-   type = ElementAverageValue
-   variable = pk2_xy
+   variable = pk2
    block = '0'
   [../]
   [./fp_xy]

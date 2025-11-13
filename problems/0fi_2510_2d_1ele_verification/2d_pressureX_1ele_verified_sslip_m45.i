@@ -11,8 +11,8 @@
   [gen]
     type = GeneratedMeshGenerator
     dim = 2
-    nx = 60
-    ny = 60
+    nx = 1
+    ny = 1
     xmin = 0.0
     ymin = 0.0
     xmax = 1.011
@@ -34,79 +34,26 @@
     order = FIRST
     family = LAGRANGE
     block = '0'
-    # initial_condition = 4000.0
+    initial_condition = 4000.0
   []
   [rho_edge_neg_1]
     order = FIRST
     family = LAGRANGE
     block = '0'
-    # initial_condition = 4000.0
+    initial_condition = 4000.0
   []
-    [rho_edge_pos_2]
-    order = FIRST
-    family = LAGRANGE
-    # initial_condition = 4000.0
-    block = '0'
-  []
-  [rho_edge_neg_2]
-    order = FIRST
-    family = LAGRANGE
-    # initial_condition = 4000.0
-    block = '0'
-  []
-[]
-
-[ICs]
-  [./rho_edge_pos_1]
-    type = FunctionIC
-    variable = 'rho_edge_pos_1'
-    function = Gaussian_mxy
-  []
-  [./rho_edge_neg_1]
-    type = FunctionIC
-    variable = 'rho_edge_neg_1'
-    function = Gaussian_mxy
-  []
-  [./rho_edge_pos_2]
-    type = FunctionIC
-    variable = 'rho_edge_pos_2'
-    function = Gaussian_pxy
-  []
-  [./rho_edge_neg_2]
-    type = FunctionIC
-    variable = 'rho_edge_neg_2'
-    function = Gaussian_pxy
-  []  
-
-  # [./rho_edge_pos_1]
-  #   type = RandomIC
-  #   variable = 'rho_edge_pos_1'
-  #   min = ${fparse 4000.0 - 4000.0*1.732*0.01}
-  #   max = ${fparse 4000.0 + 4000.0*1.732*0.01}
-  #   seed = 128
+  #   [rho_edge_pos_2]
+  #   order = SECOND
+  #   family = LAGRANGE
+  #   # initial_condition = 4000.0
+  #   block = '0'
   # []
-  # [./rho_edge_neg_1]
-  #   type = RandomIC
-  #   variable = 'rho_edge_neg_1'
-  #   min = ${fparse 4000.0 - 4000.0*1.732*0.01}
-  #   max = ${fparse 4000.0 + 4000.0*1.732*0.01}
-  #   seed = 128
+  # [rho_edge_neg_2]
+  #   order = SECOND
+  #   family = LAGRANGE
+  #   # initial_condition = 4000.0
+  #   block = '0'
   # []
-  # [./rho_edge_pos_2]
-  #   type = RandomIC
-  #   variable = 'rho_edge_pos_2'
-  #   min = ${fparse 4000.0 - 4000.0*1.732*0.01}
-  #   max = ${fparse 4000.0 + 4000.0*1.732*0.01}
-  #   seed = 128
-  # []
-  # [./rho_edge_neg_2]
-  #   type = RandomIC
-  #   variable = 'rho_edge_neg_2'
-  #   min = ${fparse 4000.0 - 4000.0*1.732*0.01}
-  #   max = ${fparse 4000.0 + 4000.0*1.732*0.01}
-  #   seed = 128
-  # []  
-
 []
 
 [Functions]
@@ -120,15 +67,13 @@
     # smooth Gaussian along the x=y diagonal (perp half-width = 0.0079)
     # use (x-y) as rotated coordinate; exponent denominator uses 4*w^2 to give
     # exp(-d_perp^2/(2*w^2)) where d_perp = |x-y|/sqrt(2)
-    expression = '0.01*4000.0 * exp(-((x - y)^2 / (4*0.0112^2))) + 4000.0'
+    expression = '0.001*16000.0 * exp(-((x - y)^2 / (4*0.0079^2))) + 8000.0'
   [../]
 
   [./Gaussian_mxy]
     type = ParsedFunction
-    # smooth Gaussian along the x=y diagonal (perp half-width = 0.0079)
-    # use (x-y) as rotated coordinate; exponent denominator uses 4*w^2 to give
-    # exp(-d_perp^2/(2*w^2)) where d_perp = |x-y|/sqrt(2)
-    expression = '0.01*4000.0 * exp(-((x + y - 1.011)^2 / (4*0.0112^2))) + 4000.0'
+    # smooth Gaussian along the x+y=1.011 diagonal (perp half-width = 0.0079)
+    expression = '0.001*16000.0 * exp(-((x + y - 1.011)^2 / (4*0.0079^2))) + 8000.0'
   [../]
 
   [./Gaussian_along_p45]
@@ -152,8 +97,8 @@
 
   [./pressue_piecewise]
     type = PiecewiseLinear
-    x = '0.0 1.0e-5  0.3'
-    y = '0.0 1.0     1.0'
+    x = '0.0 1e-4  0.3'
+    y = '0.0 1     1'
   [../]
 []
 
@@ -187,14 +132,14 @@
     auto_direction = 'x y'
     [../]
 
-    [./auto_rho_edge_pos_boundary_x_2]
-    variable = rho_edge_pos_2
-    auto_direction = 'x y'
-    [../]
-    [./auto_rho_edge_neg_boundary_x_2]
-     variable = rho_edge_neg_2
-    auto_direction = 'x y'
-    [../]
+    # [./auto_rho_edge_pos_boundary_x_2]
+    # variable = rho_edge_pos_2
+    # auto_direction = 'x y'
+    # [../]
+    # [./auto_rho_edge_neg_boundary_x_2]
+    #  variable = rho_edge_neg_2
+    # auto_direction = 'x y'
+    # [../]
   [../]
 []
 
@@ -291,31 +236,31 @@
       dislo_character = edge
   []
 
-  [Edeg_Pos_Time_Deri_2]
-    type = MassLumpedTimeDerivative
-    variable = rho_edge_pos_2
-  []
-  [Edge_Pos_Flux_2]
-    type = ConservativeAdvectionSchmidNoSSD_patternKer
-    variable = rho_edge_pos_2
-    upwinding_type = full
-      dislo_sign = positive
-      slip_sys_index = 1
-      dislo_character = edge
-  []
+  # [Edeg_Pos_Time_Deri_2]
+  #   type = MassLumpedTimeDerivative
+  #   variable = rho_edge_pos_2
+  # []
+  # [Edge_Pos_Flux_2]
+  #   type = ConservativeAdvectionSchmidNoSSD_patternKer
+  #   variable = rho_edge_pos_2
+  #   upwinding_type = full
+  #     dislo_sign = positive
+  #     slip_sys_index = 1
+  #     dislo_character = edge
+  # []
 
-  [Edeg_Neg_Time_Deri_2]
-    type = MassLumpedTimeDerivative
-    variable = rho_edge_neg_2
-  []
-  [Edge_Neg_Flux_2]
-    type = ConservativeAdvectionSchmidNoSSD_patternKer
-    variable = rho_edge_neg_2
-    upwinding_type = full
-      dislo_sign = negative
-      slip_sys_index = 1
-      dislo_character = edge
-  []
+  # [Edeg_Neg_Time_Deri_2]
+  #   type = MassLumpedTimeDerivative
+  #   variable = rho_edge_neg_2
+  # []
+  # [Edge_Neg_Flux_2]
+  #   type = ConservativeAdvectionSchmidNoSSD_patternKer
+  #   variable = rho_edge_neg_2
+  #   upwinding_type = full
+  #     dislo_sign = negative
+  #     slip_sys_index = 1
+  #     dislo_character = edge
+  # []
 
 []
 
@@ -416,8 +361,8 @@
   [../]
   [./trial_xtalpl]
     type = CrystalPlasticityBussoUpdate_patternMat
-    number_slip_systems = 2
-    slip_sys_file_name  = input_dslip_sys_al_pm45.txt
+    number_slip_systems = 1
+    slip_sys_file_name  = input_sslip_sys_al_m45.txt
       gdot0             = 1.0e6
       f0                = 2.77e-19
       boltzmann         = 1.38065e-23
@@ -436,8 +381,8 @@
 
     edge_dislo_den_pos_1 = rho_edge_pos_1
     edge_dislo_den_neg_1 = rho_edge_neg_1
-    edge_dislo_den_pos_2 = rho_edge_pos_2
-    edge_dislo_den_neg_2 = rho_edge_neg_2
+    # edge_dislo_den_pos_2 = rho_edge_pos_2
+    # edge_dislo_den_neg_2 = rho_edge_neg_2
     block = '0'
   [../]
 
@@ -459,7 +404,7 @@
   petsc_options = '-snes_ksp_ew'
   petsc_options_iname = '-pc_type -pc_hypre_type -ksp_gmres_restart'
   petsc_options_value = 'lu    boomeramg          31'
-  line_search = 'none'
+  line_search = 
   l_max_its = 50
   nl_max_its = 50
   nl_rel_tol = 1e-3 #1e-5
@@ -467,8 +412,8 @@
   l_tol = 1e-3  #1e-5 
 
   start_time = 0.0
-  end_time = 0.3 #0.01
-  dt = 1.e-8
+  end_time = 0.10 #0.01
+  dt = 5.e-6
   dtmin = 1.e-12
 []
 
@@ -546,7 +491,7 @@
 
 [Outputs]
   exodus = true
-  time_step_interval = 1000
+  time_step_interval = 200
   [csv]
     type = CSV
     file_base = rhoe_x_out_h5

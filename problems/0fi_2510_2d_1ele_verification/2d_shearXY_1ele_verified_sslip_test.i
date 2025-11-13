@@ -103,17 +103,22 @@
 []
 
 [BCs]
-  [right_x]
-    type = Pressure
+  [top_x]
+    type = FunctionDirichletBC
     variable = disp_x
-    boundary = 'right'
-    factor = -0.683 #-0.683 -0.966
-    function = pressue_piecewise
+    boundary = 'top'
+    function = disp_load
   []
-  [left_x]
+  [top_y]
+    type = DirichletBC
+    variable = disp_y
+    boundary = 'top'
+    value = 0.0
+  []  
+  [bottom_x]
     type = DirichletBC
     variable = disp_x
-    boundary = 'left'
+    boundary = 'bottom'
     value = 0.0
   []
   [bottom_y]
@@ -144,12 +149,7 @@
 []
 
 [AuxVariables]
-  [./pk2_xx]
-    order = CONSTANT
-    family = MONOMIAL
-    block = '0'
-  [../]
-  [./pk2_xy]
+  [./pk2]
     order = CONSTANT
     family = MONOMIAL
     block = '0'
@@ -367,7 +367,7 @@
   [./trial_xtalpl]
     type = CrystalPlasticityBussoUpdate_patternMat
     number_slip_systems = 1
-    slip_sys_file_name  = input_sslip_sys_al_m45.txt
+    slip_sys_file_name  = input_sslip_test.txt
       gdot0             = 1.0e6
       f0                = 2.77e-19
       boltzmann         = 1.38065e-23
