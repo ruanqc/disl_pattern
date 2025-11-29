@@ -442,9 +442,6 @@ CrystalPlasticityBussoUpdate_patternMat::calculateSlipRate()
                                                             (1.0 + _tauF_on * (rho_edge_pos[i] - rho_edge_neg[i]) / 
                                                             std::max((rho_edge_pos[i] + rho_edge_neg[i]), _zero_tol)   //ruanqc avoid zero division
                                                             );                          
-
-    // Real _slip_increment_p[_qp][i] = 0.0;
-    // Real _slip_increment_m[_qp][i] = 0.0;
                       
     if (driving_force_p < _zero_tol)
     {
@@ -473,7 +470,7 @@ CrystalPlasticityBussoUpdate_patternMat::calculateSlipRate()
     }
 
     // total contribution from positive and negative dislocations to slip increment in Lp
-    _slip_increment[_qp][i] = 0.5*( _slip_increment_p[_qp][i] +  _slip_increment_m[_qp][i]) ;
+    _slip_increment[_qp][i] = ( _slip_increment_p[_qp][i] +  _slip_increment_m[_qp][i]) ;
 
     if (std::abs(_slip_increment[_qp][i]) * _substep_dt > _slip_incr_tol)
     {
@@ -780,6 +777,7 @@ CrystalPlasticityBussoUpdate_patternMat::calculateConstitutiveSlipDerivative(std
                       1.0 / _tau_0 * std::copysign(1.0, _tau[_qp][i]) * _substep_dt;
     }
 
+    // slip_increment derivative contribution from positive and negative dislocations
     dslip_dtau[i] =  ( dslip_dtau_p + dslip_dtau_m); //ruanqc added
 
     // mooseWarning("tau=",_tau[_qp][i]);
