@@ -1,6 +1,7 @@
 # ------------------------------------------------------------------------------------------------
 # ruanqc-250820 modified to implement 2d patterning 
 # based on Hardinlusion version c1m1_AL_H0002__coarse_reload_096per_t0369_rho7e7.i
+# initial
 # ------------------------------------------------------------------------------------------------
 
 [GlobalParams]

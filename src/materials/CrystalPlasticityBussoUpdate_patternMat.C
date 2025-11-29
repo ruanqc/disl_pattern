@@ -485,6 +485,10 @@ CrystalPlasticityBussoUpdate_patternMat::calculateSlipRate()
     }
 
   }
+
+//  mooseWarning("gamma_dot1=",_slip_increment[_qp][0]);
+  // mooseWarning("gamma_dot2=",_slip_increment[_qp][1]);
+
   calculateDislocationVelocity();
 
   return true;

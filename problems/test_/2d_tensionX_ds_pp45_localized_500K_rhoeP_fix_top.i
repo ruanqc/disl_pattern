@@ -11,8 +11,8 @@
   [gen]
     type = GeneratedMeshGenerator
     dim = 2
-    nx = 60
-    ny = 60
+    nx = 100
+    ny = 100
     xmin = 0.0
     ymin = 0.0
     xmax = 1.011
@@ -31,27 +31,27 @@
       family = LAGRANGE
   []
   [rho_edge_pos_1]
-    order = SECOND
+    order = FIRST
     family = LAGRANGE
     block = '0'
     # initial_condition = 4000.0
   []
   [rho_edge_neg_1]
-    order = SECOND
+    order = FIRST
     family = LAGRANGE
     block = '0'
-    # initial_condition = 4000.0
+    initial_condition = 0.0
   []
     [rho_edge_pos_2]
-    order = SECOND
+    order = FIRST
     family = LAGRANGE
     # initial_condition = 4000.0
     block = '0'
   []
   [rho_edge_neg_2]
-    order = SECOND
+    order = FIRST
     family = LAGRANGE
-    # initial_condition = 4000.0
+    initial_condition = 0.0
     block = '0'
   []
 []
@@ -62,21 +62,21 @@
     variable = 'rho_edge_pos_1'
     function = Gaussian_mxy
   []
-  [./rho_edge_neg_1]
-    type = FunctionIC
-    variable = 'rho_edge_neg_1'
-    function = Gaussian_mxy
-  []
+ # [./rho_edge_neg_1]
+ #   type = FunctionIC
+ #   variable = 'rho_edge_neg_1'
+ #   function = Gaussian_mxy
+ # []
   [./rho_edge_pos_2]
     type = FunctionIC
     variable = 'rho_edge_pos_2'
-    function = Gaussian_pxy
+    function = Gaussian_mxy
   []
-  [./rho_edge_neg_2]
-    type = FunctionIC
-    variable = 'rho_edge_neg_2'
-    function = Gaussian_pxy
-  []  
+  #[./rho_edge_neg_2]
+  #  type = FunctionIC
+  #  variable = 'rho_edge_neg_2'
+  #  function = Gaussian_pxy
+  #[]  
 
   # [./rho_edge_pos_1]
   #   type = RandomIC
@@ -117,32 +117,12 @@
 
   [./Gaussian_pxy]
     type = ParsedFunction
-    # smooth Gaussian along the x=y diagonal (perp half-width = 0.0079)
-    # use (x-y) as rotated coordinate; exponent denominator uses 4*w^2 to give
-    # exp(-d_perp^2/(2*w^2)) where d_perp = |x-y|/sqrt(2)
-    expression = '0.01*4000.0 * exp(-((x - y)^2 / (4*0.0112^2))) + 4000.0'
+    expression = '0.01*4000.0 * exp(-((x - y)^2 / (4*0.0079^2))) + 4000.0'
   [../]
 
   [./Gaussian_mxy]
     type = ParsedFunction
-    # smooth Gaussian along the x=y diagonal (perp half-width = 0.0079)
-    # use (x-y) as rotated coordinate; exponent denominator uses 4*w^2 to give
-    # exp(-d_perp^2/(2*w^2)) where d_perp = |x-y|/sqrt(2)
-    expression = '0.01*4000.0 * exp(-((x + y - 1.011)^2 / (4*0.0112^2))) + 4000.0'
-  [../]
-
-  [./Gaussian_along_p45]
-    type = ParsedFunction
-    # +45 deg: long axis along (1,1), short axis along (1,-1)
-    # short-axis width set to ~0.0079, long-axis extended to ~0.02
-    expression = 'if((abs((x - 1.011) + (y - 1.011)) < 0.02) * (abs((x - 1.011) - (y - 1.011)) < 0.0079), 0.001*16000.0 * exp(- ( ((x - 1.011 + (y - 1.011))^2) / (4*0.02^2) + ((x - 1.011 - (y - 1.011))^2) / (4*0.0079^2) ) ) + 8000.0, 8000.0)'
-  [../]
-
-  [./Gaussian_along_m45]
-    type = ParsedFunction
-    # -45 deg: long axis along (1,-1), short axis along (1,1)
-    # short-axis width set to ~0.0079, long-axis extended to ~0.02
-    expression = 'if((abs((x - 1.011) - (y - 1.011)) < 0.02) * (abs((x - 1.011) + (y - 1.011)) < 0.0079), 0.001*16000.0 * exp(- ( ((x - 1.011 - (y - 1.011))^2) / (4*0.02^2) + ((x - 1.011 + (y - 1.011))^2) / (4*0.0079^2) ) ) + 8000.0, 8000.0)'
+    expression = '0.01*4000.0 * exp(-((x + y - 1.011)^2 / (4*0.0079^2))) + 4000.0'
   [../]
 
   [./disp_load]
@@ -162,7 +142,7 @@
     type = Pressure
     variable = disp_x
     boundary = 'right'
-    factor = -0.683 #-0.683 -0.966
+    factor = -0.481 #-0.683 -0.966
     function = pressue_piecewise
   []
   [left_x]
@@ -174,7 +154,7 @@
   [bottom_y]
     type = DirichletBC
     variable = disp_y
-    boundary = 'bottom'
+    boundary = 'top'
     value = 0.0
   []
   [./Periodic]
@@ -417,11 +397,11 @@
   [./trial_xtalpl]
     type = CrystalPlasticityBussoUpdate_patternMat
     number_slip_systems = 2
-    slip_sys_file_name  = input_dslip_sys_al_pm45.txt
+    slip_sys_file_name  = input_dslip_sys_al_pp45.txt
       gdot0             = 1.0e6
       f0                = 2.77e-19
       boltzmann         = 1.38065e-23
-      temperature       = 476.85                                         # 750 - 273.15 in degrees Celsius
+      temperature       = 500.0                                         # 750 - 273.15 in degrees Celsius
       tau_0             = 20.0
       p                 = 0.2
       q                 = 1.2
@@ -459,7 +439,7 @@
   petsc_options = '-snes_ksp_ew'
   petsc_options_iname = '-pc_type -pc_hypre_type -ksp_gmres_restart'
   petsc_options_value = 'lu    boomeramg          31'
-  line_search = 'none'
+  line_search = 'l2'  #'bt' 'l2' 'basic' 'nleqerr'
   l_max_its = 50
   nl_max_its = 50
   nl_rel_tol = 1e-3 #1e-5
@@ -467,8 +447,8 @@
   l_tol = 1e-3  #1e-5 
 
   start_time = 0.0
-  end_time = 0.3 #0.01
-  dt = 1.e-8
+  end_time = 0.2 #0.01
+  dt = 2.e-9
   dtmin = 1.e-12
 []
 
@@ -483,16 +463,16 @@
    variable = pk2
    block = '0'
   [../]
-  [./fp_xy]
-    type = ElementAverageValue
-    variable = fp_xy
-    block = '0'
-  [../]
-  [./exy]
-    type = ElementAverageValue
-    variable = exy
-    block = '0'
-  [../]
+  # [./fp_xy]
+  #   type = ElementAverageValue
+  #   variable = fp_xy
+  #   block = '0'
+  # [../]
+  # [./exy]
+  #   type = ElementAverageValue
+  #   variable = exy
+  #   block = '0'
+  # [../]
   [./slip_increment1]
    type = ElementAverageValue
    variable = slip_increment1
@@ -504,11 +484,11 @@
    block = '0'
   [../]
 
-  [./dislo_velocity]
-   type = ElementAverageValue
-   variable = dislo_velocity
-   block = '0'
-  [../]
+  # [./dislo_velocity]
+  #  type = ElementAverageValue
+  #  variable = dislo_velocity
+  #  block = '0'
+  # [../]
   [./strain_xy]
     type = ElementAverageValue
     variable = strain_xy
@@ -547,9 +527,9 @@
 [Outputs]
   exodus = true
   time_step_interval = 1000
-  [csv]
-    type = CSV
-    file_base = rhoe_x_out_h5
-    execute_on = final
-  []
+  # [csv]
+  #   type = CSV
+  #   file_base = rhoe_x_out_h5
+  #   execute_on = final
+  # []
 []
