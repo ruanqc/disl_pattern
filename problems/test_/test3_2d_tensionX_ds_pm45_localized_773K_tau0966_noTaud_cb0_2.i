@@ -502,7 +502,7 @@
       burgers           = 0.257e-6
         w1              = 0.0
         w2              = 0.0
-      scaling_Cb        = 0.1
+      scaling_Cb        = 0.2
       scaling_Cd        = 0.0
       tauF_on           = 1.0                                             #ON-1.0, OFF-0.0 (tauF= St*(1 -+ tauF_on*rhoG/rhoT) on or off)
 

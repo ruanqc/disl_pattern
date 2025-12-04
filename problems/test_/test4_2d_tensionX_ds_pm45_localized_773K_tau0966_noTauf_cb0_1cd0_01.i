@@ -1,7 +1,6 @@
 # ------------------------------------------------------------------------------------------------
 # ruanqc-250820 modified to implement 2d patterning 
 # based on Hardinlusion version c1m1_AL_H0002__coarse_reload_096per_t0369_rho7e7.i
-# ruanqc-251205 used for debugging, sdvs outputs
 # ------------------------------------------------------------------------------------------------
 
 [GlobalParams]
@@ -504,8 +503,8 @@
         w1              = 0.0
         w2              = 0.0
       scaling_Cb        = 0.1
-      scaling_Cd        = 0.1
-      tauF_on           = 1.0                                             #ON-1.0, OFF-0.0 (tauF= St*(1 -+ tauF_on*rhoG/rhoT) on or off)
+      scaling_Cd        = 0.01
+      tauF_on           = 0.0                                             #ON-1.0, OFF-0.0 (tauF= St*(1 -+ tauF_on*rhoG/rhoT) on or off)
 
     edge_dislo_den_pos_1 = rho_edge_pos_1
     edge_dislo_den_neg_1 = rho_edge_neg_1
