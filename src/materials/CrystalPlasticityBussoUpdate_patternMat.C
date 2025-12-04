@@ -147,7 +147,11 @@ CrystalPlasticityBussoUpdate_patternMat::CrystalPlasticityBussoUpdate_patternMat
     _slip_increment_p(declareProperty<std::vector<Real>>("slip_increment_p")),
     _slip_increment_m(declareProperty<std::vector<Real>>("slip_increment_m")),
 
-    _rss_qc(declareProperty<std::vector<Real>>("rss_qc")),  //ruanqc 250922 added to checkout resolved shear stress    
+    _rss_qc(declareProperty<std::vector<Real>>("rss_qc")),  //ruanqc 250922 added to checkout resolved shear stress   
+    
+    _taub_qc(declareProperty<std::vector<Real>>("taub_qc")),  //ruanqc 251105 added to checkout backstress
+    _taud_qc(declareProperty<std::vector<Real>>("taud_qc")),  //ruanqc 251105 added to checkout diffusion stress
+    _sT_qc(declareProperty<std::vector<Real>>("sT_qc")),  //ruanqc 251105 added to checkout slip resistance
 
     _accumulated_equivalent_plastic_strain(
         declareProperty<Real>(_base_name + "accumulated_equivalent_plastic_strain")),
@@ -310,6 +314,9 @@ CrystalPlasticityBussoUpdate_patternMat::calculateSlipRate()
   _slip_increment_m[_qp].resize(_number_slip_systems);
   
   _rss_qc[_qp].resize(_number_slip_systems); //ruanqc 250922 added to checkout resolved shear stress
+  _taub_qc[_qp].resize(_number_slip_systems); //ruanqc 251105 added to checkout backstress
+  _taud_qc[_qp].resize(_number_slip_systems); //ruanqc 251105 added to checkout diffusion stress
+  _sT_qc[_qp].resize(_number_slip_systems);   //ruanqc 251105 added to checkout slip resistance
 
   calculateSlipResistance();
 
@@ -431,6 +438,9 @@ CrystalPlasticityBussoUpdate_patternMat::calculateSlipRate()
     // Real driving_force = std::abs(_tau[_qp][i] - _backstress(i) ) - _slip_resistance[_qp][i];     
     
     _rss_qc[_qp][i] = _tau[_qp][i]; //ruanqc 250922 added to checkout resolved shear stress
+    _taub_qc[_qp][i] = _backstress(i); //ruanqc 251105 added to checkout backstress
+    _taud_qc[_qp][i] = _tau_d(i); //ruanqc 251105 added to checkout drag stress
+    _sT_qc[_qp][i]   = _slip_resistance[_qp][i];   //ruanqc 251105 added to checkout slip resistance
 
 
     Real driving_force_p = std::abs(_tau[_qp][i] - _backstress(i) - _tau_d(i)) - _slip_resistance[_qp][i] * 
