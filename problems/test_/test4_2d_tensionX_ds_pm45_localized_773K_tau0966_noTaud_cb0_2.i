@@ -1,7 +1,6 @@
 # ------------------------------------------------------------------------------------------------
 # ruanqc-250820 modified to implement 2d patterning 
 # based on Hardinlusion version c1m1_AL_H0002__coarse_reload_096per_t0369_rho7e7.i
-# initial
 # ------------------------------------------------------------------------------------------------
 
 [GlobalParams]
@@ -121,15 +120,13 @@
     # smooth Gaussian along the x=y diagonal (perp half-width = 0.0079)
     # use (x-y) as rotated coordinate; exponent denominator uses 4*w^2 to give
     # exp(-d_perp^2/(2*w^2)) where d_perp = |x-y|/sqrt(2)
-    expression = '0.01*4000.0 * exp(-((x - y)^2 / (4*0.0112^2))) + 4000.0'
+    expression = '0.01*4000.0 * exp(-((x - y)^2 / (4*0.0079^2))) + 4000.0'
   [../]
 
   [./Gaussian_mxy]
     type = ParsedFunction
-    # smooth Gaussian along the x=y diagonal (perp half-width = 0.0079)
-    # use (x-y) as rotated coordinate; exponent denominator uses 4*w^2 to give
-    # exp(-d_perp^2/(2*w^2)) where d_perp = |x-y|/sqrt(2)
-    expression = '0.01*4000.0 * exp(-((x + y - 1.011)^2 / (4*0.0112^2))) + 4000.0'
+    # smooth Gaussian along the x+y=1.011 diagonal (perp half-width = 0.0079)
+    expression = '0.01*4000.0 * exp(-((x + y - 1.011)^2 / (4*0.0079^2))) + 4000.0'
   [../]
 
   [./Gaussian_along_p45]
@@ -163,7 +160,7 @@
     type = Pressure
     variable = disp_x
     boundary = 'right'
-    factor = -0.683 #-0.683 -0.966
+    factor = -0.966 #-0.683 -0.966
     function = pressue_piecewise
   []
   [left_x]
@@ -249,6 +246,37 @@
   [../]
 
   [./rss_2]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
+  [../]
+  
+  [./taub_1]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
+  [../]
+  [./taub_2]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
+  [../]
+  [./taud_1]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
+  [../]
+  [./taud_2]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
+  [../]
+  [./sT_1]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
+  [../]
+    [./sT_2]                 #Name shown in Paraview
    order = CONSTANT
    family = MONOMIAL
    block = '0'
@@ -397,12 +425,55 @@
    block = '0'
   [../]
 
+  [./taub_1]                     #Name arbiarbitrary
+   type = MaterialStdVectorAux  #Use this for std::vector p
+   variable = taub_1             #Consistant with AuxVaribles
+   property = taub_qc         
+   index = 0
+   block = '0'
+  [../] 
+  [./taub_2]                     #Name arbiarbitrary
+   type = MaterialStdVectorAux  #Use this for std::vector p
+   variable = taub_2             #Consistant with AuxVariables
+   property = taub_qc         
+   index = 1
+   block = '0'
+  [../]
+  [./taud_1]                     #Name arbiarbitrary
+   type = MaterialStdVectorAux  #Use this for std::vector p
+   variable = taud_1             #Consistant with AuxVariables
+   property = taud_qc         
+   index = 0
+   block = '0'
+  [../] 
+  [./taud_2]                     #Name arbiarbitrary
+   type = MaterialStdVectorAux  #Use this for std::vector p
+   variable = taud_2             #Consistant with AuxVariables
+   property = taud_qc         
+   index = 1
+   block = '0'
+  [../]
+  [./sT_1]                     #Name arbiarbitrary
+   type = MaterialStdVectorAux  #Use this for std::vector p
+   variable = sT_1             #Consistant with AuxVariables
+   property = sT_qc         
+   index = 0
+   block = '0'
+  [../] 
+    [./sT_2]                     #Name arbiarbitrary
+   type = MaterialStdVectorAux  #Use this for std::vector p
+   variable = sT_2             #Consistant with AuxVariables
+   property = sT_qc         
+   index = 1
+   block = '0'
+  [../]
+
 []
 
 [Materials]
   [./elasticity_tensor]
     type = ComputeElasticityTensorCP
-    C_ijkl = '168.5e3 121.5e3 121.5e3 168.5e3 121.5e3 168.5e3 75.6e3 75.6e3 75.6e3'
+    C_ijkl = '184.33e3 124.70e3 124.70e3 184.33e3 124.70e3 184.33e3 88.23e3 88.23e3 88.23e3'
     fill_method = symmetric9
     euler_angle_1 = 0.0
     euler_angle_2 = 0.0 
@@ -422,7 +493,7 @@
       gdot0             = 1.0e6
       f0                = 2.77e-19
       boltzmann         = 1.38065e-23
-      temperature       = 476.85                                         # 750 - 273.15 in degrees Celsius
+      temperature       = 500.0                                         # 750 - 273.15 in degrees Celsius
       tau_0             = 20.0
       p                 = 0.2
       q                 = 1.2
@@ -432,7 +503,7 @@
         w1              = 0.0
         w2              = 0.0
       scaling_Cb        = 0.2
-      scaling_Cd        = 0.2
+      scaling_Cd        = 0.0
       tauF_on           = 1.0                                             #ON-1.0, OFF-0.0 (tauF= St*(1 -+ tauF_on*rhoG/rhoT) on or off)
 
     edge_dislo_den_pos_1 = rho_edge_pos_1
@@ -460,7 +531,7 @@
   petsc_options = '-snes_ksp_ew'
   petsc_options_iname = '-pc_type -pc_hypre_type -ksp_gmres_restart'
   petsc_options_value = 'lu    boomeramg          31'
-  line_search = 'none'
+  line_search = 'l2'  #'bt' 'l2' 'basic' 'nleqerr'
   l_max_its = 50
   nl_max_its = 50
   nl_rel_tol = 1e-3 #1e-5
@@ -468,7 +539,7 @@
   l_tol = 1e-3  #1e-5 
 
   start_time = 0.0
-  end_time = 0.3 #0.01
+  end_time = 0.2 #0.01
   dt = 1.e-8
   dtmin = 1.e-12
 []
@@ -540,6 +611,37 @@
      variable = rss_2
      block = '0'
   [../]
+
+  [./taub_1]
+     type = ElementAverageValue
+     variable = taub_1
+     block = '0'
+  [../]
+  [./taub_2]
+     type = ElementAverageValue
+     variable = taub_2
+     block = '0'
+  [../]
+  [./taud_1]
+     type = ElementAverageValue
+     variable = taud_1
+     block = '0'
+  [../]
+  [./taud_2]
+     type = ElementAverageValue
+     variable = taud_2
+     block = '0'
+  [../]
+  [./sT_1]
+     type = ElementAverageValue
+     variable = sT_1
+     block = '0'
+  [../]
+    [./sT_2]
+     type = ElementAverageValue
+     variable = sT_2
+      block = '0'
+  [../]
 []
 
 [VectorPostprocessors]
@@ -547,7 +649,7 @@
 
 [Outputs]
   exodus = true
-  time_step_interval = 1000
+  time_step_interval = 500
   [csv]
     type = CSV
     file_base = rhoe_x_out_h5

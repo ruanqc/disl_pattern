@@ -382,40 +382,46 @@ CrystalPlasticityBussoUpdate_patternMat::calculateSlipRate()
   Real RhoTotSlip;
   for (const auto i : make_range(_number_slip_systems))
   {
-    if (rho_edge_pos[i] <= _zero_tol)
-      rho_edge_pos[i] = 0.0;
+    // if (rho_edge_pos[i] <= _zero_tol)
+    //   rho_edge_pos[i] = 0.0;
 
-    if (rho_edge_neg[i] <= _zero_tol)
-      rho_edge_neg[i] = 0.0;
+    // if (rho_edge_neg[i] <= _zero_tol)
+    //   rho_edge_neg[i] = 0.0;              // ruanqc-251207-commented
 
     RhoTotSlip = rho_edge_pos[i] + rho_edge_neg[i];
 
-    if (_edge_slip_direction[_qp][i * LIBMESH_DIM] < 1.e-10)
+    // edge slip direction
+    if (_edge_slip_direction[_qp][i * LIBMESH_DIM] < 1.e-10 && _edge_slip_direction[_qp][i * LIBMESH_DIM] > -1.e-10)
       local_edge_slip_direction[0] = 0.0;
     else
       local_edge_slip_direction[0] = 1.0 / _edge_slip_direction[_qp][i * LIBMESH_DIM];
 
-    if (_edge_slip_direction[_qp][i * LIBMESH_DIM + 1] < 1.e-10)
+    if (_edge_slip_direction[_qp][i * LIBMESH_DIM + 1] < 1.e-10 && _edge_slip_direction[_qp][i * LIBMESH_DIM + 1] > -1.e-10){
       local_edge_slip_direction[1] = 0.0;
+      // mooseWarning("local_edge_slip_direction", local_edge_slip_direction[1] );
+      // mooseWarning("local_edge_slip_direction", 1.0 / _edge_slip_direction[_qp][i * LIBMESH_DIM + 1] );
+    }
     else
       local_edge_slip_direction[1] = 1.0 / _edge_slip_direction[_qp][i * LIBMESH_DIM + 1];
+      // mooseWarning("local_edge_slip_direction", 1.0 / _edge_slip_direction[_qp][i * LIBMESH_DIM + 1] );}
 
-    if (_edge_slip_direction[_qp][i * LIBMESH_DIM + 2] < 1.e-10)
+    if (_edge_slip_direction[_qp][i * LIBMESH_DIM + 2] < 1.e-10 && _edge_slip_direction[_qp][i * LIBMESH_DIM + 2] > -1.e-10)
       local_edge_slip_direction[2] = 0.0;
     else
       local_edge_slip_direction[2] = 1.0 / _edge_slip_direction[_qp][i * LIBMESH_DIM + 2];
-
-    if (_screw_slip_direction[_qp][i * LIBMESH_DIM] < 1.e-10)
+    
+      // screw slip direction
+    if (_screw_slip_direction[_qp][i * LIBMESH_DIM] < 1.e-10 && _screw_slip_direction[_qp][i * LIBMESH_DIM] > -1.e-10)
       local_screw_slip_direction[0] = 0.0;
     else
       local_screw_slip_direction[0] = 1.0 / _screw_slip_direction[_qp][i * LIBMESH_DIM];
 
-    if (_screw_slip_direction[_qp][i * LIBMESH_DIM + 1] < 1.e-10)
+    if (_screw_slip_direction[_qp][i * LIBMESH_DIM + 1] < 1.e-10 && _screw_slip_direction[_qp][i * LIBMESH_DIM + 1] > -1.e-10)
       local_screw_slip_direction[1] = 0.0;
     else
       local_screw_slip_direction[1] = 1.0 / _screw_slip_direction[_qp][i * LIBMESH_DIM + 1];
 
-    if (_screw_slip_direction[_qp][i * LIBMESH_DIM + 2] < 1.e-10)
+    if (_screw_slip_direction[_qp][i * LIBMESH_DIM + 2] < 1.e-10 && _screw_slip_direction[_qp][i * LIBMESH_DIM + 2] > -1.e-10)
       local_screw_slip_direction[2] = 0.0;
     else
       local_screw_slip_direction[2] = 1.0 / _screw_slip_direction[_qp][i * LIBMESH_DIM + 2];
@@ -426,14 +432,16 @@ CrystalPlasticityBussoUpdate_patternMat::calculateSlipRate()
                       rho_edge_neg_grad_x[i] * local_edge_slip_direction[0] +
                       rho_edge_pos_grad_y[i] * local_edge_slip_direction[1] -
                       rho_edge_neg_grad_y[i] * local_edge_slip_direction[1]) /
-                     std::max((rho_edge_pos[i] + rho_edge_neg[i]), _zero_tol); //ruanqc avoid zero division
+                      (rho_edge_pos[i] + rho_edge_neg[i]);
+                    //  std::max((rho_edge_pos[i] + rho_edge_neg[i]), _zero_tol); //ruanqc avoid zero division
 
     _tau_d(i)      = _scaling_Cd * _burgers * _shear_modulus *
                      (rho_edge_pos_grad_x[i] * local_edge_slip_direction[0] +
                       rho_edge_neg_grad_x[i] * local_edge_slip_direction[0] +
                       rho_edge_pos_grad_y[i] * local_edge_slip_direction[1] +
                       rho_edge_neg_grad_y[i] * local_edge_slip_direction[1]) /
-                     std::max((rho_edge_pos[i] + rho_edge_neg[i]), _zero_tol);  //ruanqc avoid zero division
+                      (rho_edge_pos[i] + rho_edge_neg[i]);
+                    //  std::max((rho_edge_pos[i] + rho_edge_neg[i]), _zero_tol);  //ruanqc avoid zero division
                      
     // Real driving_force = std::abs(_tau[_qp][i] - _backstress(i) ) - _slip_resistance[_qp][i];     
     
@@ -445,12 +453,14 @@ CrystalPlasticityBussoUpdate_patternMat::calculateSlipRate()
 
     Real driving_force_p = std::abs(_tau[_qp][i] - _backstress(i) - _tau_d(i)) - _slip_resistance[_qp][i] * 
                                                             (1.0 - _tauF_on * (rho_edge_pos[i] - rho_edge_neg[i]) / 
-                                                            std::max((rho_edge_pos[i] + rho_edge_neg[i]), _zero_tol)  //ruanqc avoid zero division  
+                                                            (rho_edge_pos[i] + rho_edge_neg[i])
+                                                            // std::max((rho_edge_pos[i] + rho_edge_neg[i]), _zero_tol)  //ruanqc avoid zero division  
                                                             );    
                       
     Real driving_force_m = std::abs(_tau[_qp][i] - _backstress(i) + _tau_d(i)) - _slip_resistance[_qp][i] * 
                                                             (1.0 + _tauF_on * (rho_edge_pos[i] - rho_edge_neg[i]) / 
-                                                            std::max((rho_edge_pos[i] + rho_edge_neg[i]), _zero_tol)   //ruanqc avoid zero division
+                                                            (rho_edge_pos[i] + rho_edge_neg[i])
+                                                            // std::max((rho_edge_pos[i] + rho_edge_neg[i]), _zero_tol)   //ruanqc avoid zero division
                                                             );                          
                       
     if (driving_force_p < _zero_tol)
@@ -538,11 +548,11 @@ CrystalPlasticityBussoUpdate_patternMat::calculateSlipResistance()
 
   for (const auto i : make_range(_number_slip_systems))
   {
-    if (rho_edge_pos[i] <= _zero_tol)
-      rho_edge_pos[i] = 0.0;
+    // if (rho_edge_pos[i] <= _zero_tol)
+    //   rho_edge_pos[i] = 0.0;
 
-    if (rho_edge_neg[i] <= _zero_tol)
-      rho_edge_neg[i] = 0.0;
+    // if (rho_edge_neg[i] <= _zero_tol)
+    //   rho_edge_neg[i] = 0.0;           //ruanqc-251207-added commented
 
     Real hardening_total_dislocation_density = 0.0;
     for (const auto j : make_range(_number_slip_systems))
@@ -617,12 +627,14 @@ CrystalPlasticityBussoUpdate_patternMat::calculateDislocationVelocity()
 
     Real driving_force_p = std::abs(_tau[_qp][i] - _backstress(i) - _tau_d(i)) - _slip_resistance[_qp][i] * 
                       (1.0 - _tauF_on * (rho_edge_pos[i] - rho_edge_neg[i]) / 
-                                                              std::max((rho_edge_pos[i] + rho_edge_neg[i]), _zero_tol)   //ruanqc avoid zero division
+                                                              (rho_edge_pos[i] + rho_edge_neg[i])
+                                                              // std::max((rho_edge_pos[i] + rho_edge_neg[i]), _zero_tol)   //ruanqc avoid zero division
                       );    
 
     Real driving_force_m = std::abs(_tau[_qp][i] - _backstress(i) + _tau_d(i)) - _slip_resistance[_qp][i] * 
                       (1.0 + _tauF_on * (rho_edge_pos[i] - rho_edge_neg[i]) /
-                                                              std::max((rho_edge_pos[i] + rho_edge_neg[i]), _zero_tol)   //ruanqc avoid zero division
+                                                              (rho_edge_pos[i] + rho_edge_neg[i])
+                                                              // std::max((rho_edge_pos[i] + rho_edge_neg[i]), _zero_tol)   //ruanqc avoid zero division
                       );                    
  
     
@@ -630,7 +642,8 @@ CrystalPlasticityBussoUpdate_patternMat::calculateDislocationVelocity()
     if (driving_force_p > _zero_tol)
     {  
       _dislo_velocity_p[_qp][i] =  _slip_increment_p[_qp][i] / _burgers / 
-                                                              std::max((rho_edge_pos[i] + rho_edge_neg[i]), _zero_tol );    //zero_tol -ruanqc avoid zero division
+                                                              (rho_edge_pos[i] + rho_edge_neg[i]);
+                                                              // std::max((rho_edge_pos[i] + rho_edge_neg[i]), _zero_tol );    //zero_tol -ruanqc avoid zero division
     }
     else
     {  
@@ -641,7 +654,8 @@ CrystalPlasticityBussoUpdate_patternMat::calculateDislocationVelocity()
     if (driving_force_m > _zero_tol)
     {  
       _dislo_velocity_m[_qp][i] = _slip_increment_m[_qp][i] / _burgers / 
-                                                              std::max((rho_edge_pos[i] + rho_edge_neg[i]), _zero_tol );         
+                                                              (rho_edge_pos[i] + rho_edge_neg[i]);
+                                                              // std::max((rho_edge_pos[i] + rho_edge_neg[i]), _zero_tol );         
     }
     else
     {  
@@ -730,12 +744,14 @@ CrystalPlasticityBussoUpdate_patternMat::calculateConstitutiveSlipDerivative(std
   {
     Real driving_force_p = std::abs(_tau[_qp][i] - _backstress(i) - _tau_d(i)) - _slip_resistance[_qp][i] * 
                       (1.0 - _tauF_on * (rho_edge_pos[i] - rho_edge_neg[i]) / 
-                                        std::max((rho_edge_pos[i] + rho_edge_neg[i]), _zero_tol) 
+                                        (rho_edge_pos[i] + rho_edge_neg[i])
+                                        // std::max((rho_edge_pos[i] + rho_edge_neg[i]), _zero_tol) 
                       );    
 
     Real driving_force_m = std::abs(_tau[_qp][i] - _backstress(i) + _tau_d(i)) - _slip_resistance[_qp][i] * 
                       (1.0 + _tauF_on * (rho_edge_pos[i] - rho_edge_neg[i]) /
-                                        std::max((rho_edge_pos[i] + rho_edge_neg[i]), _zero_tol) 
+                                        (rho_edge_pos[i] + rho_edge_neg[i])
+                                        // std::max((rho_edge_pos[i] + rho_edge_neg[i]), _zero_tol) 
                       );                       
 
 
@@ -752,11 +768,11 @@ CrystalPlasticityBussoUpdate_patternMat::calculateConstitutiveSlipDerivative(std
     {
       u = driving_force_p / _tau_0;
       // clamp u to [0, 1-eps] to avoid negative base to fractional power
-      const Real eps = 1e-12;
-      if (u < 0.0)
-        u = 0.0;
-      if (u >= 1.0)
-        u = 1.0 - eps;
+      // const Real eps = 1e-12;
+      // if (u < 0.0)
+      //   u = 0.0;
+      // if (u >= 1.0)
+      //   u = 1.0 - eps;
 
       vprime_p = std::pow((1.0 - std::pow(u, _p)), _q - 1.0);
       uprime_p = std::pow(u, _p - 1.0);
