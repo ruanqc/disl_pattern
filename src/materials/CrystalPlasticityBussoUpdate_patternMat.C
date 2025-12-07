@@ -7,7 +7,6 @@
 // ruanqc 2025-08/09 modified for 2d patterning from CrystalPlasticityBussoUpdate.C 
 // V251031, temp version 251105
 // V251207, corrected a bug in calculated local_edge_slip_direction && _edge_slip_direction[_qp][i * LIBMESH_DIM] > -1.e-10 in minus slips system)
-      [0] = 0.0;
 
 #include "CrystalPlasticityBussoUpdate_patternMat.h"
 #include "libmesh/int_range.h"
