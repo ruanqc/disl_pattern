@@ -34,24 +34,24 @@
     order = FIRST
     family = LAGRANGE
     block = '0'
-    # initial_condition = 4000.0
+    # initial_condition = 8000.0
   []
   [rho_edge_neg_1]
     order = FIRST
     family = LAGRANGE
     block = '0'
-    # initial_condition = 4000.0
+    # initial_condition = 8000.0
   []
     [rho_edge_pos_2]
     order = FIRST
     family = LAGRANGE
-    # initial_condition = 4000.0
+    # initial_condition = 8000.0
     block = '0'
   []
   [rho_edge_neg_2]
     order = FIRST
     family = LAGRANGE
-    # initial_condition = 4000.0
+    # initial_condition = 8000.0
     block = '0'
   []
 []
@@ -120,13 +120,13 @@
     # smooth Gaussian along the x=y diagonal (perp half-width = 0.0079)
     # use (x-y) as rotated coordinate; exponent denominator uses 4*w^2 to give
     # exp(-d_perp^2/(2*w^2)) where d_perp = |x-y|/sqrt(2)
-    expression = '0.01*4000.0 * exp(-((x - y)^2 / (4*0.0079^2))) + 4000.0'
+    expression = '0.01*8000.0 * exp(-((x - y)^2 / (4*0.0079^2))) + 8000.0'
   [../]
 
   [./Gaussian_mxy]
     type = ParsedFunction
     # smooth Gaussian along the x+y=1.011 diagonal (perp half-width = 0.0079)
-    expression = '0.01*4000.0 * exp(-((x + y - 1.011)^2 / (4*0.0079^2))) + 4000.0'
+    expression = '0.01*8000.0 * exp(-((x + y - 1.011)^2 / (4*0.0079^2))) + 8000.0'
   [../]
 
   [./Gaussian_along_p45]
