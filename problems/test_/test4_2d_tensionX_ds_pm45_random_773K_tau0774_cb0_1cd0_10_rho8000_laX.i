@@ -11,8 +11,8 @@
   [gen]
     type = GeneratedMeshGenerator
     dim = 2
-    nx = 60
-    ny = 60
+    nx = 40
+    ny = 40
     xmin = 0.0
     ymin = 0.0
     xmax = 1.011
@@ -34,24 +34,24 @@
     order = FIRST
     family = LAGRANGE
     block = '0'
-    # initial_condition = 8000.0
+    # initial_condition = 4000.0
   []
   [rho_edge_neg_1]
     order = FIRST
     family = LAGRANGE
     block = '0'
-    # initial_condition = 8000.0
+    # initial_condition = 4000.0
   []
     [rho_edge_pos_2]
     order = FIRST
     family = LAGRANGE
-    # initial_condition = 8000.0
+    # initial_condition = 4000.0
     block = '0'
   []
   [rho_edge_neg_2]
     order = FIRST
     family = LAGRANGE
-    # initial_condition = 8000.0
+    # initial_condition = 4000.0
     block = '0'
   []
 []
@@ -81,30 +81,30 @@
   [./rho_edge_pos_1]
     type = RandomIC
     variable = 'rho_edge_pos_1'
-    min = ${fparse 8000.0 - 8000.0*0.01}
-    max = ${fparse 8000.0 + 8000.0*0.01}
+    min = ${fparse 4000.0 - 4000.0*0.005}
+    max = ${fparse 4000.0 + 4000.0*0.005}
     seed = 42
   []
   [./rho_edge_neg_1]
     type = RandomIC
     variable = 'rho_edge_neg_1'
-    min = ${fparse 8000.0 - 8000.0*0.01}
-    max = ${fparse 8000.0 + 8000.0*0.01}
-    seed = 42
+    min = ${fparse 4000.0 - 4000.0*0.005}
+    max = ${fparse 4000.0 + 4000.0*0.005}
+    seed = 128
   []
   [./rho_edge_pos_2]
     type = RandomIC
     variable = 'rho_edge_pos_2'
-    min = ${fparse 8000.0 - 8000.0*0.01}
-    max = ${fparse 8000.0 + 8000.0*0.01}
-    seed = 42
+    min = ${fparse 4000.0 - 4000.0*0.005}
+    max = ${fparse 4000.0 + 4000.0*0.005}
+    seed = 128
   []
   [./rho_edge_neg_2]
     type = RandomIC
     variable = 'rho_edge_neg_2'
-    min = ${fparse 8000.0 - 8000.0*0.01}
-    max = ${fparse 8000.0 + 8000.0*0.01}
-    seed = 42
+    min = ${fparse 4000.0 - 4000.0*0.005}
+    max = ${fparse 4000.0 + 4000.0*0.005}
+    seed = 128
   []  
 
 []
@@ -112,35 +112,19 @@
 [Functions]
   [./Gaussian_x]
     type = ParsedFunction
-    expression = 'if(abs(x - 1.011) < 0.0079, 0.001*16000.0 * exp(-((x - 1.011)^2 / (2.0 * 0.0079^2))) + 8000.0, 8000.0)'
+    expression = 'if(abs(x - 1.011) < 0.0079, 0.001*16000.0 * exp(-((x - 1.011)^2 / (2.0 * 0.0079^2))) + 4000.0, 4000.0)'
   [../]
 
   [./Gaussian_pxy]
     type = ParsedFunction
-    # smooth Gaussian along the x=y diagonal (perp half-width = 0.0079)
-    # use (x-y) as rotated coordinate; exponent denominator uses 4*w^2 to give
-    # exp(-d_perp^2/(2*w^2)) where d_perp = |x-y|/sqrt(2)
-    expression = '0.01*8000.0 * exp(-((x - y)^2 / (4*0.0079^2))) + 8000.0'
+    #rho0=8000.0, l_md= 1.1um; rho0=16000.0, l_md=7.9um
+    expression = '0.01*4000.0 * exp(-((x - y)^2 / (4*0.0011^2))) + 4000.0'
   [../]
 
   [./Gaussian_mxy]
     type = ParsedFunction
-    # smooth Gaussian along the x+y=1.011 diagonal (perp half-width = 0.0079)
-    expression = '0.01*8000.0 * exp(-((x + y - 1.011)^2 / (4*0.0079^2))) + 8000.0'
-  [../]
-
-  [./Gaussian_along_p45]
-    type = ParsedFunction
-    # +45 deg: long axis along (1,1), short axis along (1,-1)
-    # short-axis width set to ~0.0079, long-axis extended to ~0.02
-    expression = 'if((abs((x - 1.011) + (y - 1.011)) < 0.02) * (abs((x - 1.011) - (y - 1.011)) < 0.0079), 0.001*16000.0 * exp(- ( ((x - 1.011 + (y - 1.011))^2) / (4*0.02^2) + ((x - 1.011 - (y - 1.011))^2) / (4*0.0079^2) ) ) + 8000.0, 8000.0)'
-  [../]
-
-  [./Gaussian_along_m45]
-    type = ParsedFunction
-    # -45 deg: long axis along (1,-1), short axis along (1,1)
-    # short-axis width set to ~0.0079, long-axis extended to ~0.02
-    expression = 'if((abs((x - 1.011) - (y - 1.011)) < 0.02) * (abs((x - 1.011) + (y - 1.011)) < 0.0079), 0.001*16000.0 * exp(- ( ((x - 1.011 - (y - 1.011))^2) / (4*0.02^2) + ((x - 1.011 + (y - 1.011))^2) / (4*0.0079^2) ) ) + 8000.0, 8000.0)'
+    #rho0=8000.0, l_md= 1.1um; rho0=16000.0, l_md=7.9um
+    expression = '0.01*4000.0 * exp(-((x + y - 1.011)^2 / (4*0.0011^2))) + 4000.0'
   [../]
 
   [./disp_load]
@@ -160,7 +144,7 @@
     type = Pressure
     variable = disp_x
     boundary = 'right'
-    factor = -0.966 #-0.683 -0.966
+    factor = -0.744 #-0.683 -0.966
     function = pressue_piecewise
   []
   [left_x]
@@ -502,9 +486,9 @@
       burgers           = 0.257e-6
         w1              = 0.0
         w2              = 0.0
-      scaling_Cb        = 0.2
-      scaling_Cd        = 0.0
-      tauF_on           = 0.0                                             #ON-1.0, OFF-0.0 (tauF= St*(1 -+ tauF_on*rhoG/rhoT) on or off)
+      scaling_Cb        = 0.1
+      scaling_Cd        = 0.1
+      tauF_on           = 1.0                                             #ON-1.0, OFF-0.0 (tauF= St*(1 -+ tauF_on*rhoG/rhoT) on or off)
 
     edge_dislo_den_pos_1 = rho_edge_pos_1
     edge_dislo_den_neg_1 = rho_edge_neg_1
@@ -540,7 +524,7 @@
 
   start_time = 0.0
   end_time = 0.2 #0.01
-  dt = 1.e-8
+  dt = 2.e-7
   dtmin = 1.e-12
 []
 
@@ -649,7 +633,7 @@
 
 [Outputs]
   exodus = true
-  time_step_interval = 500
+  time_step_interval = 200
   [csv]
     type = CSV
     file_base = rhoe_x_out_h5
