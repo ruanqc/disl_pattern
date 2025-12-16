@@ -11,8 +11,8 @@
   [gen]
     type = GeneratedMeshGenerator
     dim = 2
-    nx = 60
-    ny = 60
+    nx = 40
+    ny = 40
     xmin = 0.0
     ymin = 0.0
     xmax = 1.011
@@ -57,55 +57,55 @@
 []
 
 [ICs]
-  [./rho_edge_pos_1]
-    type = FunctionIC
-    variable = 'rho_edge_pos_1'
-    function = Gaussian_mxy
-  []
-  [./rho_edge_neg_1]
-    type = FunctionIC
-    variable = 'rho_edge_neg_1'
-    function = Gaussian_mxy
-  []
-  [./rho_edge_pos_2]
-    type = FunctionIC
-    variable = 'rho_edge_pos_2'
-    function = Gaussian_pxy
-  []
-  [./rho_edge_neg_2]
-    type = FunctionIC
-    variable = 'rho_edge_neg_2'
-    function = Gaussian_pxy
-  []  
-
   # [./rho_edge_pos_1]
-  #   type = RandomIC
+  #   type = FunctionIC
   #   variable = 'rho_edge_pos_1'
-  #   min = ${fparse 4000.0 - 4000.0*1.732*0.01}
-  #   max = ${fparse 4000.0 + 4000.0*1.732*0.01}
-  #   seed = 128
+  #   function = Gaussian_mxy
   # []
   # [./rho_edge_neg_1]
-  #   type = RandomIC
+  #   type = FunctionIC
   #   variable = 'rho_edge_neg_1'
-  #   min = ${fparse 4000.0 - 4000.0*1.732*0.01}
-  #   max = ${fparse 4000.0 + 4000.0*1.732*0.01}
-  #   seed = 128
+  #   function = Gaussian_mxy
   # []
   # [./rho_edge_pos_2]
-  #   type = RandomIC
+  #   type = FunctionIC
   #   variable = 'rho_edge_pos_2'
-  #   min = ${fparse 4000.0 - 4000.0*1.732*0.01}
-  #   max = ${fparse 4000.0 + 4000.0*1.732*0.01}
-  #   seed = 128
+  #   function = Gaussian_pxy
   # []
   # [./rho_edge_neg_2]
-  #   type = RandomIC
+  #   type = FunctionIC
   #   variable = 'rho_edge_neg_2'
-  #   min = ${fparse 4000.0 - 4000.0*1.732*0.01}
-  #   max = ${fparse 4000.0 + 4000.0*1.732*0.01}
-  #   seed = 128
+  #   function = Gaussian_pxy
   # []  
+
+  [./rho_edge_pos_1]
+    type = RandomIC
+    variable = 'rho_edge_pos_1'
+    min = ${fparse 4000.0 - 4000.0*0.005}
+    max = ${fparse 4000.0 + 4000.0*0.005}
+    seed = 42
+  []
+  [./rho_edge_neg_1]
+    type = RandomIC
+    variable = 'rho_edge_neg_1'
+    min = ${fparse 4000.0 - 4000.0*0.005}
+    max = ${fparse 4000.0 + 4000.0*0.005}
+    seed = 42
+  []
+  [./rho_edge_pos_2]
+    type = RandomIC
+    variable = 'rho_edge_pos_2'
+    min = ${fparse 4000.0 - 4000.0*0.005}
+    max = ${fparse 4000.0 + 4000.0*0.005}
+    seed = 42
+  []
+  [./rho_edge_neg_2]
+    type = RandomIC
+    variable = 'rho_edge_neg_2'
+    min = ${fparse 4000.0 - 4000.0*0.005}
+    max = ${fparse 4000.0 + 4000.0*0.005}
+    seed = 42
+  []  
 
 []
 
@@ -487,7 +487,7 @@
         w1              = 0.0
         w2              = 0.0
       scaling_Cb        = 0.1
-      scaling_Cd        = 0.1
+      scaling_Cd        = 0.0
       tauF_on           = 1.0                                             #ON-1.0, OFF-0.0 (tauF= St*(1 -+ tauF_on*rhoG/rhoT) on or off)
 
     edge_dislo_den_pos_1 = rho_edge_pos_1
@@ -524,7 +524,7 @@
 
   start_time = 0.0
   end_time = 0.2 #0.01
-  dt = 1.e-8
+  dt = 2.e-7
   dtmin = 1.e-12
 []
 
@@ -633,7 +633,7 @@
 
 [Outputs]
   exodus = true
-  time_step_interval = 500
+  time_step_interval = 200
   [csv]
     type = CSV
     file_base = rhoe_x_out_h5

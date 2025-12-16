@@ -11,8 +11,8 @@
   [gen]
     type = GeneratedMeshGenerator
     dim = 2
-    nx = 60
-    ny = 60
+    nx = 40
+    ny = 40
     xmin = 0.0
     ymin = 0.0
     xmax = 1.011
@@ -487,8 +487,8 @@
         w1              = 0.0
         w2              = 0.0
       scaling_Cb        = 0.1
-      scaling_Cd        = 0.0
-      tauF_on           = 0.0                                             #ON-1.0, OFF-0.0 (tauF= St*(1 -+ tauF_on*rhoG/rhoT) on or off)
+      scaling_Cd        = 0.01
+      tauF_on           = 1.0                                             #ON-1.0, OFF-0.0 (tauF= St*(1 -+ tauF_on*rhoG/rhoT) on or off)
 
     edge_dislo_den_pos_1 = rho_edge_pos_1
     edge_dislo_den_neg_1 = rho_edge_neg_1
@@ -524,7 +524,7 @@
 
   start_time = 0.0
   end_time = 0.2 #0.01
-  dt = 1.e-8
+  dt = 2.e-7
   dtmin = 1.e-12
 []
 
@@ -633,7 +633,7 @@
 
 [Outputs]
   exodus = true
-  time_step_interval = 500
+  time_step_interval = 200
   [csv]
     type = CSV
     file_base = rhoe_x_out_h5
