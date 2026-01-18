@@ -57,55 +57,55 @@
 []
 
 [ICs]
-  # [./rho_edge_pos_1]
-  #   type = FunctionIC
-  #   variable = 'rho_edge_pos_1'
-  #   function = Gaussian_mxy
-  # []
-  # [./rho_edge_neg_1]
-  #   type = FunctionIC
-  #   variable = 'rho_edge_neg_1'
-  #   function = Gaussian_mxy
-  # []
-  # [./rho_edge_pos_2]
-  #   type = FunctionIC
-  #   variable = 'rho_edge_pos_2'
-  #   function = Gaussian_pxy
-  # []
-  # [./rho_edge_neg_2]
-  #   type = FunctionIC
-  #   variable = 'rho_edge_neg_2'
-  #   function = Gaussian_pxy
-  # []  
-
   [./rho_edge_pos_1]
-    type = RandomIC
+    type = FunctionIC
     variable = 'rho_edge_pos_1'
-    min = ${fparse 4000.0 - 4000.0*0.005}
-    max = ${fparse 4000.0 + 4000.0*0.005}
-    seed = 42
+    function = Gaussian_mxy
   []
   [./rho_edge_neg_1]
-    type = RandomIC
+    type = FunctionIC
     variable = 'rho_edge_neg_1'
-    min = ${fparse 4000.0 - 4000.0*0.005}
-    max = ${fparse 4000.0 + 4000.0*0.005}
-    seed = 42
+    function = Gaussian_mxy
   []
   [./rho_edge_pos_2]
-    type = RandomIC
+    type = FunctionIC
     variable = 'rho_edge_pos_2'
-    min = ${fparse 4000.0 - 4000.0*0.005}
-    max = ${fparse 4000.0 + 4000.0*0.005}
-    seed = 42
+    function = Gaussian_pxy
   []
   [./rho_edge_neg_2]
-    type = RandomIC
+    type = FunctionIC
     variable = 'rho_edge_neg_2'
-    min = ${fparse 4000.0 - 4000.0*0.005}
-    max = ${fparse 4000.0 + 4000.0*0.005}
-    seed = 42
+    function = Gaussian_pxy
   []  
+
+  # [./rho_edge_pos_1]
+  #   type = RandomIC
+  #   variable = 'rho_edge_pos_1'
+  #   min = ${fparse 4000.0 - 4000.0*1.732*0.01}
+  #   max = ${fparse 4000.0 + 4000.0*1.732*0.01}
+  #   seed = 128
+  # []
+  # [./rho_edge_neg_1]
+  #   type = RandomIC
+  #   variable = 'rho_edge_neg_1'
+  #   min = ${fparse 4000.0 - 4000.0*1.732*0.01}
+  #   max = ${fparse 4000.0 + 4000.0*1.732*0.01}
+  #   seed = 128
+  # []
+  # [./rho_edge_pos_2]
+  #   type = RandomIC
+  #   variable = 'rho_edge_pos_2'
+  #   min = ${fparse 4000.0 - 4000.0*1.732*0.01}
+  #   max = ${fparse 4000.0 + 4000.0*1.732*0.01}
+  #   seed = 128
+  # []
+  # [./rho_edge_neg_2]
+  #   type = RandomIC
+  #   variable = 'rho_edge_neg_2'
+  #   min = ${fparse 4000.0 - 4000.0*1.732*0.01}
+  #   max = ${fparse 4000.0 + 4000.0*1.732*0.01}
+  #   seed = 128
+  # []  
 
 []
 
@@ -118,13 +118,13 @@
   [./Gaussian_pxy]
     type = ParsedFunction
     #rho0=8000.0, l_md= 1.1um; rho0=16000.0, l_md=7.9um
-    expression = '0.01*4000.0 * exp(-((x - y)^2 / (4*0.0011^2))) + 4000.0'
+    expression = '0.01*8000.0 * exp(-((x - y)^2 / (2*0.0079^2))) + 8000.0'
   [../]
 
   [./Gaussian_mxy]
     type = ParsedFunction
     #rho0=8000.0, l_md= 1.1um; rho0=16000.0, l_md=7.9um
-    expression = '0.01*4000.0 * exp(-((x + y - 1.011)^2 / (4*0.0011^2))) + 4000.0'
+    expression = '0.01*8000.0 * exp(-((x + y - 1.011)^2 / (2*0.0079^2))) + 8000.0'
   [../]
 
   [./disp_load]
@@ -144,7 +144,7 @@
     type = Pressure
     variable = disp_x
     boundary = 'right'
-    factor = -0.744 #-0.683 -0.966
+    factor = -0.966 #-0.683 -0.966
     function = pressue_piecewise
   []
   [left_x]
@@ -255,6 +255,29 @@
    family = MONOMIAL
    block = '0'
   [../]
+
+  [./tauf_p1]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
+  [../]
+  [./tauf_m1]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
+  [../]
+  [./tauEff_p2]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
+  [../]
+  [./tauEff_m2]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
+  [../] 
+  
+
   [./sT_1]                 #Name shown in Paraview
    order = CONSTANT
    family = MONOMIAL
@@ -265,6 +288,28 @@
    family = MONOMIAL
    block = '0'
   [../]
+
+   [./tauEff_p1]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
+  [../]
+  [./tauEff_m1]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
+  [../]
+    [./tauf_p2]                 #Name shown in Paraview
+    order = CONSTANT
+    family = MONOMIAL
+    block = '0'
+    [../]
+    [./tauf_m2]                 #Name shown in Paraview
+    order = CONSTANT
+    family = MONOMIAL
+    block = '0'
+    [../]
+
 
 []
 
@@ -437,6 +482,36 @@
    index = 1
    block = '0'
   [../]
+
+  [./tauf_p1]                     #Name arbiarbitrary
+   type = MaterialStdVectorAux  #Use this for std::vector p
+   variable = tauf_p1            #Consistant with AuxVariables
+   property = tauf_p         
+   index = 0
+   block = '0'
+  [../]   
+  [./tauf_m1]                     #Name arbiarbitrary
+   type = MaterialStdVectorAux  #Use this for std::vector p
+   variable = tauf_m1             #Consistant with AuxVariables
+   property = tauf_m         
+   index = 0
+   block = '0'
+  [../]
+  [./tauEff_p2]                     #Name arbiarbitrary
+    type = MaterialStdVectorAux  #Use this for std::vector p
+    variable = tauEff_p2            #Consistant with AuxVariables
+    property = tauEff_p         
+    index = 1
+    block = '0'
+    [../]   
+  [./tauEff_m2]                     #Name arbiarbitrary
+    type = MaterialStdVectorAux  #Use this for std::vector p
+    variable = tauEff_m2             #Consistant with AuxVariables
+    property = tauEff_m         
+    index = 1
+    block = '0'
+  [../]
+
   [./sT_1]                     #Name arbiarbitrary
    type = MaterialStdVectorAux  #Use this for std::vector p
    variable = sT_1             #Consistant with AuxVariables
@@ -451,6 +526,35 @@
    index = 1
    block = '0'
   [../]
+  
+  [./tauEff_p1]                     #Name arbiarbitrary
+   type = MaterialStdVectorAux  #Use this for std::vector p
+   variable = tauEff_p1            #Consistant with AuxVariables
+   property = tauEff_p         
+   index = 0
+   block = '0'
+  [../]   
+  [./tauEff_m1]                     #Name arbiarbitrary
+   type = MaterialStdVectorAux  #Use this for std::vector p
+   variable = tauEff_m1             #Consistant with AuxVariables
+   property = tauEff_m         
+   index = 0
+   block = '0'
+  [../] 
+    [./tauf_p2]                     #Name arbiarbitrary
+    type = MaterialStdVectorAux  #Use this for std::vector p
+    variable = tauf_p2            #Consistant with AuxVariables
+    property = tauf_p         
+    index = 1
+    block = '0'
+    [../]   
+    [./tauf_m2]                     #Name arbiarbitrary
+    type = MaterialStdVectorAux  #Use this for std::vector p
+    variable = tauf_m2             #Consistant with AuxVariables
+    property = tauf_m         
+    index = 1
+    block = '0'
+    [../] 
 
 []
 
@@ -477,7 +581,7 @@
       gdot0             = 1.0e6
       f0                = 2.77e-19
       boltzmann         = 1.38065e-23
-      temperature       = 500.0                                         # 750 - 273.15 in degrees Celsius
+      temperature       = 227.0                                         # 750 - 273.15 in degrees Celsius
       tau_0             = 20.0
       p                 = 0.2
       q                 = 1.2
@@ -487,8 +591,8 @@
         w1              = 0.0
         w2              = 0.0
       scaling_Cb        = 0.1
-      scaling_Cd        = 0.0
-      tauF_on           = 0.0                                             #ON-1.0, OFF-0.0 (tauF= St*(1 -+ tauF_on*rhoG/rhoT) on or off)
+      scaling_Cd        = 0.1
+      tauF_on           = 1.0                                             #ON-1.0, OFF-0.0 (tauF= St*(1 -+ tauF_on*rhoG/rhoT) on or off)
 
     edge_dislo_den_pos_1 = rho_edge_pos_1
     edge_dislo_den_neg_1 = rho_edge_neg_1
@@ -616,16 +720,59 @@
      variable = taud_2
      block = '0'
   [../]
+
+  [./tauf_p1]
+     type = ElementAverageValue
+     variable = tauf_p1
+     block = '0'
+  [../]
+  [./tauf_m1]
+     type = ElementAverageValue
+     variable = tauf_m1
+     block = '0'
+  [../]
+  [./tauf_p2]
+     type = ElementAverageValue
+     variable = tauf_p2
+     block = '0'
+  [../]
+  [./tauf_m2]
+     type = ElementAverageValue
+     variable = tauf_m2
+     block = '0'
+  [../]
+  
   [./sT_1]
      type = ElementAverageValue
      variable = sT_1
      block = '0'
   [../]
-    [./sT_2]
+  [./sT_2]
      type = ElementAverageValue
      variable = sT_2
       block = '0'
   [../]
+  [./tauEff_p1]
+     type = ElementAverageValue
+     variable = tauEff_p1
+     block = '0'
+  [../]
+  [./tauEff_m1]
+     type = ElementAverageValue
+     variable = tauEff_m1
+     block = '0'
+  [../]
+  [./tauEff_p2]
+     type = ElementAverageValue
+     variable = tauEff_p2
+     block = '0'
+  [../]
+  [./tauEff_m2]
+     type = ElementAverageValue
+     variable = tauEff_m2
+     block = '0'
+  [../] 
+
 []
 
 [VectorPostprocessors]
@@ -633,7 +780,7 @@
 
 [Outputs]
   exodus = true
-  time_step_interval = 200
+  time_step_interval = 500 #500
   [csv]
     type = CSV
     file_base = rhoe_x_out_h5

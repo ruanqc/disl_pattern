@@ -206,6 +206,8 @@ protected:
 
   MaterialProperty<std::vector<Real>> & _tauEff_p; //ruanqc 260118 added
   MaterialProperty<std::vector<Real>> & _tauEff_m; //ruanqc 260118 added
+  MaterialProperty<std::vector<Real>> & _tauf_p; //ruanqc 260118 added
+  MaterialProperty<std::vector<Real>> & _tauf_m; //ruanqc 260118 added
 
   MaterialProperty<std::vector<Real>> & _rss_qc; //ruanqc 250922 added to checkout resolved shear stress
   MaterialProperty<std::vector<Real>> & _taub_qc;   //ruanqc 251105 added to checkout backstress

@@ -118,13 +118,13 @@
   [./Gaussian_pxy]
     type = ParsedFunction
     #rho0=8000.0, l_md= 1.1um; rho0=16000.0, l_md=7.9um
-    expression = '0.01*4000.0 * exp(-((x - y)^2 / (4*0.0011^2))) + 4000.0'
+    expression = '0.01*8000.0 * exp(-((x - y)^2 / (2*0.0079^2))) + 8000.0'
   [../]
 
   [./Gaussian_mxy]
     type = ParsedFunction
     #rho0=8000.0, l_md= 1.1um; rho0=16000.0, l_md=7.9um
-    expression = '0.01*4000.0 * exp(-((x + y - 1.011)^2 / (4*0.0011^2))) + 4000.0'
+    expression = '0.01*8000.0 * exp(-((x + y - 1.011)^2 / (2*0.0079^2))) + 8000.0'
   [../]
 
   [./disp_load]
@@ -144,7 +144,7 @@
     type = Pressure
     variable = disp_x
     boundary = 'right'
-    factor = -0.744 #-0.683 -0.966
+    factor = -0.966 #-0.683 -0.966
     function = pressue_piecewise
   []
   [left_x]
@@ -255,23 +255,13 @@
    family = MONOMIAL
    block = '0'
   [../]
-  [./sT_1]                 #Name shown in Paraview
-   order = CONSTANT
-   family = MONOMIAL
-   block = '0'
-  [../]
-    [./sT_2]                 #Name shown in Paraview
-   order = CONSTANT
-   family = MONOMIAL
-   block = '0'
-  [../]
 
-  [./tauEff_p1]                 #Name shown in Paraview
+  [./tauf_p1]                 #Name shown in Paraview
    order = CONSTANT
    family = MONOMIAL
    block = '0'
   [../]
-  [./tauEff_m1]                 #Name shown in Paraview
+  [./tauf_m1]                 #Name shown in Paraview
    order = CONSTANT
    family = MONOMIAL
    block = '0'
@@ -285,7 +275,41 @@
    order = CONSTANT
    family = MONOMIAL
    block = '0'
-  [../]    
+  [../] 
+  
+
+  [./sT_1]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
+  [../]
+    [./sT_2]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
+  [../]
+
+   [./tauEff_p1]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
+  [../]
+  [./tauEff_m1]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
+  [../]
+    [./tauf_p2]                 #Name shown in Paraview
+    order = CONSTANT
+    family = MONOMIAL
+    block = '0'
+    [../]
+    [./tauf_m2]                 #Name shown in Paraview
+    order = CONSTANT
+    family = MONOMIAL
+    block = '0'
+    [../]
+
 
 []
 
@@ -458,6 +482,36 @@
    index = 1
    block = '0'
   [../]
+
+  [./tauf_p1]                     #Name arbiarbitrary
+   type = MaterialStdVectorAux  #Use this for std::vector p
+   variable = tauf_p1            #Consistant with AuxVariables
+   property = tauf_p         
+   index = 0
+   block = '0'
+  [../]   
+  [./tauf_m1]                     #Name arbiarbitrary
+   type = MaterialStdVectorAux  #Use this for std::vector p
+   variable = tauf_m1             #Consistant with AuxVariables
+   property = tauf_m         
+   index = 0
+   block = '0'
+  [../]
+  [./tauEff_p2]                     #Name arbiarbitrary
+    type = MaterialStdVectorAux  #Use this for std::vector p
+    variable = tauEff_p2            #Consistant with AuxVariables
+    property = tauEff_p         
+    index = 1
+    block = '0'
+    [../]   
+  [./tauEff_m2]                     #Name arbiarbitrary
+    type = MaterialStdVectorAux  #Use this for std::vector p
+    variable = tauEff_m2             #Consistant with AuxVariables
+    property = tauEff_m         
+    index = 1
+    block = '0'
+  [../]
+
   [./sT_1]                     #Name arbiarbitrary
    type = MaterialStdVectorAux  #Use this for std::vector p
    variable = sT_1             #Consistant with AuxVariables
@@ -465,7 +519,7 @@
    index = 0
    block = '0'
   [../] 
-  [./sT_2]                     #Name arbiarbitrary
+    [./sT_2]                     #Name arbiarbitrary
    type = MaterialStdVectorAux  #Use this for std::vector p
    variable = sT_2             #Consistant with AuxVariables
    property = sT_qc         
@@ -479,14 +533,7 @@
    property = tauEff_p         
    index = 0
    block = '0'
-  [../]  
-  [./tauEff_p2]                     #Name arbiarbitrary
-   type = MaterialStdVectorAux  #Use this for std::vector p
-   variable = tauEff_p2             #Consistant with AuxVariables
-   property = tauEff_p         
-   index = 1
-   block = '0'
-  [../]    
+  [../]   
   [./tauEff_m1]                     #Name arbiarbitrary
    type = MaterialStdVectorAux  #Use this for std::vector p
    variable = tauEff_m1             #Consistant with AuxVariables
@@ -494,14 +541,20 @@
    index = 0
    block = '0'
   [../] 
-  [./tauEff_m2]                     #Name arbiarbitrary
-   type = MaterialStdVectorAux  #Use this for std::vector p
-   variable = tauEff_m2             #Consistant with AuxVariables
-   property = tauEff_m         
-   index = 1
-   block = '0'
-  [../]  
-
+    [./tauf_p2]                     #Name arbiarbitrary
+    type = MaterialStdVectorAux  #Use this for std::vector p
+    variable = tauf_p2            #Consistant with AuxVariables
+    property = tauf_p         
+    index = 1
+    block = '0'
+    [../]   
+    [./tauf_m2]                     #Name arbiarbitrary
+    type = MaterialStdVectorAux  #Use this for std::vector p
+    variable = tauf_m2             #Consistant with AuxVariables
+    property = tauf_m         
+    index = 1
+    block = '0'
+    [../] 
 
 []
 
@@ -667,6 +720,28 @@
      variable = taud_2
      block = '0'
   [../]
+
+  [./tauf_p1]
+     type = ElementAverageValue
+     variable = tauf_p1
+     block = '0'
+  [../]
+  [./tauf_m1]
+     type = ElementAverageValue
+     variable = tauf_m1
+     block = '0'
+  [../]
+  [./tauf_p2]
+     type = ElementAverageValue
+     variable = tauf_p2
+     block = '0'
+  [../]
+  [./tauf_m2]
+     type = ElementAverageValue
+     variable = tauf_m2
+     block = '0'
+  [../]
+  
   [./sT_1]
      type = ElementAverageValue
      variable = sT_1
@@ -682,21 +757,22 @@
      variable = tauEff_p1
      block = '0'
   [../]
-  [./tauEff_p2]
-     type = ElementAverageValue
-     variable = tauEff_p2
-     block = '0'
-  [../]
   [./tauEff_m1]
      type = ElementAverageValue
      variable = tauEff_m1
+     block = '0'
+  [../]
+  [./tauEff_p2]
+     type = ElementAverageValue
+     variable = tauEff_p2
      block = '0'
   [../]
   [./tauEff_m2]
      type = ElementAverageValue
      variable = tauEff_m2
      block = '0'
-  [../]    
+  [../] 
+
 []
 
 [VectorPostprocessors]
@@ -704,7 +780,7 @@
 
 [Outputs]
   exodus = true
-  time_step_interval = 500
+  time_step_interval = 500 #500
   [csv]
     type = CSV
     file_base = rhoe_x_out_h5
