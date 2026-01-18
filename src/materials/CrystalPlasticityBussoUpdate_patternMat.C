@@ -148,6 +148,9 @@ CrystalPlasticityBussoUpdate_patternMat::CrystalPlasticityBussoUpdate_patternMat
     _slip_increment_p(declareProperty<std::vector<Real>>("slip_increment_p")),
     _slip_increment_m(declareProperty<std::vector<Real>>("slip_increment_m")),
 
+    _tauEff_p(declareProperty<std::vector<Real>>("tauEff_p")), //ruanqc 260118 added
+    _tauEff_m(declareProperty<std::vector<Real>>("tauEff_m")), //ruanqc 260118 added
+
     _rss_qc(declareProperty<std::vector<Real>>("rss_qc")),  //ruanqc 250922 added to checkout resolved shear stress   
     
     _taub_qc(declareProperty<std::vector<Real>>("taub_qc")),  //ruanqc 251105 added to checkout backstress
@@ -313,7 +316,9 @@ CrystalPlasticityBussoUpdate_patternMat::calculateSlipRate()
   // an out-of-bounds access, uninitialized pointer/reference, or invalid vector size.
   _slip_increment_p[_qp].resize(_number_slip_systems);
   _slip_increment_m[_qp].resize(_number_slip_systems);
-  
+  _tauEff_p[_qp].resize(_number_slip_systems);            //ruanqc 260118 added to verify gdot
+  _tauEff_m[_qp].resize(_number_slip_systems);            //ruanqc 260118
+
   _rss_qc[_qp].resize(_number_slip_systems); //ruanqc 250922 added to checkout resolved shear stress
   _taub_qc[_qp].resize(_number_slip_systems); //ruanqc 251105 added to checkout backstress
   _taud_qc[_qp].resize(_number_slip_systems); //ruanqc 251105 added to checkout diffusion stress
@@ -463,7 +468,10 @@ CrystalPlasticityBussoUpdate_patternMat::calculateSlipRate()
                                                             (rho_edge_pos[i] + rho_edge_neg[i])
                                                             // std::max((rho_edge_pos[i] + rho_edge_neg[i]), 1.e-10)   //ruanqc avoid zero division
                                                             );                          
-                      
+    
+    _tauEff_p[_qp][i]=   driving_force_p;
+    _tauEff_m[_qp][i]=   driving_force_m;   
+
     if (driving_force_p < 1.e-10)
     {
       _slip_increment_p[_qp][i] = 0.0;

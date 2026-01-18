@@ -204,6 +204,9 @@ protected:
   MaterialProperty<std::vector<Real>> & _slip_increment_p;
   MaterialProperty<std::vector<Real>> & _slip_increment_m;
 
+  MaterialProperty<std::vector<Real>> & _tauEff_p; //ruanqc 260118 added
+  MaterialProperty<std::vector<Real>> & _tauEff_m; //ruanqc 260118 added
+
   MaterialProperty<std::vector<Real>> & _rss_qc; //ruanqc 250922 added to checkout resolved shear stress
   MaterialProperty<std::vector<Real>> & _taub_qc;   //ruanqc 251105 added to checkout backstress
   MaterialProperty<std::vector<Real>> & _taud_qc;  //ruanqc 251105 added to checkout diffusion stress
