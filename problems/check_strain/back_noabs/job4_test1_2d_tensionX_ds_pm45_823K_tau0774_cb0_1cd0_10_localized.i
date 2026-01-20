@@ -581,7 +581,7 @@
       gdot0             = 1.0e6
       f0                = 2.77e-19
       boltzmann         = 1.38065e-23
-      temperature       = 500.0                                         # 750 - 273.15 in degrees Celsius
+      temperature       = 550.0                                         # 750 - 273.15 in degrees Celsius
       tau_0             = 20.0
       p                 = 0.2
       q                 = 1.2

@@ -157,6 +157,9 @@ CrystalPlasticityBussoUpdate_patternMat::CrystalPlasticityBussoUpdate_patternMat
     _taud_qc(declareProperty<std::vector<Real>>("taud_qc")),  //ruanqc 251105 added to checkout diffusion stress
     _tauf_p(declareProperty<std::vector<Real>>("tauf_p")),  //ruanqc 260118 added to checkout fraction stress
     _tauf_m(declareProperty<std::vector<Real>>("tauf_m")),  //ruanqc 260118 added to checkout fraction stress
+    _rhoT1(declareProperty<std::vector<Real>>("rhoT1")),  //ruanqc 260118 added to checkout fraction stress, in the first posision
+    _rhoT2(declareProperty<std::vector<Real>>("rhoT2")),  //ruanqc 260118 added to checkout fraction stress, in the second posision
+
 
     _sT_qc(declareProperty<std::vector<Real>>("sT_qc")),  //ruanqc 251105 added to checkout slip resistance
 
@@ -328,6 +331,8 @@ CrystalPlasticityBussoUpdate_patternMat::calculateSlipRate()
   _tauf_p[_qp].resize(_number_slip_systems); //ruanqc 260118 added to checkout fraction  stress
   _tauf_m[_qp].resize(_number_slip_systems); //ruanqc 260118 added to checkout fraction  stress 
 
+  _rhoT1[_qp].resize(_number_slip_systems); //ruanqc 260120 added to checkout totdal density in slip resistance
+
   _sT_qc[_qp].resize(_number_slip_systems);   //ruanqc 251105 added to checkout slip resistance
 
   calculateSlipResistance();
@@ -457,17 +462,19 @@ CrystalPlasticityBussoUpdate_patternMat::calculateSlipRate()
     _taud_qc[_qp][i] = _tau_d(i); //ruanqc 251105 added to checkout drag stress
     _sT_qc[_qp][i]   = _slip_resistance[_qp][i];   //ruanqc 251105 added to checkout slip resistance
 
+    _rhoT1[_qp][i]    = (rho_edge_pos[i] + rho_edge_neg[i]);   //ruanqc 260120 added to checkout total density in slip resistance
+
 
     Real driving_force_p = std::abs(_tau[_qp][i] - _backstress(i) - _tau_d(i)) - _slip_resistance[_qp][i] * 
-                                                            (1.0 - _tauF_on * (rho_edge_pos[i] - rho_edge_neg[i]) / 
+                                                            (1.0 - _tauF_on *
+                                                            (rho_edge_pos[i] - rho_edge_neg[i]) / 
                                                             (rho_edge_pos[i] + rho_edge_neg[i])
-                                                            // std::max((rho_edge_pos[i] + rho_edge_neg[i]), 1.e-10)  //ruanqc avoid zero division  
                                                             );    
                       
     Real driving_force_m = std::abs(_tau[_qp][i] - _backstress(i) + _tau_d(i)) - _slip_resistance[_qp][i] * 
-                                                            (1.0 + _tauF_on * (rho_edge_pos[i] - rho_edge_neg[i]) / 
+                                                            (1.0 + _tauF_on *
+                                                            (rho_edge_pos[i] - rho_edge_neg[i]) / 
                                                             (rho_edge_pos[i] + rho_edge_neg[i])
-                                                            // std::max((rho_edge_pos[i] + rho_edge_neg[i]), 1.e-10)   //ruanqc avoid zero division
                                                             );                          
     
     _tauEff_p[_qp][i]=   std::abs(_tau[_qp][i] - _backstress(i) - _tau_d(i));
@@ -603,6 +610,8 @@ CrystalPlasticityBussoUpdate_patternMat::calculateDislocationVelocity()
   _dislo_velocity_p[_qp].resize(_number_slip_systems);
   _dislo_velocity_m[_qp].resize(_number_slip_systems);
 
+  _rhoT2[_qp].resize(_number_slip_systems); //ruanqc 260120 added to checkout totdal density in slip resistance
+
   Real total_dislocation_density = 0.0; // total dislocation density in the current slip system
 
   rho_edge_pos[0] = _edge_dislo_den_pos_1[_qp];
@@ -646,17 +655,19 @@ CrystalPlasticityBussoUpdate_patternMat::calculateDislocationVelocity()
     // // ruanqc commented and modified by adding two driving forces for + and - dislocations
     // Real driving_force   = std::abs(_tau[_qp][i] - _backstress(i) - _tau_d(i)) - _slip_resistance[_qp][i];
 
+    _rhoT2[_qp][i] = (rho_edge_pos[i] + rho_edge_neg[i]); // ruanqc 260120 added to check total dislocation density in slip resistance
+
     Real driving_force_p = std::abs(_tau[_qp][i] - _backstress(i) - _tau_d(i)) - _slip_resistance[_qp][i] * 
-                      (1.0 - _tauF_on * (rho_edge_pos[i] - rho_edge_neg[i]) / 
-                                                              (rho_edge_pos[i] + rho_edge_neg[i])
-                                                              // std::max((rho_edge_pos[i] + rho_edge_neg[i]), 1.e-10)   //ruanqc avoid zero division
-                      );    
+                                                           (1.0 - _tauF_on *
+                                                            (rho_edge_pos[i] - rho_edge_neg[i]) / 
+                                                            (rho_edge_pos[i] + rho_edge_neg[i])
+                                                            );    
 
     Real driving_force_m = std::abs(_tau[_qp][i] - _backstress(i) + _tau_d(i)) - _slip_resistance[_qp][i] * 
-                      (1.0 + _tauF_on * (rho_edge_pos[i] - rho_edge_neg[i]) /
-                                                              (rho_edge_pos[i] + rho_edge_neg[i])
-                                                              // std::max((rho_edge_pos[i] + rho_edge_neg[i]), 1.e-10)   //ruanqc avoid zero division
-                      );                    
+                                                           (1.0 + _tauF_on *
+                                                            (rho_edge_pos[i] - rho_edge_neg[i]) / 
+                                                            (rho_edge_pos[i] + rho_edge_neg[i])
+                                                            );                    
  
 
     if (driving_force_p > 1.e-10)
@@ -777,13 +788,11 @@ CrystalPlasticityBussoUpdate_patternMat::calculateConstitutiveSlipDerivative(std
     Real driving_force_p = std::abs(_tau[_qp][i] - _backstress(i) - _tau_d(i)) - _slip_resistance[_qp][i] * 
                       (1.0 - _tauF_on * (rho_edge_pos[i] - rho_edge_neg[i]) / 
                                         (rho_edge_pos[i] + rho_edge_neg[i])
-                                        // std::max((rho_edge_pos[i] + rho_edge_neg[i]), 1.e-10) 
                       );    
 
     Real driving_force_m = std::abs(_tau[_qp][i] - _backstress(i) + _tau_d(i)) - _slip_resistance[_qp][i] * 
                       (1.0 + _tauF_on * (rho_edge_pos[i] - rho_edge_neg[i]) /
                                         (rho_edge_pos[i] + rho_edge_neg[i])
-                                        // std::max((rho_edge_pos[i] + rho_edge_neg[i]), 1.e-10) 
                       );                       
 
 

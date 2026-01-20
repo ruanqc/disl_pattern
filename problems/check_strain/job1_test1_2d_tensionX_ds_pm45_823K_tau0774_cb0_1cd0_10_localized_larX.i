@@ -11,8 +11,8 @@
   [gen]
     type = GeneratedMeshGenerator
     dim = 2
-    nx = 40
-    ny = 40
+    nx = 10
+    ny = 10
     xmin = 0.0
     ymin = 0.0
     xmax = 1.011
@@ -309,7 +309,16 @@
     family = MONOMIAL
     block = '0'
     [../]
-
+  [./rhoT1]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
+  [../]
+  [./rhoT2]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
+  [../]
 
 []
 
@@ -555,7 +564,21 @@
     index = 1
     block = '0'
     [../] 
-
+  
+  [./rhoT1]
+  type = MaterialStdVectorAux  #Use this for std::vector p
+  variable = rhoT1             #Consistant with AuxVariables
+  property = rhoT1         
+  index = 0
+  block = '0'
+  [../]
+  [./rhoT2]
+  type = MaterialStdVectorAux  #Use this for std::vector p
+  variable = rhoT2             #Consistant with AuxVariables
+  property = rhoT2
+  index = 0
+  block = '0'
+  [../]
 []
 
 [Materials]
@@ -581,7 +604,7 @@
       gdot0             = 1.0e6
       f0                = 2.77e-19
       boltzmann         = 1.38065e-23
-      temperature       = 500.0                                         # 750 - 273.15 in degrees Celsius
+      temperature       = 550.0                                         # 750 - 273.15 in degrees Celsius
       tau_0             = 20.0
       p                 = 0.2
       q                 = 1.2
@@ -591,7 +614,7 @@
         w1              = 0.0
         w2              = 0.0
       scaling_Cb        = 0.1
-      scaling_Cd        = 0.05
+      scaling_Cd        = 0.1
       tauF_on           = 1.0                                             #ON-1.0, OFF-0.0 (tauF= St*(1 -+ tauF_on*rhoG/rhoT) on or off)
 
     edge_dislo_den_pos_1 = rho_edge_pos_1
@@ -772,6 +795,16 @@
      variable = tauEff_m2
      block = '0'
   [../] 
+  [./rhoT1]
+     type = ElementAverageValue
+     variable = rhoT1
+     block = '0'
+  [../]
+  [./rhoT2]
+     type = ElementAverageValue
+     variable = rhoT2
+     block = '0'
+  [../]
 
 []
 
@@ -780,7 +813,7 @@
 
 [Outputs]
   exodus = true
-  time_step_interval = 500 #500
+  time_step_interval = 200 #500
   [csv]
     type = CSV
     file_base = rhoe_x_out_h5

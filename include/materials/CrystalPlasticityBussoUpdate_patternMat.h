@@ -214,6 +214,8 @@ protected:
   MaterialProperty<std::vector<Real>> & _taud_qc;  //ruanqc 251105 added to checkout diffusion stress
   MaterialProperty<std::vector<Real>> & _sT_qc;  //ruanqc 251105 added to checkout slip resistance
 
+  MaterialProperty<std::vector<Real>> & _rhoT1;  //ruanqc 261105 added to checkout total density in slip resistance, first position
+  MaterialProperty<std::vector<Real>> & _rhoT2;  //ruanqc 260120 added to checkout total density in slip resistance, second position
 
   MaterialProperty<Real> & _accumulated_equivalent_plastic_strain;
   const MaterialProperty<Real> & _accumulated_equivalent_plastic_strain_old;
