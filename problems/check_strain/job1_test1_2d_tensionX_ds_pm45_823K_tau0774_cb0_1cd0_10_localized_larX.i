@@ -320,6 +320,26 @@
    block = '0'
   [../]
 
+  [./rho_ini1]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
+  [../]
+  [./rho_har1]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
+  [../]
+  [./rho_ini2]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
+  [../]
+  [./rho_har2]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
+  [../]
 []
 
 
@@ -579,6 +599,36 @@
   index = 0
   block = '0'
   [../]
+
+  [./rho_ini1]
+  type = MaterialStdVectorAux  #Use this for std::vector p
+  variable = rho_ini1             #Consistant with AuxVariables
+  property = rho_ini
+  index = 0
+  block = '0'
+  [../]   
+  [./rho_har1]
+  type = MaterialStdVectorAux  #Use this for std::vector p
+  variable = rho_har1             #Consistant with AuxVariables
+  property = rho_har
+  index = 0
+  block = '0'
+  [../]
+  [./rho_ini2]
+  type = MaterialStdVectorAux  #Use this for std::vector p
+  variable = rho_ini2             #Consistant with AuxVariables
+  property = rho_ini
+  index = 1
+  block = '0'
+  [../]   
+  [./rho_har2]
+  type = MaterialStdVectorAux  #Use this for std::vector p
+  variable = rho_har2             #Consistant with AuxVariables
+  property = rho_har  
+  index = 1
+  block = '0'
+  [../]
+  
 []
 
 [Materials]
@@ -803,6 +853,26 @@
   [./rhoT2]
      type = ElementAverageValue
      variable = rhoT2
+     block = '0'
+  [../]
+  [./rho_ini1]
+     type = ElementAverageValue
+     variable = rho_ini1
+     block = '0'
+  [../]
+  [./rho_har1]
+     type = ElementAverageValue
+     variable = rho_har1
+     block = '0'
+  [../]
+  [./rho_ini2]
+     type = ElementAverageValue
+     variable = rho_ini2
+     block = '0'
+  [../]
+  [./rho_har2]
+     type = ElementAverageValue
+     variable = rho_har2
      block = '0'
   [../]
 

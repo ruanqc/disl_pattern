@@ -159,6 +159,9 @@ CrystalPlasticityBussoUpdate_patternMat::CrystalPlasticityBussoUpdate_patternMat
     _tauf_m(declareProperty<std::vector<Real>>("tauf_m")),  //ruanqc 260118 added to checkout fraction stress
     _rhoT1(declareProperty<std::vector<Real>>("rhoT1")),  //ruanqc 260118 added to checkout fraction stress, in the first posision
     _rhoT2(declareProperty<std::vector<Real>>("rhoT2")),  //ruanqc 260118 added to checkout fraction stress, in the second posision
+    
+    _rho_ini(declareProperty<std::vector<Real>>("rho_ini")),  //ruanqc 260118 added to checkout initial density
+    _rho_har(declareProperty<std::vector<Real>>("rho_har")),  //ruanqc 260118 added to checkout hardening density
 
 
     _sT_qc(declareProperty<std::vector<Real>>("sT_qc")),  //ruanqc 251105 added to checkout slip resistance
@@ -178,6 +181,7 @@ CrystalPlasticityBussoUpdate_patternMat::initQpStatefulProperties()
 
   std::vector<Real> rho_edge_pos(_number_slip_systems);
   std::vector<Real> rho_edge_neg(_number_slip_systems);
+  _rho_ini[_qp].resize(_number_slip_systems); //ruanqc 260120 added to checkout initial density
 
   rho_edge_pos[0] = _edge_dislo_den_pos_1[_qp];
   rho_edge_pos[1] = _edge_dislo_den_pos_2[_qp];
@@ -222,6 +226,9 @@ CrystalPlasticityBussoUpdate_patternMat::initQpStatefulProperties()
       // _w1   * (_edge_dislocation_density[_qp][j] + _screw_dislocation_density[_qp][j]); // latent
       // hardening
     }
+   
+    _rho_ini[_qp][i] =initial_hardening_total_dislocation_density; //ruanqc 260120 added to checkout initial density
+   
     _slip_resistance[_qp][i] =
         _dlamb * _shear_modulus * _burgers * std::sqrt(initial_hardening_total_dislocation_density);
   }
@@ -554,6 +561,8 @@ CrystalPlasticityBussoUpdate_patternMat::calculateSlipResistance()
 
   _slip_resistance[_qp].resize(_number_slip_systems);
 
+  _rho_har[_qp].resize(_number_slip_systems); //ruanqc 260120 added to checkout hardening density
+
   rho_edge_pos[0] = _edge_dislo_den_pos_1[_qp];
   rho_edge_pos[1] = _edge_dislo_den_pos_2[_qp];
   // rho_edge_pos[2] = _rho_edge_pos_3[_qp];
@@ -592,6 +601,9 @@ CrystalPlasticityBussoUpdate_patternMat::calculateSlipResistance()
         hardening_total_dislocation_density +=
             _w1 * (rho_edge_pos[j] + rho_edge_neg[j]); // latent hardening
     }
+    
+    _rho_har[_qp][i] = hardening_total_dislocation_density; //ruanqc 260120 added to checkout hardening density
+
     _slip_resistance[_qp][i] =
         _dlamb * _shear_modulus * _burgers * std::sqrt(hardening_total_dislocation_density);
   }

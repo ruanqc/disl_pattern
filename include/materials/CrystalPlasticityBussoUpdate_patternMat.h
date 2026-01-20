@@ -217,6 +217,9 @@ protected:
   MaterialProperty<std::vector<Real>> & _rhoT1;  //ruanqc 261105 added to checkout total density in slip resistance, first position
   MaterialProperty<std::vector<Real>> & _rhoT2;  //ruanqc 260120 added to checkout total density in slip resistance, second position
 
+  MaterialProperty<std::vector<Real>> & _rho_ini;  //ruanqc 260120 added to checkout initial density
+  MaterialProperty<std::vector<Real>> & _rho_har;  //ruanqc 260120 added to checkout hardening density
+
   MaterialProperty<Real> & _accumulated_equivalent_plastic_strain;
   const MaterialProperty<Real> & _accumulated_equivalent_plastic_strain_old;
 
