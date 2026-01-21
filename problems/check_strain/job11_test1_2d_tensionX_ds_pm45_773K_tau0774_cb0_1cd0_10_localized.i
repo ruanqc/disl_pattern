@@ -11,8 +11,8 @@
   [gen]
     type = GeneratedMeshGenerator
     dim = 2
-    nx = 10
-    ny = 10
+    nx = 40
+    ny = 40
     xmin = 0.0
     ymin = 0.0
     xmax = 1.011
@@ -340,6 +340,27 @@
    family = MONOMIAL
    block = '0'
   [../]
+  [./gdot_p1]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
+  [../]
+  [./gdot_m1]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
+  [../]
+  [./gdot_p2]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
+  [../]
+  [./gdot_m2]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
+  [../]
+
 []
 
 
@@ -628,6 +649,35 @@
   index = 1
   block = '0'
   [../]
+
+  [./gdot_p1]                     #Name arbiarbitrary
+   type = MaterialStdVectorAux  #Use this for std::vector p
+   variable = gdot_p1            #Consistant with AuxVariables
+   property = slip_increment_p         
+   index = 0
+   block = '0'
+  [../]   
+  [./gdot_m1]                     #Name arbiarbitrary
+   type = MaterialStdVectorAux  #Use this for std::vector p
+   variable = gdot_m1             #Consistant with AuxVariables
+   property = slip_increment_m         
+   index = 0
+   block = '0'
+  [../]
+  [./gdot_p2]                     #Name arbiarbitrary
+    type = MaterialStdVectorAux  #Use this for std::vector p
+    variable = gdot_p2            #Consistant with AuxVariables
+    property = slip_increment_p        
+    index = 1
+    block = '0'
+    [../]   
+  [./gdot_m2]                     #Name arbiarbitrary
+    type = MaterialStdVectorAux  #Use this for std::vector p
+    variable = gdot_m2             #Consistant with AuxVariables
+    property = slip_increment_m         
+    index = 1
+    block = '0'
+  [../]
   
 []
 
@@ -654,7 +704,7 @@
       gdot0             = 1.0e6
       f0                = 2.77e-19
       boltzmann         = 1.38065e-23
-      temperature       = 550.0                                         # 750 - 273.15 in degrees Celsius
+      temperature       = 500.0                                        # 750 - 273.15 in degrees Celsius
       tau_0             = 20.0
       p                 = 0.2
       q                 = 1.2
@@ -875,6 +925,27 @@
      variable = rho_har2
      block = '0'
   [../]
+    
+  [./gdot_p1]
+     type = ElementAverageValue
+     variable = gdot_p1
+     block = '0'
+  [../]
+  [./gdot_m1]
+     type = ElementAverageValue
+     variable = gdot_m1
+     block = '0'
+  [../]
+  [./gdot_p2]
+     type = ElementAverageValue
+     variable = gdot_p2
+     block = '0'
+  [../]
+  [./gdot_m2]
+     type = ElementAverageValue
+     variable = gdot_m2
+     block = '0'
+  [../]
 
 []
 
@@ -883,7 +954,7 @@
 
 [Outputs]
   exodus = true
-  time_step_interval = 200 #500
+  time_step_interval = 500 #500
   [csv]
     type = CSV
     file_base = rhoe_x_out_h5

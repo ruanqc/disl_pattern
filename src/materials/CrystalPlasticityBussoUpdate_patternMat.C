@@ -492,17 +492,18 @@ CrystalPlasticityBussoUpdate_patternMat::calculateSlipRate()
 
     if (driving_force_p > 1.e-10)
     {
-      if((rho_edge_pos[i] + rho_edge_neg[i]) > 1.e-10)
+      if((rho_edge_pos[i] + rho_edge_neg[i]) < 100.0)
       {
+        _slip_increment_p[_qp][i] = 0.0;
+      }
+      else
+      {
+        
         _slip_increment_p[_qp][i] =
           _gdot0 *
           std::exp(-_f0 / _boltzmann / theta *
                    std::pow((1.0 - std::pow((driving_force_p / _tau_0), _p)), _q)) *
           std::copysign(1.0, _tau[_qp][i] - _backstress(i) -  _tau_d(i));
-      }
-      else
-      {
-        _slip_increment_p[_qp][i] = 0.0;
       }
     }
     else
@@ -512,17 +513,17 @@ CrystalPlasticityBussoUpdate_patternMat::calculateSlipRate()
 
     if (driving_force_m > 1.e-10)
     {
-      if((rho_edge_pos[i] + rho_edge_neg[i]) > 1.e-10)
+      if((rho_edge_pos[i] + rho_edge_neg[i]) < 100.0)
+      {
+        _slip_increment_m[_qp][i] = 0.0;
+      }
+      else
       {
         _slip_increment_m[_qp][i] =
           _gdot0 *
           std::exp(-_f0 / _boltzmann / theta *
                    std::pow((1.0 - std::pow((driving_force_m / _tau_0), _p)), _q)) *
-          std::copysign(1.0, _tau[_qp][i] - _backstress(i) +  _tau_d(i)); 
-      }
-      else
-      {
-        _slip_increment_m[_qp][i] = 0.0;
+          std::copysign(1.0, _tau[_qp][i] - _backstress(i) +  _tau_d(i));         
       }
     }
     else
@@ -684,14 +685,15 @@ CrystalPlasticityBussoUpdate_patternMat::calculateDislocationVelocity()
 
     if (driving_force_p > 1.e-10)
     {  
-      if((rho_edge_pos[i] + rho_edge_neg[i]) > 1.e-10)
-      {
-        _dislo_velocity_p[_qp][i] =  _slip_increment_p[_qp][i] / _burgers / 
-                                                              (rho_edge_pos[i] + rho_edge_neg[i]);
-      }
+      if((rho_edge_pos[i] + rho_edge_neg[i]) < 100.0)
+        {
+          _dislo_velocity_p[_qp][i] = 0.0;
+
+        }
       else
       {
-        _dislo_velocity_p[_qp][i] = 0.0;
+          _dislo_velocity_p[_qp][i] =  _slip_increment_p[_qp][i] / _burgers / 
+                                                                (rho_edge_pos[i] + rho_edge_neg[i]);         
       }
     }
     else
@@ -702,14 +704,15 @@ CrystalPlasticityBussoUpdate_patternMat::calculateDislocationVelocity()
 
     if (driving_force_m > 1.e-10)
     { 
-       if((rho_edge_pos[i] + rho_edge_neg[i]) > 1.e-10)
+       if((rho_edge_pos[i] + rho_edge_neg[i]) < 100.0)
        {
-        _dislo_velocity_m[_qp][i] = _slip_increment_m[_qp][i] / _burgers / 
-                                                              (rho_edge_pos[i] + rho_edge_neg[i]);
+        _dislo_velocity_m[_qp][i] = 0.0;
        }
        else
        {
-        _dislo_velocity_m[_qp][i] = 0.0;
+         
+        _dislo_velocity_m[_qp][i] = _slip_increment_m[_qp][i] / _burgers / 
+                                                              (rho_edge_pos[i] + rho_edge_neg[i]);
        }      
     }
     else
@@ -807,8 +810,6 @@ CrystalPlasticityBussoUpdate_patternMat::calculateConstitutiveSlipDerivative(std
                                         (rho_edge_pos[i] + rho_edge_neg[i])
                       );                       
 
-
-
     Real u = 0.0;
     Real uprime_p = 0.0, vprime_p = 0.0;
     Real uprime_m = 0.0, vprime_m = 0.0;
@@ -817,14 +818,22 @@ CrystalPlasticityBussoUpdate_patternMat::calculateConstitutiveSlipDerivative(std
 
     if (driving_force_p > 1.e-10)
     {
-      u = driving_force_p / _tau_0;
-      vprime_p = std::pow((1.0 - std::pow(u, _p)), _q - 1.0);
-      uprime_p = std::pow(u, _p - 1.0);
+      if((rho_edge_pos[i] + rho_edge_neg[i]) < 100.0)
+      {      
+        dslip_dtau_p = 0.0;
+      }       
+      else
+      {
+        
+        u = driving_force_p / _tau_0;
+        vprime_p = std::pow((1.0 - std::pow(u, _p)), _q - 1.0);
+        uprime_p = std::pow(u, _p - 1.0);
 
-      dslip_dtau_p = std::copysign(1.0, _tau[_qp][i] - _backstress(i) -  _tau_d(i)) *  
-                      _gdot0 * std::exp(-_f0 / _boltzmann / theta * std::pow((1.0 - std::pow(u, _p)), _q)) *  //dot_gamma_{e+}
-                      _p * _q * _f0 / _boltzmann / theta * vprime_p * uprime_p *
-                      1.0 / _tau_0 * std::copysign(1.0, _tau[_qp][i]) * _substep_dt;
+        dslip_dtau_p = std::copysign(1.0, _tau[_qp][i] - _backstress(i) -  _tau_d(i)) *  
+                        _gdot0 * std::exp(-_f0 / _boltzmann / theta * std::pow((1.0 - std::pow(u, _p)), _q)) *  //dot_gamma_{e+}
+                        _p * _q * _f0 / _boltzmann / theta * vprime_p * uprime_p *
+                        1.0 / _tau_0 * std::copysign(1.0, _tau[_qp][i]) * _substep_dt;        
+      }
     }
     else
     {
@@ -833,20 +842,21 @@ CrystalPlasticityBussoUpdate_patternMat::calculateConstitutiveSlipDerivative(std
 
     if (driving_force_m > 1.e-10)
     {
-      u = driving_force_m / _tau_0;
-      const Real eps = 1e-12;
-      if (u < 0.0)
-        u = 0.0;
-      if (u >= 1.0)
-        u = 1.0 - eps;
+      if((rho_edge_pos[i] + rho_edge_neg[i]) < 100.0)
+      {  
+        dslip_dtau_m = 0.0;
+      }
+      else
+      {
+        u = driving_force_m / _tau_0;
+        vprime_m = std::pow((1.0 - std::pow(u, _p)), _q - 1.0);
+        uprime_m = std::pow(u, _p - 1.0);
 
-      vprime_m = std::pow((1.0 - std::pow(u, _p)), _q - 1.0);
-      uprime_m = std::pow(u, _p - 1.0);
-
-      dslip_dtau_m = std::copysign(1.0, _tau[_qp][i] - _backstress(i) +  _tau_d(i)) *  
-                      _gdot0 * std::exp(-_f0 / _boltzmann / theta * std::pow((1.0 - std::pow(u, _p)), _q)) *  //dot_gamma_{e-}
-                      _p * _q * _f0 / _boltzmann / theta * vprime_m * uprime_m *
-                      1.0 / _tau_0 * std::copysign(1.0, _tau[_qp][i]) * _substep_dt;
+        dslip_dtau_m = std::copysign(1.0, _tau[_qp][i] - _backstress(i) +  _tau_d(i)) *  
+                        _gdot0 * std::exp(-_f0 / _boltzmann / theta * std::pow((1.0 - std::pow(u, _p)), _q)) *  //dot_gamma_{e-}
+                        _p * _q * _f0 / _boltzmann / theta * vprime_m * uprime_m *
+                        1.0 / _tau_0 * std::copysign(1.0, _tau[_qp][i]) * _substep_dt;        
+      }
     }
     else
     {
