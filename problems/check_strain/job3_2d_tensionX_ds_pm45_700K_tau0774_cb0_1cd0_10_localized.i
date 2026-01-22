@@ -11,8 +11,8 @@
   [gen]
     type = GeneratedMeshGenerator
     dim = 2
-    nx = 10
-    ny = 10
+    nx = 50
+    ny = 50
     xmin = 0.0
     ymin = 0.0
     xmax = 1.011
@@ -684,7 +684,7 @@
 [Materials]
   [./elasticity_tensor]
     type = ComputeElasticityTensorCP
-    C_ijkl = '184.33e3 124.70e3 124.70e3 184.33e3 124.70e3 184.33e3 88.23e3 88.23e3 88.23e3'
+    C_ijkl = '175.251e3 122.059e3 122.059e3 175.251e3 122.059e3 175.251e3 81.161e3 81.161e3 81.161e3'
     fill_method = symmetric9
     euler_angle_1 = 0.0
     euler_angle_2 = 0.0 
@@ -704,7 +704,7 @@
       gdot0             = 1.0e6
       f0                = 2.77e-19
       boltzmann         = 1.38065e-23
-      temperature       = 500.0                                        # 750 - 273.15 in degrees Celsius
+      temperature       = 427.0                                         # 750 - 273.15 in degrees Celsius
       tau_0             = 20.0
       p                 = 0.2
       q                 = 1.2

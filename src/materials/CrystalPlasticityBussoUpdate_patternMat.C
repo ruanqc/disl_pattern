@@ -6,7 +6,7 @@
 
 // ruanqc 2025-08/09 modified for 2d patterning from CrystalPlasticityBussoUpdate.C 
 // V251208, corrected a bug in calculated local_edge_slip_direction && _edge_slip_direction[_qp][i * LIBMESH_DIM] > -1.e-10 in minus slips system, corrected gamma_dot=0.5(gamma_dot_p - gamma_dot_m) consistant with analytical value)
-// temp version 251105
+// temp version 260122
 
 #include "CrystalPlasticityBussoUpdate_patternMat.h"
 #include "libmesh/int_range.h"
@@ -492,19 +492,11 @@ CrystalPlasticityBussoUpdate_patternMat::calculateSlipRate()
 
     if (driving_force_p > 1.e-10)
     {
-      if((rho_edge_pos[i] + rho_edge_neg[i]) < 100.0)
-      {
-        _slip_increment_p[_qp][i] = 0.0;
-      }
-      else
-      {
-        
         _slip_increment_p[_qp][i] =
           _gdot0 *
           std::exp(-_f0 / _boltzmann / theta *
                    std::pow((1.0 - std::pow((driving_force_p / _tau_0), _p)), _q)) *
           std::copysign(1.0, _tau[_qp][i] - _backstress(i) -  _tau_d(i));
-      }
     }
     else
     {
@@ -513,18 +505,11 @@ CrystalPlasticityBussoUpdate_patternMat::calculateSlipRate()
 
     if (driving_force_m > 1.e-10)
     {
-      if((rho_edge_pos[i] + rho_edge_neg[i]) < 100.0)
-      {
-        _slip_increment_m[_qp][i] = 0.0;
-      }
-      else
-      {
         _slip_increment_m[_qp][i] =
           _gdot0 *
           std::exp(-_f0 / _boltzmann / theta *
                    std::pow((1.0 - std::pow((driving_force_m / _tau_0), _p)), _q)) *
           std::copysign(1.0, _tau[_qp][i] - _backstress(i) +  _tau_d(i));         
-      }
     }
     else
     {
@@ -685,16 +670,8 @@ CrystalPlasticityBussoUpdate_patternMat::calculateDislocationVelocity()
 
     if (driving_force_p > 1.e-10)
     {  
-      if((rho_edge_pos[i] + rho_edge_neg[i]) < 100.0)
-        {
-          _dislo_velocity_p[_qp][i] = 0.0;
-
-        }
-      else
-      {
           _dislo_velocity_p[_qp][i] =  _slip_increment_p[_qp][i] / _burgers / 
                                                                 (rho_edge_pos[i] + rho_edge_neg[i]);         
-      }
     }
     else
     {  
@@ -704,16 +681,9 @@ CrystalPlasticityBussoUpdate_patternMat::calculateDislocationVelocity()
 
     if (driving_force_m > 1.e-10)
     { 
-       if((rho_edge_pos[i] + rho_edge_neg[i]) < 100.0)
-       {
-        _dislo_velocity_m[_qp][i] = 0.0;
-       }
-       else
-       {
          
         _dislo_velocity_m[_qp][i] = _slip_increment_m[_qp][i] / _burgers / 
-                                                              (rho_edge_pos[i] + rho_edge_neg[i]);
-       }      
+                                                              (rho_edge_pos[i] + rho_edge_neg[i]);   
     }
     else
     {  
@@ -817,14 +787,7 @@ CrystalPlasticityBussoUpdate_patternMat::calculateConstitutiveSlipDerivative(std
     Real dslip_dtau_m = 0.0; //ruanqc added
 
     if (driving_force_p > 1.e-10)
-    {
-      if((rho_edge_pos[i] + rho_edge_neg[i]) < 100.0)
-      {      
-        dslip_dtau_p = 0.0;
-      }       
-      else
-      {
-        
+    {        
         u = driving_force_p / _tau_0;
         vprime_p = std::pow((1.0 - std::pow(u, _p)), _q - 1.0);
         uprime_p = std::pow(u, _p - 1.0);
@@ -833,7 +796,6 @@ CrystalPlasticityBussoUpdate_patternMat::calculateConstitutiveSlipDerivative(std
                         _gdot0 * std::exp(-_f0 / _boltzmann / theta * std::pow((1.0 - std::pow(u, _p)), _q)) *  //dot_gamma_{e+}
                         _p * _q * _f0 / _boltzmann / theta * vprime_p * uprime_p *
                         1.0 / _tau_0 * std::copysign(1.0, _tau[_qp][i]) * _substep_dt;        
-      }
     }
     else
     {
@@ -842,12 +804,6 @@ CrystalPlasticityBussoUpdate_patternMat::calculateConstitutiveSlipDerivative(std
 
     if (driving_force_m > 1.e-10)
     {
-      if((rho_edge_pos[i] + rho_edge_neg[i]) < 100.0)
-      {  
-        dslip_dtau_m = 0.0;
-      }
-      else
-      {
         u = driving_force_m / _tau_0;
         vprime_m = std::pow((1.0 - std::pow(u, _p)), _q - 1.0);
         uprime_m = std::pow(u, _p - 1.0);
@@ -856,7 +812,6 @@ CrystalPlasticityBussoUpdate_patternMat::calculateConstitutiveSlipDerivative(std
                         _gdot0 * std::exp(-_f0 / _boltzmann / theta * std::pow((1.0 - std::pow(u, _p)), _q)) *  //dot_gamma_{e-}
                         _p * _q * _f0 / _boltzmann / theta * vprime_m * uprime_m *
                         1.0 / _tau_0 * std::copysign(1.0, _tau[_qp][i]) * _substep_dt;        
-      }
     }
     else
     {
