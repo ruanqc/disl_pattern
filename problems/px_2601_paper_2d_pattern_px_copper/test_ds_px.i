@@ -7,18 +7,18 @@
   displacements = 'disp_x disp_y'
 []
 
-[Mesh]
-  [read]
-    type = FileMeshGenerator
-    file = px_cu_square_inner.inp
-  []
-  [remove]
-    type = BoundaryDeletionGenerator
-    input = 'read'
-    boundary_names = 'ESet-inner ESet-outer'
-  []
-  [create_sideset]
-    type = SideSetsFromNodeSetsGenerator
+ [Mesh]
+   [read]
+     type = FileMeshGenerator
+     file = px_cu_square_inner.inp
+   []
+   [remove]
+     type = BoundaryDeletionGenerator
+     input = 'read'
+     boundary_names = 'ESet-inner ESet-outer'
+    []
+    [create_sideset]
+     type = SideSetsFromNodeSetsGenerator
     input = remove
   []
 []
@@ -80,34 +80,34 @@
     function = Gaussian_pxy
   []  
 
-  # [./rho_edge_pos_1]
-  #   type = RandomIC
-  #   variable = 'rho_edge_pos_1'
-  #   min = ${fparse 8000.0 - 8000.0*0.01}
-  #   max = ${fparse 8000.0 + 8000.0*0.01}
-  #   seed = 41
-  # []
-  # [./rho_edge_neg_1]
-  #   type = RandomIC
-  #   variable = 'rho_edge_neg_1'
-  #   min = ${fparse 8000.0 - 8000.0*0.01}
-  #   max = ${fparse 8000.0 + 8000.0*0.01}
-  #   seed = 41
-  # []
-  # [./rho_edge_pos_2]
-  #   type = RandomIC
-  #   variable = 'rho_edge_pos_2'
-  #   min = ${fparse 8000.0 - 8000.0*0.01}
-  #   max = ${fparse 8000.0 + 8000.0*0.01}
-  #   seed = 41
-  # []
-  # [./rho_edge_neg_2]
-  #   type = RandomIC
-  #   variable = 'rho_edge_neg_2'
-  #   min = ${fparse 8000.0 - 8000.0*0.01}
-  #   max = ${fparse 8000.0 + 8000.0*0.01}
-  #   seed = 41
-  # []  
+#   [./rho_edge_pos_1]
+#     type = RandomIC
+#     variable = 'rho_edge_pos_1'
+#     min = ${fparse 8000.0 - 8000.0*0.01}
+#     max = ${fparse 8000.0 + 8000.0*0.01}
+#     seed = 41
+#   []
+#   [./rho_edge_neg_1]
+#     type = RandomIC
+#     variable = 'rho_edge_neg_1'
+#     min = ${fparse 8000.0 - 8000.0*0.01}
+#     max = ${fparse 8000.0 + 8000.0*0.01}
+#     seed = 41
+#   []
+#   [./rho_edge_pos_2]
+#     type = RandomIC
+#     variable = 'rho_edge_pos_2'
+#     min = ${fparse 8000.0 - 8000.0*0.01}
+#     max = ${fparse 8000.0 + 8000.0*0.01}
+#     seed = 41
+#   []
+#   [./rho_edge_neg_2]
+#     type = RandomIC
+#     variable = 'rho_edge_neg_2'
+#     min = ${fparse 8000.0 - 8000.0*0.01}
+#     max = ${fparse 8000.0 + 8000.0*0.01}
+#     seed = 41
+#   []  
 []
 
 [Functions]
@@ -128,26 +128,28 @@
     expression = '0.01*8000.0 * exp(-((x + y - 1.011)^2 / (2*0.0079^2))) + 8000.0'
   [../]
 
-  [./disp_load]
+  [./disp_load_top]
     type = ParsedFunction
     expression = '0.1*1.011*t'
   [../]
 
   [./pressue_piecewise]
     type = PiecewiseLinear
-    x = '0.0 1.0e-5  0.3'
-    y = '0.0 1.0    1.0'
+    x = '0.0 1.0e-5  0.2'
+    y = '0.0 1.00    1.00'
   [../]
 []
+
 
 [BCs]
   [right_x]
     type = Pressure
     variable = disp_x
     boundary = 'right'
-    factor = -0.966 #-0.683 -0.966
+    factor = -0.966
     function = pressue_piecewise
   []
+
   [left_x]
     type = DirichletBC
     variable = disp_x
@@ -685,7 +687,8 @@
 [Materials]
   [./elasticity_tensor]
     type = ComputeElasticityTensorCP
-    C_ijkl = '188.555e3 125.967e3 125.967e3 188.555e3 125.967e3 188.555e3 91.504e3 91.504e3 91.504e3'
+    # C_ijkl = '188.555e3 125.967e3 125.967e3 188.555e3 125.967e3 188.555e3 91.504e3 91.504e3 91.504e3'
+    C_ijkl = '184.33e3 124.70e3 124.70e3 184.33e3 124.70e3 184.33e3 88.23e3 88.23e3 88.23e3'
     fill_method = symmetric9
     euler_angle_1 = 0.0
     euler_angle_2 = 0.0 
@@ -701,7 +704,7 @@
   [./trial_xtalpl0]
     type = CrystalPlasticityBussoUpdate_patternMat
     number_slip_systems = 2
-    slip_sys_file_name  = input_dslip_sys_al_pm50.txt
+    slip_sys_file_name  = input_dslip_sys_al_pm45.txt
       gdot0             = 1.0e6
       f0                = 2.77e-19
       boltzmann         = 1.38065e-23
@@ -778,9 +781,9 @@
   line_search = 'l2'  #'bt' 'l2' 'basic' 'nleqerr'
   l_max_its = 50
   nl_max_its = 50
-  nl_rel_tol = 1e-1 #1e-3
-  nl_abs_tol = 1e-1 #1e-3
-  l_tol = 1e-1  #1e-3
+  nl_rel_tol = 0.01    #1e-3
+  nl_abs_tol = 0.01   #1e-3
+  l_tol = 0.01         #1e-3
 
   start_time = 0.0
   end_time = 0.2 #0.01
@@ -987,7 +990,7 @@
 
 [Outputs]
   exodus = true
-  time_step_interval = 500 #500
+  time_step_interval = 20 #500
   [csv]
     type = CSV
     file_base = rhoe_x_out_h5

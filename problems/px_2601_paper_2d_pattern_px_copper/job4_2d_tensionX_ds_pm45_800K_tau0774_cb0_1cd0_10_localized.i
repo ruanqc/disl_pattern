@@ -1,6 +1,6 @@
 # ------------------------------------------------------------------------------------------------
-# ruanqc-260123 modified to implement 2d px_cu_patterning 
-# based on job5_2d_tensionX_px_900K_tau0774_cb0_1cd0_10_localized.i and pbc_test_v1.i
+# ruanqc-250820 modified to implement 2d patterning 
+# based on Hardinlusion version c1m1_AL_H0002__coarse_reload_096per_t0369_rho7e7.i
 # ------------------------------------------------------------------------------------------------
 
 [GlobalParams]
@@ -8,18 +8,16 @@
 []
 
 [Mesh]
-  [read]
-    type = FileMeshGenerator
-    file = px_cu_square_inner.inp
-  []
-  [remove]
-    type = BoundaryDeletionGenerator
-    input = 'read'
-    boundary_names = 'ESet-inner ESet-outer'
-  []
-  [create_sideset]
-    type = SideSetsFromNodeSetsGenerator
-    input = remove
+  [gen]
+    type = GeneratedMeshGenerator
+    dim = 2
+    nx = 20
+    ny = 20
+    xmin = 0.0
+    ymin = 0.0
+    xmax = 1.011
+    ymax = 1.011
+    elem_type = 'QUAD9'   #QUAD4
   []
 []
 
@@ -35,79 +33,80 @@
   [rho_edge_pos_1]
     order = FIRST
     family = LAGRANGE
-  block = '0 1'
+    block = '0'
     # initial_condition = 4000.0
   []
   [rho_edge_neg_1]
     order = FIRST
     family = LAGRANGE
-  block = '0 1'
+    block = '0'
     # initial_condition = 4000.0
   []
     [rho_edge_pos_2]
     order = FIRST
     family = LAGRANGE
     # initial_condition = 4000.0
-  block = '0 1'
+    block = '0'
   []
   [rho_edge_neg_2]
     order = FIRST
     family = LAGRANGE
     # initial_condition = 4000.0
-  block = '0 1'
+    block = '0'
   []
 []
 
 [ICs]
-  # [./rho_edge_pos_1]
-  #   type = FunctionIC
-  #   variable = 'rho_edge_pos_1'
-  #   function = Gaussian_mxy
-  # []
-  # [./rho_edge_neg_1]
-  #   type = FunctionIC
-  #   variable = 'rho_edge_neg_1'
-  #   function = Gaussian_mxy
-  # []
-  # [./rho_edge_pos_2]
-  #   type = FunctionIC
-  #   variable = 'rho_edge_pos_2'
-  #   function = Gaussian_pxy
-  # []
-  # [./rho_edge_neg_2]
-  #   type = FunctionIC
-  #   variable = 'rho_edge_neg_2'
-  #   function = Gaussian_pxy
-  # []  
-
   [./rho_edge_pos_1]
-    type = RandomIC
+    type = FunctionIC
     variable = 'rho_edge_pos_1'
-    min = ${fparse 8000.0 - 8000.0*0.01}
-    max = ${fparse 8000.0 + 8000.0*0.01}
-    seed = 41
+    function = Gaussian_mxy
   []
   [./rho_edge_neg_1]
-    type = RandomIC
+    type = FunctionIC
     variable = 'rho_edge_neg_1'
-    min = ${fparse 8000.0 - 8000.0*0.01}
-    max = ${fparse 8000.0 + 8000.0*0.01}
-    seed = 41
+    function = Gaussian_mxy
   []
   [./rho_edge_pos_2]
-    type = RandomIC
+    type = FunctionIC
     variable = 'rho_edge_pos_2'
-    min = ${fparse 8000.0 - 8000.0*0.01}
-    max = ${fparse 8000.0 + 8000.0*0.01}
-    seed = 41
+    function = Gaussian_pxy
   []
   [./rho_edge_neg_2]
-    type = RandomIC
+    type = FunctionIC
     variable = 'rho_edge_neg_2'
-    min = ${fparse 8000.0 - 8000.0*0.01}
-    max = ${fparse 8000.0 + 8000.0*0.01}
-    seed = 41
+    function = Gaussian_pxy
   []  
+
+  # [./rho_edge_pos_1]
+  #   type = RandomIC
+  #   variable = 'rho_edge_pos_1'
+  #   min = ${fparse 4000.0 - 4000.0*1.732*0.01}
+  #   max = ${fparse 4000.0 + 4000.0*1.732*0.01}
+  #   seed = 128
+  # []
+  # [./rho_edge_neg_1]
+  #   type = RandomIC
+  #   variable = 'rho_edge_neg_1'
+  #   min = ${fparse 4000.0 - 4000.0*1.732*0.01}
+  #   max = ${fparse 4000.0 + 4000.0*1.732*0.01}
+  #   seed = 128
+  # []
+  # [./rho_edge_pos_2]
+  #   type = RandomIC
+  #   variable = 'rho_edge_pos_2'
+  #   min = ${fparse 4000.0 - 4000.0*1.732*0.01}
+  #   max = ${fparse 4000.0 + 4000.0*1.732*0.01}
+  #   seed = 128
+  # []
+  # [./rho_edge_neg_2]
+  #   type = RandomIC
+  #   variable = 'rho_edge_neg_2'
+  #   min = ${fparse 4000.0 - 4000.0*1.732*0.01}
+  #   max = ${fparse 4000.0 + 4000.0*1.732*0.01}
+  #   seed = 128
+  # []  
+
 []
 
 [Functions]
@@ -136,7 +135,7 @@
   [./pressue_piecewise]
     type = PiecewiseLinear
     x = '0.0 1.0e-5  0.3'
-    y = '0.0 1.0    1.0'
+    y = '0.0 1.0     1.0'
   [../]
 []
 
@@ -185,181 +184,181 @@
   [./pk2]
     order = CONSTANT
     family = MONOMIAL
-  block = '0 1'
+    block = '0'
   [../]
   [./fp_xy]
     order = CONSTANT
     family = MONOMIAL
-  block = '0 1'
+    block = '0'
   [../]
   [./exy]
     order = CONSTANT
     family = MONOMIAL
-  block = '0 1'
+    block = '0'
   [../]
   [./slip_increment]
    order = CONSTANT
    family = MONOMIAL
-   block = '0 1'
+   block = '0'
   [../]
   [./dislo_velocity]
    order = CONSTANT
    family = MONOMIAL
-   block = '0 1'
+   block = '0'
   [../]
   [./epeq]
    order = CONSTANT
    family = MONOMIAL
-   block = '0 1'
+   block = '0'
   [../]
 
   [./slip_increment1]
    order = CONSTANT
    family = MONOMIAL
-   block = '0 1'
+   block = '0'
   [../]
   [./slip_increment2]
    order = CONSTANT
    family = MONOMIAL
-   block = '0 1'
+   block = '0'
   [../]   
 
   [./rss_1]                 #Name shown in Paraview
    order = CONSTANT
    family = MONOMIAL
-   block = '0 1'
+   block = '0'
   [../]
 
   [./rss_2]                 #Name shown in Paraview
    order = CONSTANT
    family = MONOMIAL
-   block = '0 1'
+   block = '0'
   [../]
   
   [./taub_1]                 #Name shown in Paraview
    order = CONSTANT
    family = MONOMIAL
-   block = '0 1'
+   block = '0'
   [../]
   [./taub_2]                 #Name shown in Paraview
    order = CONSTANT
    family = MONOMIAL
-   block = '0 1'
+   block = '0'
   [../]
   [./taud_1]                 #Name shown in Paraview
    order = CONSTANT
    family = MONOMIAL
-   block = '0 1'
+   block = '0'
   [../]
   [./taud_2]                 #Name shown in Paraview
    order = CONSTANT
    family = MONOMIAL
-   block = '0 1'
+   block = '0'
   [../]
 
   [./tauf_p1]                 #Name shown in Paraview
    order = CONSTANT
    family = MONOMIAL
-   block = '0 1'
+   block = '0'
   [../]
   [./tauf_m1]                 #Name shown in Paraview
    order = CONSTANT
    family = MONOMIAL
-   block = '0 1'
+   block = '0'
   [../]
   [./tauEff_p2]                 #Name shown in Paraview
    order = CONSTANT
    family = MONOMIAL
-   block = '0 1'
+   block = '0'
   [../]
   [./tauEff_m2]                 #Name shown in Paraview
    order = CONSTANT
    family = MONOMIAL
-   block = '0 1'
+   block = '0'
   [../] 
   
 
   [./sT_1]                 #Name shown in Paraview
    order = CONSTANT
    family = MONOMIAL
-   block = '0 1'
+   block = '0'
   [../]
     [./sT_2]                 #Name shown in Paraview
    order = CONSTANT
    family = MONOMIAL
-   block = '0 1'
+   block = '0'
   [../]
 
    [./tauEff_p1]                 #Name shown in Paraview
    order = CONSTANT
    family = MONOMIAL
-   block = '0 1'
+   block = '0'
   [../]
   [./tauEff_m1]                 #Name shown in Paraview
    order = CONSTANT
    family = MONOMIAL
-   block = '0 1'
+   block = '0'
   [../]
     [./tauf_p2]                 #Name shown in Paraview
     order = CONSTANT
     family = MONOMIAL
-  block = '0 1'
+    block = '0'
     [../]
     [./tauf_m2]                 #Name shown in Paraview
     order = CONSTANT
     family = MONOMIAL
-  block = '0 1'
+    block = '0'
     [../]
   [./rhoT1]                 #Name shown in Paraview
    order = CONSTANT
    family = MONOMIAL
-   block = '0 1'
+   block = '0'
   [../]
   [./rhoT2]                 #Name shown in Paraview
    order = CONSTANT
    family = MONOMIAL
-   block = '0 1'
+   block = '0'
   [../]
 
   [./rho_ini1]                 #Name shown in Paraview
    order = CONSTANT
    family = MONOMIAL
-   block = '0 1'
+   block = '0'
   [../]
   [./rho_har1]                 #Name shown in Paraview
    order = CONSTANT
    family = MONOMIAL
-   block = '0 1'
+   block = '0'
   [../]
   [./rho_ini2]                 #Name shown in Paraview
    order = CONSTANT
    family = MONOMIAL
-   block = '0 1'
+   block = '0'
   [../]
   [./rho_har2]                 #Name shown in Paraview
    order = CONSTANT
    family = MONOMIAL
-   block = '0 1'
+   block = '0'
   [../]
   [./gdot_p1]                 #Name shown in Paraview
    order = CONSTANT
    family = MONOMIAL
-   block = '0 1'
+   block = '0'
   [../]
   [./gdot_m1]                 #Name shown in Paraview
    order = CONSTANT
    family = MONOMIAL
-   block = '0 1'
+   block = '0'
   [../]
   [./gdot_p2]                 #Name shown in Paraview
    order = CONSTANT
    family = MONOMIAL
-   block = '0 1'
+   block = '0'
   [../]
   [./gdot_m2]                 #Name shown in Paraview
    order = CONSTANT
    family = MONOMIAL
-   block = '0 1'
+   block = '0'
   [../]
 
 []
@@ -436,7 +435,7 @@
    index_j = 0
    index_i = 0
    execute_on = timestep_end
-   block = '0 1'
+   block = '0'
   [../]
   [./exy]
     type = RankTwoAux
@@ -445,7 +444,7 @@
     index_j = 0
     index_i = 1
     execute_on = timestep_end
-  block = '0 1'
+    block = '0'
   [../]
   [./fp_xy]
     type = RankTwoAux
@@ -454,7 +453,7 @@
     index_j = 0
     index_i = 1
     execute_on = timestep_end
-  block = '0 1'
+    block = '0'
   [../]
   [./slip_increment1]
    type = MaterialStdVectorAux
@@ -462,7 +461,7 @@
    property = slip_increment
    index = 0
    execute_on = timestep_end
-   block = '0 1'
+   block = '0'
   [../]
 
   [./slip_increment2]
@@ -471,7 +470,7 @@
    property = slip_increment
    index = 1
    execute_on = timestep_end
-   block = '0 1'
+   block = '0'
   [../]
 
   [./dislo_vel]
@@ -480,14 +479,14 @@
    property = dislo_velocity
    index = 0
    execute_on = timestep_end
-   block = '0 1'
+   block = '0'
   [../]
   [./epeq]
    type = MaterialRealAux
    variable = epeq
    property = accumulated_equivalent_plastic_strain
    execute_on = timestep_end
-   block = '0 1'
+   block = '0'
   [../]  
 
   [./rss_1]                     #Name arbiarbitrary
@@ -495,14 +494,14 @@
    variable = rss_1             #Consistant with AuxVaribles
    property = rss_qc         
    index = 0
-   block = '0 1'
+   block = '0'
   [../]
   [./rss_2]                     #Name arbiarbitrary
    type = MaterialStdVectorAux  #Use this for std::vector p
    variable = rss_2             #Consistant with AuxVaribles
    property = rss_qc         
    index = 1
-   block = '0 1'
+   block = '0'
   [../]
 
   [./taub_1]                     #Name arbiarbitrary
@@ -510,28 +509,28 @@
    variable = taub_1             #Consistant with AuxVaribles
    property = taub_qc         
    index = 0
-   block = '0 1'
+   block = '0'
   [../] 
   [./taub_2]                     #Name arbiarbitrary
    type = MaterialStdVectorAux  #Use this for std::vector p
    variable = taub_2             #Consistant with AuxVariables
    property = taub_qc         
    index = 1
-   block = '0 1'
+   block = '0'
   [../]
   [./taud_1]                     #Name arbiarbitrary
    type = MaterialStdVectorAux  #Use this for std::vector p
    variable = taud_1             #Consistant with AuxVariables
    property = taud_qc         
    index = 0
-   block = '0 1'
+   block = '0'
   [../] 
   [./taud_2]                     #Name arbiarbitrary
    type = MaterialStdVectorAux  #Use this for std::vector p
    variable = taud_2             #Consistant with AuxVariables
    property = taud_qc         
    index = 1
-   block = '0 1'
+   block = '0'
   [../]
 
   [./tauf_p1]                     #Name arbiarbitrary
@@ -539,28 +538,28 @@
    variable = tauf_p1            #Consistant with AuxVariables
    property = tauf_p         
    index = 0
-   block = '0 1'
+   block = '0'
   [../]   
   [./tauf_m1]                     #Name arbiarbitrary
    type = MaterialStdVectorAux  #Use this for std::vector p
    variable = tauf_m1             #Consistant with AuxVariables
    property = tauf_m         
    index = 0
-   block = '0 1'
+   block = '0'
   [../]
   [./tauEff_p2]                     #Name arbiarbitrary
     type = MaterialStdVectorAux  #Use this for std::vector p
     variable = tauEff_p2            #Consistant with AuxVariables
     property = tauEff_p         
     index = 1
-  block = '0 1'
+    block = '0'
     [../]   
   [./tauEff_m2]                     #Name arbiarbitrary
     type = MaterialStdVectorAux  #Use this for std::vector p
     variable = tauEff_m2             #Consistant with AuxVariables
     property = tauEff_m         
     index = 1
-  block = '0 1'
+    block = '0'
   [../]
 
   [./sT_1]                     #Name arbiarbitrary
@@ -568,14 +567,14 @@
    variable = sT_1             #Consistant with AuxVariables
    property = sT_qc         
    index = 0
-   block = '0 1'
+   block = '0'
   [../] 
     [./sT_2]                     #Name arbiarbitrary
    type = MaterialStdVectorAux  #Use this for std::vector p
    variable = sT_2             #Consistant with AuxVariables
    property = sT_qc         
    index = 1
-   block = '0 1'
+   block = '0'
   [../]
   
   [./tauEff_p1]                     #Name arbiarbitrary
@@ -583,28 +582,28 @@
    variable = tauEff_p1            #Consistant with AuxVariables
    property = tauEff_p         
    index = 0
-   block = '0 1'
+   block = '0'
   [../]   
   [./tauEff_m1]                     #Name arbiarbitrary
    type = MaterialStdVectorAux  #Use this for std::vector p
    variable = tauEff_m1             #Consistant with AuxVariables
    property = tauEff_m         
    index = 0
-   block = '0 1'
+   block = '0'
   [../] 
     [./tauf_p2]                     #Name arbiarbitrary
     type = MaterialStdVectorAux  #Use this for std::vector p
     variable = tauf_p2            #Consistant with AuxVariables
     property = tauf_p         
     index = 1
-  block = '0 1'
+    block = '0'
     [../]   
     [./tauf_m2]                     #Name arbiarbitrary
     type = MaterialStdVectorAux  #Use this for std::vector p
     variable = tauf_m2             #Consistant with AuxVariables
     property = tauf_m         
     index = 1
-  block = '0 1'
+    block = '0'
     [../] 
   
   [./rhoT1]
@@ -612,14 +611,14 @@
   variable = rhoT1             #Consistant with AuxVariables
   property = rhoT1         
   index = 0
-  block = '0 1'
+  block = '0'
   [../]
   [./rhoT2]
   type = MaterialStdVectorAux  #Use this for std::vector p
   variable = rhoT2             #Consistant with AuxVariables
   property = rhoT2
   index = 0
-  block = '0 1'
+  block = '0'
   [../]
 
   [./rho_ini1]
@@ -627,28 +626,28 @@
   variable = rho_ini1             #Consistant with AuxVariables
   property = rho_ini
   index = 0
-  block = '0 1'
+  block = '0'
   [../]   
   [./rho_har1]
   type = MaterialStdVectorAux  #Use this for std::vector p
   variable = rho_har1             #Consistant with AuxVariables
   property = rho_har
   index = 0
-  block = '0 1'
+  block = '0'
   [../]
   [./rho_ini2]
   type = MaterialStdVectorAux  #Use this for std::vector p
   variable = rho_ini2             #Consistant with AuxVariables
   property = rho_ini
   index = 1
-  block = '0 1'
+  block = '0'
   [../]   
   [./rho_har2]
   type = MaterialStdVectorAux  #Use this for std::vector p
   variable = rho_har2             #Consistant with AuxVariables
   property = rho_har  
   index = 1
-  block = '0 1'
+  block = '0'
   [../]
 
   [./gdot_p1]                     #Name arbiarbitrary
@@ -656,28 +655,28 @@
    variable = gdot_p1            #Consistant with AuxVariables
    property = slip_increment_p         
    index = 0
-   block = '0 1'
+   block = '0'
   [../]   
   [./gdot_m1]                     #Name arbiarbitrary
    type = MaterialStdVectorAux  #Use this for std::vector p
    variable = gdot_m1             #Consistant with AuxVariables
    property = slip_increment_m         
    index = 0
-   block = '0 1'
+   block = '0'
   [../]
   [./gdot_p2]                     #Name arbiarbitrary
     type = MaterialStdVectorAux  #Use this for std::vector p
     variable = gdot_p2            #Consistant with AuxVariables
     property = slip_increment_p        
     index = 1
-  block = '0 1'
+    block = '0'
     [../]   
   [./gdot_m2]                     #Name arbiarbitrary
     type = MaterialStdVectorAux  #Use this for std::vector p
     variable = gdot_m2             #Consistant with AuxVariables
     property = slip_increment_m         
     index = 1
-  block = '0 1'
+    block = '0'
   [../]
   
 []
@@ -690,47 +689,15 @@
     euler_angle_1 = 0.0
     euler_angle_2 = 0.0 
     euler_angle_3 = 0.0 
-    block = '0 1'
+    block = '0'
   [../]
-  [./stress0]
+  [./stress]
     type = ComputeCrystalPlasticityDislocationStress
-    crystal_plasticity_models = 'trial_xtalpl0'
+    crystal_plasticity_models = 'trial_xtalpl'
     tan_mod_type = exact
-      block = '0'
+    block = '0'
   [../]
-  [./trial_xtalpl0]
-    type = CrystalPlasticityBussoUpdate_patternMat
-    number_slip_systems = 2
-    slip_sys_file_name  = input_dslip_sys_al_pm50.txt
-      gdot0             = 1.0e6
-      f0                = 2.77e-19
-      boltzmann         = 1.38065e-23
-      temperature       = 527.0                                         # 750 - 273.15 in degrees Celsius
-      tau_0             = 20.0
-      p                 = 0.2
-      q                 = 1.2
-      dlamb             = 0.3
-      shear_modulus     = 45.0e3
-      burgers           = 0.257e-6
-        w1              = 0.0
-        w2              = 0.0
-      scaling_Cb        = 0.1
-      scaling_Cd        = 0.1
-      tauF_on           = 1.0                                             #ON-1.0, OFF-0.0 (tauF= St*(1 -+ tauF_on*rhoG/rhoT) on or off)
-
-    edge_dislo_den_pos_1 = rho_edge_pos_1
-    edge_dislo_den_neg_1 = rho_edge_neg_1
-    edge_dislo_den_pos_2 = rho_edge_pos_2
-    edge_dislo_den_neg_2 = rho_edge_neg_2
-      block = '0'
-  [../]
-  [./stress1]
-    type = ComputeCrystalPlasticityDislocationStress
-    crystal_plasticity_models = 'trial_xtalpl1'
-    tan_mod_type = exact
-      block = '1'
-  [../]
-  [./trial_xtalpl1]
+  [./trial_xtalpl]
     type = CrystalPlasticityBussoUpdate_patternMat
     number_slip_systems = 2
     slip_sys_file_name  = input_dslip_sys_al_pm45.txt
@@ -754,7 +721,7 @@
     edge_dislo_den_neg_1 = rho_edge_neg_1
     edge_dislo_den_pos_2 = rho_edge_pos_2
     edge_dislo_den_neg_2 = rho_edge_neg_2
-      block = '1'
+    block = '0'
   [../]
 
 []
@@ -778,9 +745,9 @@
   line_search = 'l2'  #'bt' 'l2' 'basic' 'nleqerr'
   l_max_its = 50
   nl_max_its = 50
-  nl_rel_tol = 1e-1 #1e-3
-  nl_abs_tol = 1e-1 #1e-3
-  l_tol = 1e-1  #1e-3
+  nl_rel_tol = 1e-2 #1e-5
+  nl_abs_tol = 1e-2
+  l_tol = 1e-2  #1e-5 
 
   start_time = 0.0
   end_time = 0.2 #0.01
@@ -792,53 +759,53 @@
   [./stress_xy]
     type = ElementAverageValue
     variable = stress_xy
-      block = '0 1'
+    block = '0'
   [../]
   [./pk2]
    type = ElementAverageValue
    variable = pk2
-   block = '0 1'
+   block = '0'
   [../]
   [./fp_xy]
     type = ElementAverageValue
     variable = fp_xy
-      block = '0 1'
+    block = '0'
   [../]
   [./exy]
     type = ElementAverageValue
     variable = exy
-      block = '0 1'
+    block = '0'
   [../]
   [./slip_increment1]
    type = ElementAverageValue
    variable = slip_increment1
-   block = '0 1'
+   block = '0'
   [../]
     [./slip_increment2]
    type = ElementAverageValue
    variable = slip_increment2
-   block = '0 1'
+   block = '0'
   [../]
 
   [./dislo_velocity]
    type = ElementAverageValue
    variable = dislo_velocity
-   block = '0 1'
+   block = '0'
   [../]
   [./strain_xy]
     type = ElementAverageValue
     variable = strain_xy
-  block = '0 1'
+    block = '0'
   [../]
   [./strain_xx]
     type = ElementAverageValue
     variable = strain_xx
-  block = '0 1'
+    block = '0'
   [../]
   [./epeq]
     type = ElementAverageValue
     variable = epeq
-  block = '0 1'
+    block = '0'
   [../]
   [./disp_x]
      type = NodalVariableValue
@@ -848,136 +815,136 @@
   [./rss_1]
      type = ElementAverageValue
      variable = rss_1
-   block = '0 1'
+     block = '0'
   [../]
   [./rss_2]
      type = ElementAverageValue
      variable = rss_2
-   block = '0 1'
+     block = '0'
   [../]
 
   [./taub_1]
      type = ElementAverageValue
      variable = taub_1
-   block = '0 1'
+     block = '0'
   [../]
   [./taub_2]
      type = ElementAverageValue
      variable = taub_2
-   block = '0 1'
+     block = '0'
   [../]
   [./taud_1]
      type = ElementAverageValue
      variable = taud_1
-   block = '0 1'
+     block = '0'
   [../]
   [./taud_2]
      type = ElementAverageValue
      variable = taud_2
-   block = '0 1'
+     block = '0'
   [../]
 
   [./tauf_p1]
      type = ElementAverageValue
      variable = tauf_p1
-   block = '0 1'
+     block = '0'
   [../]
   [./tauf_m1]
      type = ElementAverageValue
      variable = tauf_m1
-   block = '0 1'
+     block = '0'
   [../]
   [./tauf_p2]
      type = ElementAverageValue
      variable = tauf_p2
-   block = '0 1'
+     block = '0'
   [../]
   [./tauf_m2]
      type = ElementAverageValue
      variable = tauf_m2
-   block = '0 1'
+     block = '0'
   [../]
   
   [./sT_1]
      type = ElementAverageValue
      variable = sT_1
-   block = '0 1'
+     block = '0'
   [../]
   [./sT_2]
      type = ElementAverageValue
      variable = sT_2
-    block = '0 1'
+      block = '0'
   [../]
   [./tauEff_p1]
      type = ElementAverageValue
      variable = tauEff_p1
-   block = '0 1'
+     block = '0'
   [../]
   [./tauEff_m1]
      type = ElementAverageValue
      variable = tauEff_m1
-   block = '0 1'
+     block = '0'
   [../]
   [./tauEff_p2]
      type = ElementAverageValue
      variable = tauEff_p2
-   block = '0 1'
+     block = '0'
   [../]
   [./tauEff_m2]
      type = ElementAverageValue
      variable = tauEff_m2
-   block = '0 1'
+     block = '0'
   [../] 
-  # [./rhoT1]
-  #    type = ElementAverageValue
-  #    variable = rhoT1
-  #  block = '0 1'
-  # [../]
-  # [./rhoT2]
-  #    type = ElementAverageValue
-  #    variable = rhoT2
-  #  block = '0 1'
-  # [../]
-  # [./rho_ini1]
-  #    type = ElementAverageValue
-  #    variable = rho_ini1
-  #  block = '0 1'
-  # [../]
-  # [./rho_har1]
-  #    type = ElementAverageValue
-  #    variable = rho_har1
-  #  block = '0 1'
-  # [../]
-  # [./rho_ini2]
-  #    type = ElementAverageValue
-  #    variable = rho_ini2
-  #  block = '0 1'
-  # [../]
-  # [./rho_har2]
-  #    type = ElementAverageValue
-  #    variable = rho_har2
-  #  block = '0 1'
-  # [../]
+  [./rhoT1]
+     type = ElementAverageValue
+     variable = rhoT1
+     block = '0'
+  [../]
+  [./rhoT2]
+     type = ElementAverageValue
+     variable = rhoT2
+     block = '0'
+  [../]
+  [./rho_ini1]
+     type = ElementAverageValue
+     variable = rho_ini1
+     block = '0'
+  [../]
+  [./rho_har1]
+     type = ElementAverageValue
+     variable = rho_har1
+     block = '0'
+  [../]
+  [./rho_ini2]
+     type = ElementAverageValue
+     variable = rho_ini2
+     block = '0'
+  [../]
+  [./rho_har2]
+     type = ElementAverageValue
+     variable = rho_har2
+     block = '0'
+  [../]
     
   [./gdot_p1]
      type = ElementAverageValue
      variable = gdot_p1
-   block = '0 1'
+     block = '0'
   [../]
   [./gdot_m1]
      type = ElementAverageValue
      variable = gdot_m1
-   block = '0 1'
+     block = '0'
   [../]
   [./gdot_p2]
      type = ElementAverageValue
      variable = gdot_p2
-   block = '0 1'
+     block = '0'
   [../]
   [./gdot_m2]
      type = ElementAverageValue
      variable = gdot_m2
-   block = '0 1'
+     block = '0'
   [../]
 
 []
@@ -987,7 +954,7 @@
 
 [Outputs]
   exodus = true
-  time_step_interval = 500 #500
+  time_step_interval = 20 #500
   [csv]
     type = CSV
     file_base = rhoe_x_out_h5
