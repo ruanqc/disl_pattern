@@ -94,6 +94,8 @@ ComputeCrystalPlasticityDislocationStress::ComputeCrystalPlasticityDislocationSt
     _total_lagrangian_strain(
         declareProperty<RankTwoTensor>("total_lagrangian_strain")), // Lagrangian strain
     _updated_rotation(declareProperty<RankTwoTensor>("updated_rotation")),
+    // ruanqc-20260128-add New property for the rotation angle in degrees
+    _rotation_angle(declareProperty<RankTwoTensor>("rotation_angle")),
     _crysrot(getMaterialProperty<RankTwoTensor>(
         _base_name + "crysrot")), // defined in the elasticity tensor classes for crystal plasticity
     _print_convergence_message(getParam<bool>("print_state_variable_convergence_error_messages"))
@@ -307,6 +309,12 @@ ComputeCrystalPlasticityDislocationStress::postSolveQp(RankTwoTensor & cauchy_st
   RankTwoTensor rot;
   _elastic_deformation_gradient.getRUDecompositionRotation(rot);
   _updated_rotation[_qp] = rot * _crysrot[_qp];
+
+  // ruanqc-20260128-add New property for the rotation angle in degrees
+  _rotation_angle[_qp] =
+      std::acos(0.5 * (_updated_rotation[_qp](0, 0) + _updated_rotation[_qp](1, 1) +
+                       _updated_rotation[_qp](2, 2) - 1.0)) *
+      180.0 / libMesh::pi; 
 }
 
 void

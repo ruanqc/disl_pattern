@@ -207,6 +207,9 @@ protected:
    */
   const MaterialProperty<RankTwoTensor> & _crysrot;
 
+  /// ruanqc-20260128-add New property for the rotation angle in degrees
+  MaterialProperty<RankTwoTensor> & _rotation_angle;
+
   ///@{Helper deformation gradient tensor variables used in iterative solve
   RankTwoTensor _temporary_deformation_gradient;
   RankTwoTensor _elastic_deformation_gradient;
