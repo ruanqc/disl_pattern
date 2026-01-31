@@ -954,7 +954,7 @@
 
 [Outputs]
   exodus = true
-  time_step_interval = 200 #500
+  time_step_interval = 600 #500
   [csv]
     type = CSV
     file_base = rhoe_x_out_h5

@@ -10,7 +10,7 @@
  [Mesh]
    [read]
      type = FileMeshGenerator
-     file = px_cu_square_inner.inp
+     file = px_cu_square_corse.inp
    []
    [remove]
      type = BoundaryDeletionGenerator
@@ -736,7 +736,7 @@
   [./trial_xtalpl1]
     type = CrystalPlasticityBussoUpdate_patternMat
     number_slip_systems = 2
-    slip_sys_file_name  = input_dslip_sys_al_pm45.txt
+    slip_sys_file_name  = input_dslip_sys_al_pm50.txt
       gdot0             = 1.0e6
       f0                = 2.77e-19
       boltzmann         = 1.38065e-23
@@ -787,7 +787,7 @@
 
   start_time = 0.0
   end_time = 0.2 #0.01
-  dt = 2.e-7
+  dt = 1.e-7
   dtmin = 1.e-12
 []
 
@@ -990,7 +990,7 @@
 
 [Outputs]
   exodus = true
-  time_step_interval = 20 #500
+  time_step_interval = 50  #500
   [csv]
     type = CSV
     file_base = rhoe_x_out_h5
