@@ -11,8 +11,8 @@
   [gen]
     type = GeneratedMeshGenerator
     dim = 2
-    nx = 10
-    ny = 10
+    nx = 50
+    ny = 50
     xmin = 0.0
     ymin = 0.0
     xmax = 1.011
@@ -320,26 +320,27 @@
    block = '0'
   [../]
 
-  [./rho_ini1]                 #Name shown in Paraview
-   order = CONSTANT
-   family = MONOMIAL
-   block = '0'
-  [../]
-  [./rho_har1]                 #Name shown in Paraview
-   order = CONSTANT
-   family = MONOMIAL
-   block = '0'
-  [../]
-  [./rho_ini2]                 #Name shown in Paraview
-   order = CONSTANT
-   family = MONOMIAL
-   block = '0'
-  [../]
-  [./rho_har2]                 #Name shown in Paraview
-   order = CONSTANT
-   family = MONOMIAL
-   block = '0'
-  [../]
+  # [./rho_ini1]                 #Name shown in Paraview
+  #  order = CONSTANT
+  #  family = MONOMIAL
+  #  block = '0'
+  # [../]
+  # [./rho_har1]                 #Name shown in Paraview
+  #  order = CONSTANT
+  #  family = MONOMIAL
+  #  block = '0'
+  # [../]
+  # [./rho_ini2]                 #Name shown in Paraview
+  #  order = CONSTANT
+  #  family = MONOMIAL
+  #  block = '0'
+  # [../]
+  # [./rho_har2]                 #Name shown in Paraview
+  #  order = CONSTANT
+  #  family = MONOMIAL
+  #  block = '0'
+  # [../]
+  
   [./gdot_p1]                 #Name shown in Paraview
    order = CONSTANT
    family = MONOMIAL
@@ -621,34 +622,34 @@
   block = '0'
   [../]
 
-  [./rho_ini1]
-  type = MaterialStdVectorAux  #Use this for std::vector p
-  variable = rho_ini1             #Consistant with AuxVariables
-  property = rho_ini
-  index = 0
-  block = '0'
-  [../]   
-  [./rho_har1]
-  type = MaterialStdVectorAux  #Use this for std::vector p
-  variable = rho_har1             #Consistant with AuxVariables
-  property = rho_har
-  index = 0
-  block = '0'
-  [../]
-  [./rho_ini2]
-  type = MaterialStdVectorAux  #Use this for std::vector p
-  variable = rho_ini2             #Consistant with AuxVariables
-  property = rho_ini
-  index = 1
-  block = '0'
-  [../]   
-  [./rho_har2]
-  type = MaterialStdVectorAux  #Use this for std::vector p
-  variable = rho_har2             #Consistant with AuxVariables
-  property = rho_har  
-  index = 1
-  block = '0'
-  [../]
+  # [./rho_ini1]
+  # type = MaterialStdVectorAux  #Use this for std::vector p
+  # variable = rho_ini1             #Consistant with AuxVariables
+  # property = rho_ini
+  # index = 0
+  # block = '0'
+  # [../]   
+  # [./rho_har1]
+  # type = MaterialStdVectorAux  #Use this for std::vector p
+  # variable = rho_har1             #Consistant with AuxVariables
+  # property = rho_har
+  # index = 0
+  # block = '0'
+  # [../]
+  # [./rho_ini2]
+  # type = MaterialStdVectorAux  #Use this for std::vector p
+  # variable = rho_ini2             #Consistant with AuxVariables
+  # property = rho_ini
+  # index = 1
+  # block = '0'
+  # [../]   
+  # [./rho_har2]
+  # type = MaterialStdVectorAux  #Use this for std::vector p
+  # variable = rho_har2             #Consistant with AuxVariables
+  # property = rho_har  
+  # index = 1
+  # block = '0'
+  # [../]
 
   [./gdot_p1]                     #Name arbiarbitrary
    type = MaterialStdVectorAux  #Use this for std::vector p
@@ -684,7 +685,7 @@
 [Materials]
   [./elasticity_tensor]
     type = ComputeElasticityTensorCP
-    C_ijkl = '184.33e3 124.70e3 124.70e3 184.33e3 124.70e3 184.33e3 88.23e3 88.23e3 88.23e3'
+    C_ijkl = '188.555e3 125.967e3 125.967e3 188.555e3 125.967e3 188.555e3 91.504e3 91.504e3 91.504e3'
     fill_method = symmetric9
     euler_angle_1 = 0.0
     euler_angle_2 = 0.0 
@@ -704,7 +705,7 @@
       gdot0             = 1.0e6
       f0                = 2.77e-19
       boltzmann         = 1.38065e-23
-      temperature       = 550.0                                         # 750 - 273.15 in degrees Celsius
+      temperature       = 527.0                                         # 750 - 273.15 in degrees Celsius
       tau_0             = 20.0
       p                 = 0.2
       q                 = 1.2
@@ -713,7 +714,7 @@
       burgers           = 0.257e-6
         w1              = 0.0
         w2              = 0.0
-      scaling_Cb        = 0.1
+      scaling_Cb        = 0.3
       scaling_Cd        = 0.1
       tauF_on           = 1.0                                             #ON-1.0, OFF-0.0 (tauF= St*(1 -+ tauF_on*rhoG/rhoT) on or off)
 
@@ -905,26 +906,26 @@
      variable = rhoT2
      block = '0'
   [../]
-  [./rho_ini1]
-     type = ElementAverageValue
-     variable = rho_ini1
-     block = '0'
-  [../]
-  [./rho_har1]
-     type = ElementAverageValue
-     variable = rho_har1
-     block = '0'
-  [../]
-  [./rho_ini2]
-     type = ElementAverageValue
-     variable = rho_ini2
-     block = '0'
-  [../]
-  [./rho_har2]
-     type = ElementAverageValue
-     variable = rho_har2
-     block = '0'
-  [../]
+  # [./rho_ini1]
+  #    type = ElementAverageValue
+  #    variable = rho_ini1
+  #    block = '0'
+  # [../]
+  # [./rho_har1]
+  #    type = ElementAverageValue
+  #    variable = rho_har1
+  #    block = '0'
+  # [../]
+  # [./rho_ini2]
+  #    type = ElementAverageValue
+  #    variable = rho_ini2
+  #    block = '0'
+  # [../]
+  # [./rho_har2]
+  #    type = ElementAverageValue
+  #    variable = rho_har2
+  #    block = '0'
+  # [../]
     
   [./gdot_p1]
      type = ElementAverageValue
@@ -954,7 +955,7 @@
 
 [Outputs]
   exodus = true
-  time_step_interval = 200 #500
+  time_step_interval = 600 #500
   [csv]
     type = CSV
     file_base = rhoe_x_out_h5
