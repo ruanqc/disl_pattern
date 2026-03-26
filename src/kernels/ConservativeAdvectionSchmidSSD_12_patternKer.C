@@ -1,0 +1,298 @@
+#include "ConservativeAdvectionSchmidSSD_12_patternKer.h"
+#include "SystemBase.h"
+#include "libmesh/utility.h"
+
+// ruanqc 2026-03/25 modified for 2d patterning from ConservativeAdvectionSchmidNoSSD.C
+// temp version, updated 26-03-25
+
+registerMooseObject("disl_patternApp", ConservativeAdvectionSchmidSSD_12_patternKer);
+
+InputParameters
+ConservativeAdvectionSchmidSSD_12_patternKer::validParams()
+{
+  InputParameters params = Kernel::validParams();
+  params.addClassDescription("Conservative form of $\\nabla \\cdot \\vec{v} u$ which in its weak "
+                             "form is given by: $(-\\nabla \\psi_i, \\vec{v} u)$. "
+                             "Velocity \vec{v} is taken as material property.");
+  MooseEnum upwinding_type("none full", "none");
+  params.addParam<MooseEnum>("upwinding_type",
+                             upwinding_type,
+                             "Type of upwinding used.  None: Typically results in overshoots and "
+                             "undershoots, but numerical diffusion is minimized.  Full: Overshoots "
+                             "and undershoots are avoided, but numerical diffusion is large");
+  params.addRequiredParam<int>("slip_sys_index",
+                               "Slip system index to determine slip direction "
+                               "for instance from 0 to 11 for FCC.");
+  MooseEnum dislo_sign("positive negative", "positive");
+  params.addRequiredParam<MooseEnum>("dislo_sign", dislo_sign, "Sign of dislocations.");
+  MooseEnum dislo_character("edge screw", "edge");
+  params.addRequiredParam<MooseEnum>(
+      "dislo_character", dislo_character, "Character of dislocations: edge or screw.");
+  return params;
+}
+
+ConservativeAdvectionSchmidSSD_12_patternKer::ConservativeAdvectionSchmidSSD_12_patternKer(
+    const InputParameters & parameters)
+  : Kernel(parameters),
+    _edge_slip_direction(
+        getMaterialProperty<std::vector<Real>>("edge_slip_direction")), // Edge velocity direction
+    _screw_slip_direction(
+        getMaterialProperty<std::vector<Real>>("screw_slip_direction")), // Screw velocity direction
+    _dislo_velocity(getMaterialProperty<std::vector<Real>>("dislo_velocity")), // Velocity value (signed)
+         _dislo_velocity_p(getMaterialProperty<std::vector<Real>>("dislo_velocity_p")), // Positive dislocation
+         _dislo_velocity_m(getMaterialProperty<std::vector<Real>>("dislo_velocity_m")), // Negative dislocation
+    _upwinding(getParam<MooseEnum>("upwinding_type").getEnum<UpwindingType>()),
+    _slip_sys_index(getParam<int>("slip_sys_index")),
+    _dislo_sign(getParam<MooseEnum>("dislo_sign").getEnum<DisloSign>()),
+    _dislo_character(getParam<MooseEnum>("dislo_character").getEnum<DisloCharacter>()),
+    _edge_dislocation_increment(
+        getMaterialProperty<std::vector<Real>>("edge_dislocation_increment")),
+    _d_edge_dislocation_increment_d_rho(
+        getMaterialProperty<std::vector<Real>>("d_edge_dislocation_increment_d_rho")),
+    _u_nodal(_var.dofValues()),
+    _upwind_node(0),
+    _dtotal_mass_out(0)
+{
+}
+
+Real
+ConservativeAdvectionSchmidSSD_12_patternKer::negSpeedQp()
+{
+  Real edge_sign;
+
+  switch (_dislo_sign)
+  {
+    case DisloSign::positive:
+      edge_sign = _dislo_velocity_p[_qp][_slip_sys_index];
+      break;
+    case DisloSign::negative:
+      edge_sign = -_dislo_velocity_m[_qp][_slip_sys_index];
+      break;
+  }
+
+  _velocity.resize(3, 0.0);
+
+  // Find dislocation velocity based on slip systems index and dislocation character
+  switch (_dislo_character)
+  {
+    case DisloCharacter::edge:
+      for (const auto j : make_range(LIBMESH_DIM))
+      {
+        _velocity[j] =
+            _edge_slip_direction[_qp][_slip_sys_index * LIBMESH_DIM + j]; // edge direction
+      }
+      break;
+    case DisloCharacter::screw:
+      for (const auto j : make_range(LIBMESH_DIM))
+      {
+        _velocity[j] =
+            _screw_slip_direction[_qp][_slip_sys_index * LIBMESH_DIM + j]; // screw direction
+      }
+      break;
+  }
+
+  for (const auto j : make_range(LIBMESH_DIM))
+  {
+    // ruanqc comment out
+    // _velocity[j] *= _dislo_velocity[_qp][_slip_sys_index]; // velocity value
+    _velocity[j] *= edge_sign;                             // positive or negative dislocation
+  }
+
+
+  return -_grad_test[_i][_qp] * RealVectorValue(_velocity[0], _velocity[1], _velocity[2]);
+}
+
+Real
+ConservativeAdvectionSchmidSSD_12_patternKer::computeQpResidual()
+{
+  // This is the no-upwinded version
+  // It gets called via Kernel::computeResidual()
+  return negSpeedQp() * _u[_qp];
+  //  - _edge_dislocation_increment[_qp][_slip_sys_index] * _test[_i][_qp];
+}
+
+Real
+ConservativeAdvectionSchmidSSD_12_patternKer::computeQpJacobian()
+{
+  // 1. Advection Jacobian
+  // negSpeedQp() contains (-v * grad_test_i)
+  // We multiply by _phi[_j] because d(u)/d(u_j) = phi_j
+  Real advection_jac = negSpeedQp() * _phi[_j][_qp];
+
+  // 2. Source Jacobian
+  // Derivative is d(Source)/d(rho) * phi_j
+  // We MUST multiply by _test[_i] because the weak form is Integral(Source * test)
+  Real source_jac =
+      _d_edge_dislocation_increment_d_rho[_qp][_slip_sys_index] * _phi[_j][_qp] * _test[_i][_qp];
+
+  // Return the sum
+  return advection_jac - source_jac;
+}
+
+void
+ConservativeAdvectionSchmidSSD_12_patternKer::computeResidual()
+{
+  switch (_upwinding)
+  {
+    case UpwindingType::none:
+      Kernel::computeResidual();
+      break;
+    case UpwindingType::full:
+      fullUpwind(JacRes::CALCULATE_RESIDUAL);
+      break;
+  }
+}
+
+void
+ConservativeAdvectionSchmidSSD_12_patternKer::computeJacobian()
+{
+  switch (_upwinding)
+  {
+    case UpwindingType::none:
+      Kernel::computeJacobian();
+      break;
+    case UpwindingType::full:
+      fullUpwind(JacRes::CALCULATE_JACOBIAN);
+      break;
+  }
+}
+
+void
+ConservativeAdvectionSchmidSSD_12_patternKer::fullUpwind(JacRes res_or_jac)
+{
+  // The number of nodes in the element
+  const unsigned int num_nodes = _test.size();
+
+  // Even if we are computing the Jacobian we still need to compute the outflow from each node to
+  // see which nodes are upwind and which are downwind
+  prepareVectorTag(_assembly, _var.number());
+
+  if (res_or_jac == JacRes::CALCULATE_JACOBIAN)
+    prepareMatrixTag(_assembly, _var.number(), _var.number());
+
+  // Compute the outflux from each node and store in _local_re
+  // If _local_re is positive at the node, mass (or whatever the Variable represents) is flowing out
+  // of the node
+  _upwind_node.resize(num_nodes);
+  for (_i = 0; _i < num_nodes; ++_i)
+  {
+    for (_qp = 0; _qp < _qrule->n_points(); _qp++)
+      _local_re(_i) += _JxW[_qp] * _coord[_qp] * negSpeedQp();
+    _upwind_node[_i] = (_local_re(_i) >= 0.0);
+  }
+
+  // Variables used to ensure mass conservation
+  Real total_mass_out = 0.0;
+  Real total_in = 0.0;
+  if (res_or_jac == JacRes::CALCULATE_JACOBIAN)
+    _dtotal_mass_out.assign(num_nodes, 0.0);
+
+  for (unsigned int n = 0; n < num_nodes; ++n)
+  {
+    if (_upwind_node[n]) // If node is pushing mass OUT
+    {
+      // If computing Jacobian, add diagonal contribution
+      if (res_or_jac == JacRes::CALCULATE_JACOBIAN)
+      {
+        if (_test.size() == _phi.size())
+          /* u at node=n depends only on the u at node=n, by construction.  For
+           * linear-lagrange variables, this means that Jacobian entries involving the derivative
+           * will only be nonzero for derivatives wrt variable at node=n.  Hence the
+           * (n, n) in the line below.  The above "if" statement catches other variable types
+           * (eg constant monomials)
+           */
+          _local_ke(n, n) += _local_re(n);
+
+        _dtotal_mass_out[n] += _local_ke(n, n);
+      }
+      _local_re(n) *= _u_nodal[n];
+      total_mass_out += _local_re(n);
+    }
+    else                        // If node is sucking mass IN (Downwind)
+      total_in -= _local_re(n); // note the -= means the result is positive
+  }
+
+  // Conserve mass over all phases by proportioning the total_mass_out mass to the inflow nodes,
+  // weighted by their local_re values
+  // 3. Redistribute Mass
+  // Take the mass leaving the Upwind nodes and distribute it to the Downwind nodes
+  // proportional to their "capacity" (local_re).
+  for (unsigned int n = 0; n < num_nodes; ++n)
+  {
+    if (!_upwind_node[n]) // downwind node
+    {
+      if (res_or_jac == JacRes::CALCULATE_JACOBIAN)
+        for (_j = 0; _j < _phi.size(); _j++)
+          _local_ke(n, _j) += _local_re(n) * _dtotal_mass_out[_j] / total_in;
+      // Update residual:
+      // New_Res = Old_Res * (Total_Out / Total_In)
+      _local_re(n) *= total_mass_out / total_in;
+    }
+  }
+
+  // The source term is a volume integral: Integral(Source * TestFunction)
+  // We perform standard Gaussian integration here.
+
+  for (_i = 0; _i < num_nodes; ++_i)
+  {
+    for (_qp = 0; _qp < _qrule->n_points(); _qp++)
+    {
+      // Calculate Integration Weight (dx * dy * dz)
+      Real JxW = _JxW[_qp] * _coord[_qp];
+
+      // 1. RESIDUAL contribution
+      // Note: Check your sign convention in computeQpResidual.
+      // If you used: return Advection + Source;
+      // Then we add it here:
+      Real source_residual = _edge_dislocation_increment[_qp][_slip_sys_index] * _test[_i][_qp];
+
+      _local_re(_i) += -1.0 * source_residual * JxW;
+
+      // 2. JACOBIAN contribution
+      // Only if we are calculating the Jacobian
+      if (res_or_jac == JacRes::CALCULATE_JACOBIAN)
+      {
+        for (_j = 0; _j < _phi.size(); _j++)
+        {
+          // Derivative: (dSource/dRho) * phi_j * test_i
+          Real source_jac = _d_edge_dislocation_increment_d_rho[_qp][_slip_sys_index] *
+                            _phi[_j][_qp] * _test[_i][_qp];
+
+          _local_ke(_i, _j) += -1.0 * source_jac * JxW;
+        }
+      }
+    }
+  }
+
+  // Add the result to the residual and jacobian
+  // 4. Add to Global System
+  // Finally, add these redistributed values to the global residual vector
+  if (res_or_jac == JacRes::CALCULATE_RESIDUAL)
+  {
+    accumulateTaggedLocalResidual();
+
+    if (_has_save_in)
+    {
+      Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+      for (const auto & var : _save_in)
+        var->sys().solution().add_vector(_local_re, var->dofIndices());
+    }
+  }
+
+  if (res_or_jac == JacRes::CALCULATE_JACOBIAN)
+  {
+    accumulateTaggedLocalMatrix();
+
+    if (_has_diag_save_in)
+    {
+      unsigned int rows = _local_ke.m();
+      DenseVector<Number> diag(rows);
+      for (unsigned int i = 0; i < rows; i++)
+        diag(i) = _local_ke(i, i);
+
+      Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+      for (const auto & var : _diag_save_in)
+        var->sys().solution().add_vector(diag, var->dofIndices());
+    }
+  }
+}

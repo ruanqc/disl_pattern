@@ -11,8 +11,8 @@
   [gen]
     type = GeneratedMeshGenerator
     dim = 2
-    nx = 40
-    ny = 40
+    nx = 1
+    ny = 1
     xmin = 0.0
     ymin = 0.0
     xmax = 1.011
@@ -34,49 +34,49 @@
     order = FIRST
     family = LAGRANGE
     block = '0'
-    # initial_condition = 4000.0
+    initial_condition = 4000.0
   []
   [rho_edge_neg_1]
     order = FIRST
     family = LAGRANGE
     block = '0'
-    # initial_condition = 4000.0
+    initial_condition = 4000.0
   []
     [rho_edge_pos_2]
     order = FIRST
     family = LAGRANGE
-    # initial_condition = 4000.0
+    initial_condition = 4000.0
     block = '0'
   []
   [rho_edge_neg_2]
     order = FIRST
     family = LAGRANGE
-    # initial_condition = 4000.0
+    initial_condition = 4000.0
     block = '0'
   []
 []
 
 [ICs]
-  [./rho_edge_pos_1]
-    type = FunctionIC
-    variable = 'rho_edge_pos_1'
-    function = Gaussian_mxy
-  []
-  [./rho_edge_neg_1]
-    type = FunctionIC
-    variable = 'rho_edge_neg_1'
-    function = Gaussian_mxy
-  []
-  [./rho_edge_pos_2]
-    type = FunctionIC
-    variable = 'rho_edge_pos_2'
-    function = Gaussian_pxy
-  []
-  [./rho_edge_neg_2]
-    type = FunctionIC
-    variable = 'rho_edge_neg_2'
-    function = Gaussian_pxy
-  []  
+  # [./rho_edge_pos_1]
+  #   type = FunctionIC
+  #   variable = 'rho_edge_pos_1'
+  #   function = Gaussian_mxy
+  # []
+  # [./rho_edge_neg_1]
+  #   type = FunctionIC
+  #   variable = 'rho_edge_neg_1'
+  #   function = Gaussian_mxy
+  # []
+  # [./rho_edge_pos_2]
+  #   type = FunctionIC
+  #   variable = 'rho_edge_pos_2'
+  #   function = Gaussian_pxy
+  # []
+  # [./rho_edge_neg_2]
+  #   type = FunctionIC
+  #   variable = 'rho_edge_neg_2'
+  #   function = Gaussian_pxy
+  # []  
 
   # [./rho_edge_pos_1]
   #   type = RandomIC
@@ -118,13 +118,13 @@
   [./Gaussian_pxy]
     type = ParsedFunction
     #rho0=8000.0, l_md= 1.1um; rho0=16000.0, l_md=7.9um
-    expression = '0.01*4000.0 * exp(-((x - y)^2 / (4*0.0011^2))) + 4000.0'
+    expression = '0.01*8000.0 * exp(-((x - y)^2 / (2*0.0079^2))) + 8000.0'
   [../]
 
   [./Gaussian_mxy]
     type = ParsedFunction
     #rho0=8000.0, l_md= 1.1um; rho0=16000.0, l_md=7.9um
-    expression = '0.01*4000.0 * exp(-((x + y - 1.011)^2 / (4*0.0011^2))) + 4000.0'
+    expression = '0.01*8000.0 * exp(-((x + y - 1.011)^2 / (2*0.0079^2))) + 8000.0'
   [../]
 
   [./disp_load]
@@ -140,23 +140,22 @@
 []
 
 [BCs]
-  [right_x]
-    type = Pressure
+  [disp_right_x]
+    type = FunctionDirichletBC
     variable = disp_x
     boundary = 'right'
-    factor = -0.744 #-0.683 -0.966
-    function = pressue_piecewise
-  []
-  [left_x]
-    type = DirichletBC
-    variable = disp_x
-    boundary = 'left'
-    value = 0.0
+    function = disp_load
   []
   [bottom_y]
     type = DirichletBC
     variable = disp_y
     boundary = 'bottom'
+    value = 0.0
+  []
+  [left_x]
+    type = DirichletBC
+    variable = disp_x
+    boundary = 'left'
     value = 0.0
   []
   [./Periodic]
@@ -255,6 +254,29 @@
    family = MONOMIAL
    block = '0'
   [../]
+
+  [./tauf_p1]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
+  [../]
+  [./tauf_m1]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
+  [../]
+  [./tauEff_p2]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
+  [../]
+  [./tauEff_m2]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
+  [../] 
+  
+
   [./sT_1]                 #Name shown in Paraview
    order = CONSTANT
    family = MONOMIAL
@@ -266,18 +288,79 @@
    block = '0'
   [../]
 
-  [./euler_angle_1]
+   [./tauEff_p1]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
+  [../]
+  [./tauEff_m1]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
+  [../]
+    [./tauf_p2]                 #Name shown in Paraview
     order = CONSTANT
     family = MONOMIAL
-  [../]
-  [./euler_angle_2]
+    block = '0'
+    [../]
+    [./tauf_m2]                 #Name shown in Paraview
     order = CONSTANT
     family = MONOMIAL
+    block = '0'
+    [../]
+  [./rhoT1]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
   [../]
-  [./euler_angle_3]
-    order = CONSTANT
-    family = MONOMIAL
+  [./rhoT2]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
   [../]
+
+  # [./rho_ini1]                 #Name shown in Paraview
+  #  order = CONSTANT
+  #  family = MONOMIAL
+  #  block = '0'
+  # [../]
+  # [./rho_har1]                 #Name shown in Paraview
+  #  order = CONSTANT
+  #  family = MONOMIAL
+  #  block = '0'
+  # [../]
+  # [./rho_ini2]                 #Name shown in Paraview
+  #  order = CONSTANT
+  #  family = MONOMIAL
+  #  block = '0'
+  # [../]
+  # [./rho_har2]                 #Name shown in Paraview
+  #  order = CONSTANT
+  #  family = MONOMIAL
+  #  block = '0'
+  # [../]
+  
+  [./gdot_p1]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
+  [../]
+  [./gdot_m1]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
+  [../]
+  [./gdot_p2]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
+  [../]
+  [./gdot_m2]                 #Name shown in Paraview
+   order = CONSTANT
+   family = MONOMIAL
+   block = '0'
+  [../]
+
 []
 
 
@@ -295,7 +378,7 @@
     variable = rho_edge_pos_1
   []
   [Edge_Pos_Flux_1]
-    type = ConservativeAdvectionSchmidNoSSD_patternKer
+    type = ConservativeAdvectionSchmidSSD_12_patternKer
     variable = rho_edge_pos_1
     upwinding_type = full
       dislo_sign = positive
@@ -308,7 +391,7 @@
     variable = rho_edge_neg_1
   []
   [Edge_Neg_Flux_1]
-    type = ConservativeAdvectionSchmidNoSSD_patternKer
+    type = ConservativeAdvectionSchmidSSD_12_patternKer
     variable = rho_edge_neg_1
     upwinding_type = full
       dislo_sign = negative
@@ -321,7 +404,7 @@
     variable = rho_edge_pos_2
   []
   [Edge_Pos_Flux_2]
-    type = ConservativeAdvectionSchmidNoSSD_patternKer
+    type = ConservativeAdvectionSchmidSSD_12_patternKer
     variable = rho_edge_pos_2
     upwinding_type = full
       dislo_sign = positive
@@ -334,7 +417,7 @@
     variable = rho_edge_neg_2
   []
   [Edge_Neg_Flux_2]
-    type = ConservativeAdvectionSchmidNoSSD_patternKer
+    type = ConservativeAdvectionSchmidSSD_12_patternKer
     variable = rho_edge_neg_2
     upwinding_type = full
       dislo_sign = negative
@@ -449,6 +532,36 @@
    index = 1
    block = '0'
   [../]
+
+  [./tauf_p1]                     #Name arbiarbitrary
+   type = MaterialStdVectorAux  #Use this for std::vector p
+   variable = tauf_p1            #Consistant with AuxVariables
+   property = tauf_p         
+   index = 0
+   block = '0'
+  [../]   
+  [./tauf_m1]                     #Name arbiarbitrary
+   type = MaterialStdVectorAux  #Use this for std::vector p
+   variable = tauf_m1             #Consistant with AuxVariables
+   property = tauf_m         
+   index = 0
+   block = '0'
+  [../]
+  [./tauEff_p2]                     #Name arbiarbitrary
+    type = MaterialStdVectorAux  #Use this for std::vector p
+    variable = tauEff_p2            #Consistant with AuxVariables
+    property = tauEff_p         
+    index = 1
+    block = '0'
+    [../]   
+  [./tauEff_m2]                     #Name arbiarbitrary
+    type = MaterialStdVectorAux  #Use this for std::vector p
+    variable = tauEff_m2             #Consistant with AuxVariables
+    property = tauEff_m         
+    index = 1
+    block = '0'
+  [../]
+
   [./sT_1]                     #Name arbiarbitrary
    type = MaterialStdVectorAux  #Use this for std::vector p
    variable = sT_1             #Consistant with AuxVariables
@@ -463,35 +576,115 @@
    index = 1
    block = '0'
   [../]
+  
+  [./tauEff_p1]                     #Name arbiarbitrary
+   type = MaterialStdVectorAux  #Use this for std::vector p
+   variable = tauEff_p1            #Consistant with AuxVariables
+   property = tauEff_p         
+   index = 0
+   block = '0'
+  [../]   
+  [./tauEff_m1]                     #Name arbiarbitrary
+   type = MaterialStdVectorAux  #Use this for std::vector p
+   variable = tauEff_m1             #Consistant with AuxVariables
+   property = tauEff_m         
+   index = 0
+   block = '0'
+  [../] 
+    [./tauf_p2]                     #Name arbiarbitrary
+    type = MaterialStdVectorAux  #Use this for std::vector p
+    variable = tauf_p2            #Consistant with AuxVariables
+    property = tauf_p         
+    index = 1
+    block = '0'
+    [../]   
+    [./tauf_m2]                     #Name arbiarbitrary
+    type = MaterialStdVectorAux  #Use this for std::vector p
+    variable = tauf_m2             #Consistant with AuxVariables
+    property = tauf_m         
+    index = 1
+    block = '0'
+    [../] 
+  
+  [./rhoT1]
+  type = MaterialStdVectorAux  #Use this for std::vector p
+  variable = rhoT1             #Consistant with AuxVariables
+  property = rhoT1         
+  index = 0
+  block = '0'
+  [../]
+  [./rhoT2]
+  type = MaterialStdVectorAux  #Use this for std::vector p
+  variable = rhoT2             #Consistant with AuxVariables
+  property = rhoT2
+  index = 0
+  block = '0'
+  [../]
 
-  [./euler_angle_1]
-    type = MaterialRealVectorValueAux
-    variable = euler_angle_1
-    property = Euler_angles
-    component = 0
-    execute_on = timestep_end
+  # [./rho_ini1]
+  # type = MaterialStdVectorAux  #Use this for std::vector p
+  # variable = rho_ini1             #Consistant with AuxVariables
+  # property = rho_ini
+  # index = 0
+  # block = '0'
+  # [../]   
+  # [./rho_har1]
+  # type = MaterialStdVectorAux  #Use this for std::vector p
+  # variable = rho_har1             #Consistant with AuxVariables
+  # property = rho_har
+  # index = 0
+  # block = '0'
+  # [../]
+  # [./rho_ini2]
+  # type = MaterialStdVectorAux  #Use this for std::vector p
+  # variable = rho_ini2             #Consistant with AuxVariables
+  # property = rho_ini
+  # index = 1
+  # block = '0'
+  # [../]   
+  # [./rho_har2]
+  # type = MaterialStdVectorAux  #Use this for std::vector p
+  # variable = rho_har2             #Consistant with AuxVariables
+  # property = rho_har  
+  # index = 1
+  # block = '0'
+  # [../]
+
+  [./gdot_p1]                     #Name arbiarbitrary
+   type = MaterialStdVectorAux  #Use this for std::vector p
+   variable = gdot_p1            #Consistant with AuxVariables
+   property = slip_increment_p         
+   index = 0
+   block = '0'
+  [../]   
+  [./gdot_m1]                     #Name arbiarbitrary
+   type = MaterialStdVectorAux  #Use this for std::vector p
+   variable = gdot_m1             #Consistant with AuxVariables
+   property = slip_increment_m         
+   index = 0
+   block = '0'
   [../]
-  [./euler_angle_2]
-    type = MaterialRealVectorValueAux
-    variable = euler_angle_2
-    property = Euler_angles
-    component = 1
-    execute_on = timestep_end
+  [./gdot_p2]                     #Name arbiarbitrary
+    type = MaterialStdVectorAux  #Use this for std::vector p
+    variable = gdot_p2            #Consistant with AuxVariables
+    property = slip_increment_p        
+    index = 1
+    block = '0'
+    [../]   
+  [./gdot_m2]                     #Name arbiarbitrary
+    type = MaterialStdVectorAux  #Use this for std::vector p
+    variable = gdot_m2             #Consistant with AuxVariables
+    property = slip_increment_m         
+    index = 1
+    block = '0'
   [../]
-  [./euler_angle_3]
-    type = MaterialRealVectorValueAux
-    variable = euler_angle_3
-    property = Euler_angles
-    component = 2
-    execute_on = timestep_end
-  [../]
+  
 []
-
 
 [Materials]
   [./elasticity_tensor]
     type = ComputeElasticityTensorCP
-    C_ijkl = '184.33e3 124.70e3 124.70e3 184.33e3 124.70e3 184.33e3 88.23e3 88.23e3 88.23e3'
+    C_ijkl = '188.555e3 125.967e3 125.967e3 188.555e3 125.967e3 188.555e3 91.504e3 91.504e3 91.504e3'
     fill_method = symmetric9
     euler_angle_1 = 0.0
     euler_angle_2 = 0.0 
@@ -511,7 +704,7 @@
       gdot0             = 1.0e6
       f0                = 2.77e-19
       boltzmann         = 1.38065e-23
-      temperature       = 500.0                                         # 750 - 273.15 in degrees Celsius
+      temperature       = 527.0                                         # 750 - 273.15 in degrees Celsius
       tau_0             = 20.0
       p                 = 0.2
       q                 = 1.2
@@ -520,8 +713,8 @@
       burgers           = 0.257e-6
         w1              = 0.0
         w2              = 0.0
-      scaling_Cb        = 0.1
-      scaling_Cd        = 0.1
+      scaling_Cb        = 0.2
+      scaling_Cd        = 0.2
       tauF_on           = 1.0                                             #ON-1.0, OFF-0.0 (tauF= St*(1 -+ tauF_on*rhoG/rhoT) on or off)
 
     edge_dislo_den_pos_1 = rho_edge_pos_1
@@ -530,8 +723,25 @@
     edge_dislo_den_neg_2 = rho_edge_neg_2
     block = '0'
   [../]
-
+  #ssd
+  [./ssd]
+    type = SSDUpdate_sim
+    nss = 2
+    Ce = 0.25      # Cu (2004)acta 0.5  
+    ke_b = 55000  # Cu (2004)acta 55000 mm^-1  
+    de = 1.0e-6   # Cu (2004)acta 1nm
+    # Cs = 0.25      # Cu (2004)acta 0.5
+    # ks_b = 110000 # Cu (2004)acta 110000 mm^-1
+    # ds = 5.0e-6   # Cu (2004)acta 5nm
+      dislo_source_edge = 8000.0          #2.77e7 5.e7 1.e8
+    dislo_den_pos_1 = rho_edge_pos_1
+    dislo_den_neg_1 = rho_edge_neg_1
+    dislo_den_pos_2 = rho_edge_pos_2
+    dislo_den_neg_2 = rho_edge_neg_2
+    block = '0'
+  [../]
 []
+
 
 [Preconditioning]
   active = 'smp'
@@ -558,7 +768,7 @@
 
   start_time = 0.0
   end_time = 0.2 #0.01
-  dt = 2.e-7
+  dt = 2.e-6
   dtmin = 1.e-12
 []
 
@@ -650,16 +860,110 @@
      variable = taud_2
      block = '0'
   [../]
+
+  [./tauf_p1]
+     type = ElementAverageValue
+     variable = tauf_p1
+     block = '0'
+  [../]
+  [./tauf_m1]
+     type = ElementAverageValue
+     variable = tauf_m1
+     block = '0'
+  [../]
+  [./tauf_p2]
+     type = ElementAverageValue
+     variable = tauf_p2
+     block = '0'
+  [../]
+  [./tauf_m2]
+     type = ElementAverageValue
+     variable = tauf_m2
+     block = '0'
+  [../]
+  
   [./sT_1]
      type = ElementAverageValue
      variable = sT_1
      block = '0'
   [../]
-    [./sT_2]
+  [./sT_2]
      type = ElementAverageValue
      variable = sT_2
       block = '0'
   [../]
+  [./tauEff_p1]
+     type = ElementAverageValue
+     variable = tauEff_p1
+     block = '0'
+  [../]
+  [./tauEff_m1]
+     type = ElementAverageValue
+     variable = tauEff_m1
+     block = '0'
+  [../]
+  [./tauEff_p2]
+     type = ElementAverageValue
+     variable = tauEff_p2
+     block = '0'
+  [../]
+  [./tauEff_m2]
+     type = ElementAverageValue
+     variable = tauEff_m2
+     block = '0'
+  [../] 
+  [./rhoT1]
+     type = ElementAverageValue
+     variable = rhoT1
+     block = '0'
+  [../]
+  [./rhoT2]
+     type = ElementAverageValue
+     variable = rhoT2
+     block = '0'
+  [../]
+  # [./rho_ini1]
+  #    type = ElementAverageValue
+  #    variable = rho_ini1
+  #    block = '0'
+  # [../]
+  # [./rho_har1]
+  #    type = ElementAverageValue
+  #    variable = rho_har1
+  #    block = '0'
+  # [../]
+  # [./rho_ini2]
+  #    type = ElementAverageValue
+  #    variable = rho_ini2
+  #    block = '0'
+  # [../]
+  # [./rho_har2]
+  #    type = ElementAverageValue
+  #    variable = rho_har2
+  #    block = '0'
+  # [../]
+    
+  [./gdot_p1]
+     type = ElementAverageValue
+     variable = gdot_p1
+     block = '0'
+  [../]
+  [./gdot_m1]
+     type = ElementAverageValue
+     variable = gdot_m1
+     block = '0'
+  [../]
+  [./gdot_p2]
+     type = ElementAverageValue
+     variable = gdot_p2
+     block = '0'
+  [../]
+  [./gdot_m2]
+     type = ElementAverageValue
+     variable = gdot_m2
+     block = '0'
+  [../]
+
 []
 
 [VectorPostprocessors]
@@ -667,7 +971,7 @@
 
 [Outputs]
   exodus = true
-  time_step_interval = 500
+  time_step_interval = 100 #500
   [csv]
     type = CSV
     file_base = rhoe_x_out_h5
