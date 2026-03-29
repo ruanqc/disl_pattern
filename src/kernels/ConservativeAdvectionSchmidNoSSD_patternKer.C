@@ -183,8 +183,9 @@ ConservativeAdvectionSchmidNoSSD_patternKer::fullUpwind(JacRes res_or_jac)
 
   for (unsigned int n = 0; n < num_nodes; ++n)
   {
-    if (_upwind_node[n])
+    if (_upwind_node[n]) // If node is pushing mass OUT
     {
+      // If computing Jacobian, add diagonal contribution
       if (res_or_jac == JacRes::CALCULATE_JACOBIAN)
       {
         if (_test.size() == _phi.size())
@@ -201,12 +202,15 @@ ConservativeAdvectionSchmidNoSSD_patternKer::fullUpwind(JacRes res_or_jac)
       _local_re(n) *= _u_nodal[n];
       total_mass_out += _local_re(n);
     }
-    else                        // downwind node
+    else                        // If node is sucking mass IN (Downwind)
       total_in -= _local_re(n); // note the -= means the result is positive
   }
 
   // Conserve mass over all phases by proportioning the total_mass_out mass to the inflow nodes,
   // weighted by their local_re values
+  // 3. Redistribute Mass
+  // Take the mass leaving the Upwind nodes and distribute it to the Downwind nodes
+  // proportional to their "capacity" (local_re).
   for (unsigned int n = 0; n < num_nodes; ++n)
   {
     if (!_upwind_node[n]) // downwind node
@@ -214,11 +218,15 @@ ConservativeAdvectionSchmidNoSSD_patternKer::fullUpwind(JacRes res_or_jac)
       if (res_or_jac == JacRes::CALCULATE_JACOBIAN)
         for (_j = 0; _j < _phi.size(); _j++)
           _local_ke(n, _j) += _local_re(n) * _dtotal_mass_out[_j] / total_in;
-      _local_re(n) *= total_mass_out / total_in;
+      // Update residual:
+      // New_Res = Old_Res * (Total_Out / Total_In)
+          _local_re(n) *= total_mass_out / total_in;
     }
   }
 
   // Add the result to the residual and jacobian
+  // 4. Add to Global System
+  // Finally, add these redistributed values to the global residual vector
   if (res_or_jac == JacRes::CALCULATE_RESIDUAL)
   {
     accumulateTaggedLocalResidual();

@@ -59,7 +59,17 @@ Real
 ConservativeAdvectionSchmidSSD_12_patternKer::negSpeedQp()
 {
   Real edge_sign;
-
+  
+  // switch (_dislo_sign)
+  // {
+  //   case DisloSign::positive:
+  //     edge_sign = 1.0;
+  //     break;
+  //   case DisloSign::negative:
+  //     edge_sign = -1.0;
+  //     break;
+  // }
+  
   switch (_dislo_sign)
   {
     case DisloSign::positive:
@@ -98,7 +108,6 @@ ConservativeAdvectionSchmidSSD_12_patternKer::negSpeedQp()
     _velocity[j] *= edge_sign;                             // positive or negative dislocation
   }
 
-
   return -_grad_test[_i][_qp] * RealVectorValue(_velocity[0], _velocity[1], _velocity[2]);
 }
 
@@ -107,8 +116,8 @@ ConservativeAdvectionSchmidSSD_12_patternKer::computeQpResidual()
 {
   // This is the no-upwinded version
   // It gets called via Kernel::computeResidual()
-  return negSpeedQp() * _u[_qp];
-  //  - _edge_dislocation_increment[_qp][_slip_sys_index] * _test[_i][_qp];
+  return negSpeedQp() * _u[_qp] - 
+         _edge_dislocation_increment[_qp][_slip_sys_index] * _test[_i][_qp];
 }
 
 Real

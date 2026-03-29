@@ -1,5 +1,8 @@
 #include "SSDUpdate_sim.h"
 
+
+// ruanqc modified to implement 2d px_cu_patterning based on zhangchenfan's work version
+
 registerMooseObject("disl_patternApp", SSDUpdate_sim);
 
 InputParameters
@@ -16,8 +19,7 @@ SSDUpdate_sim::validParams()
   params.addParam<Real>("ds", 5.0e-6, "critical screw annihilation distance");
   params.addParam<Real>("Ce", 0.0, "edge proportional constant");
   params.addParam<Real>("Cs", 0.0, "screw proportional constant");
-  params.addParam<Real>(
-      "dislo_source_edge", 0.0, "initial value of SSD component of edge dislocation");
+  params.addParam<Real>("dislo_source_edge", 0.0, "initial value of SSD component of edge dislocation");
 
   params.addRequiredParam<int>("nss", "Number of slip systems");
   // Coupled Variables of Slip 1
@@ -272,13 +274,11 @@ SSDUpdate_sim::SSDUpdate_sim(const InputParameters & parameters)
     _slip_increment(getMaterialProperty<std::vector<Real>>("slip_increment")),
     // Declare the current value and older value of SSD density
     _edge_dislocation_increment(declareProperty<std::vector<Real>>("edge_dislocation_increment")),
-    _edge_dislocation_increment_old(
-        getMaterialPropertyOld<std::vector<Real>>("edge_dislocation_increment")),
+    _edge_dislocation_increment_old(getMaterialPropertyOld<std::vector<Real>>("edge_dislocation_increment")),
 
     // Declare the new derivative property for the Jacobian
     // This stores d(SSD_increment) / d(Total_Density)
-    _d_edge_dislocation_increment_d_rho(
-        declareProperty<std::vector<Real>>("d_edge_dislocation_increment_d_rho"))
+    _d_edge_dislocation_increment_d_rho(declareProperty<std::vector<Real>>("d_edge_dislocation_increment_d_rho"))
 
 // _screw_dislocation_increment(declareProperty<std::vector<Real>>("screw_dislocation_increment")),
 // _screw_dislocation_increment_old(
@@ -429,10 +429,10 @@ SSDUpdate_sim::initQpStatefulProperties()
     _d_edge_dislocation_increment_d_rho[_qp][i] = 0.0;
   }
 
-  TotalDislocationDensity_ALL = 0;
-
   for (const auto i : make_range(_nss))
   {
+    TotalDislocationDensity_ALL = 0;  // Reset for each slip system
+
     const Real abs_slip_increment = std::abs(_slip_increment[_qp][i]);
 
     for (const auto j : make_range(_nss))
@@ -596,10 +596,9 @@ SSDUpdate_sim::computeQpProperties()
     total_dislocation_density[i] = edge_dislocation_density[i];
   }
 
-  TotalDislocationDensity_ALL = 0;
-
   for (const auto i : make_range(_nss))
   {
+    TotalDislocationDensity_ALL = 0;  // Reset for each slip system
 
     const Real abs_slip_increment = std::abs(_slip_increment[_qp][i]);
 
