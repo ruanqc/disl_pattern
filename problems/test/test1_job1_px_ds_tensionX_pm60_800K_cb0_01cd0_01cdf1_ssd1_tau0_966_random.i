@@ -44,18 +44,18 @@
   block = '0 1'
     # initial_condition = 4000.0
   []
-  #   [rho_edge_pos_2]
-  #   order = FIRST
-  #   family = LAGRANGE
-  #   # initial_condition = 4000.0
-  # block = '0 1'
-  # []
-  # [rho_edge_neg_2]
-  #   order = FIRST
-  #   family = LAGRANGE
-  #   # initial_condition = 4000.0
-  # block = '0 1'
-  # []
+    [rho_edge_pos_2]
+    order = FIRST
+    family = LAGRANGE
+    # initial_condition = 4000.0
+  block = '0 1'
+  []
+  [rho_edge_neg_2]
+    order = FIRST
+    family = LAGRANGE
+    # initial_condition = 4000.0
+  block = '0 1'
+  []
 []
 
 [ICs]
@@ -94,20 +94,20 @@
     max = ${fparse 8000.0 + 8000.0*0.01}
     seed = 41
   []
-  # [./rho_edge_pos_2]
-  #   type = RandomIC
-  #   variable = 'rho_edge_pos_2'
-  #   min = ${fparse 8000.0 - 8000.0*0.01}
-  #   max = ${fparse 8000.0 + 8000.0*0.01}
-  #   seed = 41
-  # []
-  # [./rho_edge_neg_2]
-  #   type = RandomIC
-  #   variable = 'rho_edge_neg_2'
-  #   min = ${fparse 8000.0 - 8000.0*0.01}
-  #   max = ${fparse 8000.0 + 8000.0*0.01}
-  #   seed = 41
-  # []  
+  [./rho_edge_pos_2]
+    type = RandomIC
+    variable = 'rho_edge_pos_2'
+    min = ${fparse 8000.0 - 8000.0*0.01}
+    max = ${fparse 8000.0 + 8000.0*0.01}
+    seed = 41
+  []
+  [./rho_edge_neg_2]
+    type = RandomIC
+    variable = 'rho_edge_neg_2'
+    min = ${fparse 8000.0 - 8000.0*0.01}
+    max = ${fparse 8000.0 + 8000.0*0.01}
+    seed = 41
+  []  
 []
 
 [Functions]
@@ -172,14 +172,14 @@
     auto_direction = 'x y'
     [../]
 
-    # [./auto_rho_edge_pos_boundary_x_2]
-    # variable = rho_edge_pos_2
-    # auto_direction = 'x y'
-    # [../]
-    # [./auto_rho_edge_neg_boundary_x_2]
-    #  variable = rho_edge_neg_2
-    # auto_direction = 'x y'
-    # [../]
+    [./auto_rho_edge_pos_boundary_x_2]
+    variable = rho_edge_pos_2
+    auto_direction = 'x y'
+    [../]
+    [./auto_rho_edge_neg_boundary_x_2]
+     variable = rho_edge_neg_2
+    auto_direction = 'x y'
+    [../]
   [../]
 []
 
@@ -403,7 +403,7 @@
     variable = rho_edge_pos_1
   []
   [Edge_Pos_Flux_1]
-    type = ConservativeAdvectionSchmidNoSSD_patternKer
+    type = ConservativeAdvectionSchmidSSD_12_patternKer
     variable = rho_edge_pos_1
     upwinding_type = full
       dislo_sign = positive
@@ -416,7 +416,7 @@
     variable = rho_edge_neg_1
   []
   [Edge_Neg_Flux_1]
-    type = ConservativeAdvectionSchmidNoSSD_patternKer
+    type = ConservativeAdvectionSchmidSSD_12_patternKer
     variable = rho_edge_neg_1
     upwinding_type = full
       dislo_sign = negative
@@ -424,31 +424,31 @@
       dislo_character = edge
   []
 
-  # [Edeg_Pos_Time_Deri_2]
-  #   type = MassLumpedTimeDerivative
-  #   variable = rho_edge_pos_2
-  # []
-  # [Edge_Pos_Flux_2]
-  #   type = ConservativeAdvectionSchmidNoSSD_patternKer
-  #   variable = rho_edge_pos_2
-  #   upwinding_type = full
-  #     dislo_sign = positive
-  #     slip_sys_index = 1
-  #     dislo_character = edge
-  # []
+  [Edeg_Pos_Time_Deri_2]
+    type = MassLumpedTimeDerivative
+    variable = rho_edge_pos_2
+  []
+  [Edge_Pos_Flux_2]
+    type = ConservativeAdvectionSchmidSSD_12_patternKer
+    variable = rho_edge_pos_2
+    upwinding_type = full
+      dislo_sign = positive
+      slip_sys_index = 1
+      dislo_character = edge
+  []
 
-  # [Edeg_Neg_Time_Deri_2]
-  #   type = MassLumpedTimeDerivative
-  #   variable = rho_edge_neg_2
-  # []
-  # [Edge_Neg_Flux_2]
-  #   type = ConservativeAdvectionSchmidNoSSD_patternKer
-  #   variable = rho_edge_neg_2
-  #   upwinding_type = full
-  #     dislo_sign = negative
-  #     slip_sys_index = 1
-  #     dislo_character = edge
-  # []
+  [Edeg_Neg_Time_Deri_2]
+    type = MassLumpedTimeDerivative
+    variable = rho_edge_neg_2
+  []
+  [Edge_Neg_Flux_2]
+    type = ConservativeAdvectionSchmidSSD_12_patternKer
+    variable = rho_edge_neg_2
+    upwinding_type = full
+      dislo_sign = negative
+      slip_sys_index = 1
+      dislo_character = edge
+  []
 
 []
 
@@ -763,12 +763,12 @@
   [../]
   [./trial_xtalpl0]
     type = CrystalPlasticityBussoUpdate_patternMat
-    number_slip_systems = 1
-    slip_sys_file_name  = input_sslip_sys_al_pm60.txt                   #inner dark
+    number_slip_systems = 2
+    slip_sys_file_name  = input_dslip_sys_al_pm60.txt                   #inner dark
       gdot0             = 1.0e6
       f0                = 2.77e-19
       boltzmann         = 1.38065e-23
-      temperature       = 527.0                                         # 750 - 273.15 in degrees Celsius
+      temperature       = 527.0                                         # 800 - 273 in degrees Celsius
       tau_0             = 20.0
       p                 = 0.2
       q                 = 1.2
@@ -783,9 +783,26 @@
 
     edge_dislo_den_pos_1 = rho_edge_pos_1
     edge_dislo_den_neg_1 = rho_edge_neg_1
-    # edge_dislo_den_pos_2 = rho_edge_pos_2
-    # edge_dislo_den_neg_2 = rho_edge_neg_2
+    edge_dislo_den_pos_2 = rho_edge_pos_2
+    edge_dislo_den_neg_2 = rho_edge_neg_2
       block = '0'
+  [../]
+      #ssd
+  [./ssd0]
+    type = SSDUpdate_sim
+    nss = 2
+    Ce = 0.5      # Cu (2004)acta 0.5  
+    ke_b = 55000  # Cu (2004)acta 55000 mm^-1  
+    de = 1.0e-6   # Cu (2004)acta 1nm
+    # Cs = 0.25      # Cu (2004)acta 0.5
+    # ks_b = 110000 # Cu (2004)acta 110000 mm^-1
+    # ds = 5.0e-6   # Cu (2004)acta 5nm
+      dislo_source_edge = 8000.0          #2.77e7 5.e7 1.e8
+    dislo_den_pos_1 = rho_edge_pos_1
+    dislo_den_neg_1 = rho_edge_neg_1
+    dislo_den_pos_2 = rho_edge_pos_2
+    dislo_den_neg_2 = rho_edge_neg_2
+    block = '0'
   [../]
   [./stress1]
     type = ComputeCrystalPlasticityDislocationStress
@@ -795,8 +812,8 @@
   [../]
   [./trial_xtalpl1]
     type = CrystalPlasticityBussoUpdate_patternMat
-    number_slip_systems = 1
-    slip_sys_file_name  = input_sslip_sys_al_pm45.txt
+    number_slip_systems = 2
+    slip_sys_file_name  = input_dslip_sys_al_pm45.txt
       gdot0             = 1.0e6
       f0                = 2.77e-19
       boltzmann         = 1.38065e-23
@@ -815,9 +832,26 @@
 
     edge_dislo_den_pos_1 = rho_edge_pos_1
     edge_dislo_den_neg_1 = rho_edge_neg_1
-    # edge_dislo_den_pos_2 = rho_edge_pos_2
-    # edge_dislo_den_neg_2 = rho_edge_neg_2
+    edge_dislo_den_pos_2 = rho_edge_pos_2
+    edge_dislo_den_neg_2 = rho_edge_neg_2
       block = '1'
+  [../]
+    #ssd
+  [./ssd1]
+    type = SSDUpdate_sim
+    nss = 2
+    Ce = 0.5      # Cu (2004)acta 0.5  
+    ke_b = 55000  # Cu (2004)acta 55000 mm^-1  
+    de = 1.0e-6   # Cu (2004)acta 1nm
+    # Cs = 0.5      # Cu (2004)acta 0.5
+    # ks_b = 110000 # Cu (2004)acta 110000 mm^-1
+    # ds = 5.0e-6   # Cu (2004)acta 5nm
+      dislo_source_edge = 8000.0          #2.77e7 5.e7 1.e8
+    dislo_den_pos_1 = rho_edge_pos_1
+    dislo_den_neg_1 = rho_edge_neg_1
+    dislo_den_pos_2 = rho_edge_pos_2
+    dislo_den_neg_2 = rho_edge_neg_2
+    block = '1'
   [../]
 
 []
@@ -841,9 +875,9 @@
   line_search = 'NONE'  #'bt' 'l2' 'basic' 'nleqerr'
   l_max_its = 50
   nl_max_its = 50
-  nl_rel_tol = 0.02    #1e-3
-  nl_abs_tol = 0.01   #1e-3
-  l_tol = 0.02      #1e-3
+  nl_rel_tol = 2e-2    #1e-3
+  nl_abs_tol = 1e-2   #1e-3
+  l_tol = 2e-2      #1e-3
 
   start_time = 0.0
   end_time = 0.2 #0.01
@@ -991,16 +1025,16 @@
      variable = tauEff_m2
    block = '0 1'
   [../] 
-  # [./rhoT1]
-  #    type = ElementAverageValue
-  #    variable = rhoT1
-  #  block = '0 1'
-  # [../]
-  # [./rhoT2]
-  #    type = ElementAverageValue
-  #    variable = rhoT2
-  #  block = '0 1'
-  # [../]
+  [./rhoT1]
+     type = ElementAverageValue
+     variable = rhoT1
+   block = '0 1'
+  [../]
+  [./rhoT2]
+     type = ElementAverageValue
+     variable = rhoT2
+   block = '0 1'
+  [../]
   # [./rho_ini1]
   #    type = ElementAverageValue
   #    variable = rho_ini1
@@ -1050,7 +1084,7 @@
 
 [Outputs]
   exodus = true
-  time_step_interval = 300  #300
+  time_step_interval = 500 #300
   [csv]
     type = CSV
     file_base = rhoe_x_out_h5

@@ -146,7 +146,7 @@
     type = Pressure
     variable = disp_x
     boundary = 'right'
-    factor = -0.966
+    factor = -1.1
     function = pressue_piecewise
   []
 
@@ -777,8 +777,8 @@
       burgers           = 0.257e-6
         w1              = 0.0
         w2              = 0.0
-      scaling_Cb        = 0.01
-      scaling_Cd        = 0.01
+      scaling_Cb        = 0.1
+      scaling_Cd        = 0.1
       tauF_on           = 1.0                                             #ON-1.0, OFF-0.0 (tauF= St*(1 -+ tauF_on*rhoG/rhoT) on or off)
 
     edge_dislo_den_pos_1 = rho_edge_pos_1
@@ -791,7 +791,7 @@
   [./ssd0]
     type = SSDUpdate_sim
     nss = 2
-    Ce = 0.0      # Cu (2004)acta 0.5  
+    Ce = 0.5      # Cu (2004)acta 0.5  
     ke_b = 55000  # Cu (2004)acta 55000 mm^-1  
     de = 1.0e-6   # Cu (2004)acta 1nm
     # Cs = 0.25      # Cu (2004)acta 0.5
@@ -817,7 +817,7 @@
       gdot0             = 1.0e6
       f0                = 2.77e-19
       boltzmann         = 1.38065e-23
-      temperature       = 527.0                                         # 750 - 273.15 in degrees Celsius
+      temperature       = 527.0                                         # 527= 800 - 273 in degrees Celsius
       tau_0             = 20.0
       p                 = 0.2
       q                 = 1.2
@@ -826,8 +826,8 @@
       burgers           = 0.257e-6
         w1              = 0.0
         w2              = 0.0
-      scaling_Cb        = 0.01
-      scaling_Cd        = 0.01
+      scaling_Cb        = 0.1
+      scaling_Cd        = 0.1
       tauF_on           = 1.0                                             #ON-1.0, OFF-0.0 (tauF= St*(1 -+ tauF_on*rhoG/rhoT) on or off)
 
     edge_dislo_den_pos_1 = rho_edge_pos_1
@@ -840,10 +840,10 @@
   [./ssd1]
     type = SSDUpdate_sim
     nss = 2
-    Ce = 0.0      # Cu (2004)acta 0.5  
+    Ce = 0.5      # Cu (2004)acta 0.5  
     ke_b = 55000  # Cu (2004)acta 55000 mm^-1  
     de = 1.0e-6   # Cu (2004)acta 1nm
-    # Cs = 0.25      # Cu (2004)acta 0.5
+    # Cs = 0.5      # Cu (2004)acta 0.5
     # ks_b = 110000 # Cu (2004)acta 110000 mm^-1
     # ds = 5.0e-6   # Cu (2004)acta 5nm
       dislo_source_edge = 8000.0          #2.77e7 5.e7 1.e8
@@ -875,9 +875,9 @@
   line_search = 'NONE'  #'bt' 'l2' 'basic' 'nleqerr'
   l_max_its = 50
   nl_max_its = 50
-  nl_rel_tol = 0.02    #1e-3
-  nl_abs_tol = 0.01   #1e-3
-  l_tol = 0.02      #1e-3
+  nl_rel_tol = 2e-2    #1e-3
+  nl_abs_tol = 1e-2   #1e-3
+  l_tol = 2e-2      #1e-3
 
   start_time = 0.0
   end_time = 0.2 #0.01

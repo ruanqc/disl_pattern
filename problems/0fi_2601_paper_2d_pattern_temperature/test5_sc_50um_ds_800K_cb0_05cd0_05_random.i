@@ -11,12 +11,12 @@
   [gen]
     type = GeneratedMeshGenerator
     dim = 2
-    nx = 1
-    ny = 1
+    nx = 20
+    ny = 20
     xmin = 0.0
     ymin = 0.0
-    xmax = 1.011
-    ymax = 1.011
+    xmax = 0.050
+    ymax = 0.050
     elem_type = 'QUAD9'   #QUAD4
   []
 []
@@ -34,24 +34,24 @@
     order = FIRST
     family = LAGRANGE
     block = '0'
-    initial_condition = 4000.0
+    # initial_condition = 4000.0
   []
   [rho_edge_neg_1]
     order = FIRST
     family = LAGRANGE
     block = '0'
-    initial_condition = 4000.0
+    # initial_condition = 4000.0
   []
     [rho_edge_pos_2]
     order = FIRST
     family = LAGRANGE
-    initial_condition = 4000.0
+    # initial_condition = 4000.0
     block = '0'
   []
   [rho_edge_neg_2]
     order = FIRST
     family = LAGRANGE
-    initial_condition = 4000.0
+    # initial_condition = 4000.0
     block = '0'
   []
 []
@@ -78,53 +78,48 @@
   #   function = Gaussian_pxy
   # []  
 
-  # [./rho_edge_pos_1]
-  #   type = RandomIC
-  #   variable = 'rho_edge_pos_1'
-  #   min = ${fparse 4000.0 - 4000.0*1.732*0.01}
-  #   max = ${fparse 4000.0 + 4000.0*1.732*0.01}
-  #   seed = 128
-  # []
-  # [./rho_edge_neg_1]
-  #   type = RandomIC
-  #   variable = 'rho_edge_neg_1'
-  #   min = ${fparse 4000.0 - 4000.0*1.732*0.01}
-  #   max = ${fparse 4000.0 + 4000.0*1.732*0.01}
-  #   seed = 128
-  # []
-  # [./rho_edge_pos_2]
-  #   type = RandomIC
-  #   variable = 'rho_edge_pos_2'
-  #   min = ${fparse 4000.0 - 4000.0*1.732*0.01}
-  #   max = ${fparse 4000.0 + 4000.0*1.732*0.01}
-  #   seed = 128
-  # []
-  # [./rho_edge_neg_2]
-  #   type = RandomIC
-  #   variable = 'rho_edge_neg_2'
-  #   min = ${fparse 4000.0 - 4000.0*1.732*0.01}
-  #   max = ${fparse 4000.0 + 4000.0*1.732*0.01}
-  #   seed = 128
-  # []  
-
+  [./rho_edge_pos_1]
+    type = RandomIC
+    variable = 'rho_edge_pos_1'
+    min = ${fparse 0.5e6 - 0.5e6*0.005}
+    max = ${fparse 0.5e6 + 0.5e6*0.005}
+    seed = 42
+  []
+  [./rho_edge_neg_1]
+    type = RandomIC
+    variable = 'rho_edge_neg_1'
+    min = ${fparse 0.5e6 - 0.5e6*0.005}
+    max = ${fparse 0.5e6 + 0.5e6*0.005}
+    seed = 42
+  []
+  [./rho_edge_pos_2]
+    type = RandomIC
+    variable = 'rho_edge_pos_2'
+    min = ${fparse 0.5e6 - 0.5e6*0.005}
+    max = ${fparse 0.5e6 + 0.5e6*0.005}
+    seed = 42
+  []
+  [./rho_edge_neg_2]
+    type = RandomIC
+    variable = 'rho_edge_neg_2'
+    min = ${fparse 0.5e6 - 0.5e6*0.005}
+    max = ${fparse 0.5e6 + 0.5e6*0.005}
+    seed = 42
+  []  
 []
 
 [Functions]
-  [./Gaussian_x]
-    type = ParsedFunction
-    expression = 'if(abs(x - 1.011) < 0.0079, 0.001*16000.0 * exp(-((x - 1.011)^2 / (2.0 * 0.0079^2))) + 4000.0, 4000.0)'
-  [../]
 
   [./Gaussian_pxy]
     type = ParsedFunction
-    #rho0=8000.0, l_md= 1.1um; rho0=16000.0, l_md=7.9um
-    expression = '0.01*8000.0 * exp(-((x - y)^2 / (2*0.0079^2))) + 8000.0'
+    #rho0=0.5e6, l_md= 1.1um; rho0=16000.0, l_md=7.9um
+    expression = '0.01*0.5e6 * exp(-((x - y)^2 / (2*0.0079^2))) + 0.5e6'
   [../]
 
   [./Gaussian_mxy]
     type = ParsedFunction
-    #rho0=8000.0, l_md= 1.1um; rho0=16000.0, l_md=7.9um
-    expression = '0.01*8000.0 * exp(-((x + y - 1.011)^2 / (2*0.0079^2))) + 8000.0'
+    #rho0=0.5e6, l_md= 1.1um; rho0=16000.0, l_md=7.9um
+    expression = '0.01*0.5e6 * exp(-((x + y - 1.011)^2 / (2*0.0079^2))) + 0.5e6'
   [../]
 
   [./disp_load]
@@ -134,28 +129,29 @@
 
   [./pressue_piecewise]
     type = PiecewiseLinear
-    x = '0.0 1.0e-5  0.3'
-    y = '0.0 1.0     1.0'
+    x = '0.0 1.0e-5  0.2'
+    y = '0  1    1'
   [../]
 []
 
 [BCs]
-  [disp_right_x]
-    type = FunctionDirichletBC
+  [right_x]
+    type = Pressure
     variable = disp_x
     boundary = 'right'
-    function = disp_load
-  []
-  [bottom_y]
-    type = DirichletBC
-    variable = disp_y
-    boundary = 'bottom'
-    value = 0.0
+    factor = -7.64 #-0.683 -0.966
+    function = pressue_piecewise
   []
   [left_x]
     type = DirichletBC
     variable = disp_x
     boundary = 'left'
+    value = 0.0
+  []
+  [bottom_y]
+    type = DirichletBC
+    variable = disp_y
+    boundary = 'bottom'
     value = 0.0
   []
   [./Periodic]
@@ -378,7 +374,7 @@
     variable = rho_edge_pos_1
   []
   [Edge_Pos_Flux_1]
-    type = ConservativeAdvectionSchmidSSD_12_patternKer
+    type = ConservativeAdvectionSchmidNoSSD_patternKer
     variable = rho_edge_pos_1
     upwinding_type = full
       dislo_sign = positive
@@ -391,7 +387,7 @@
     variable = rho_edge_neg_1
   []
   [Edge_Neg_Flux_1]
-    type = ConservativeAdvectionSchmidSSD_12_patternKer
+    type = ConservativeAdvectionSchmidNoSSD_patternKer
     variable = rho_edge_neg_1
     upwinding_type = full
       dislo_sign = negative
@@ -404,7 +400,7 @@
     variable = rho_edge_pos_2
   []
   [Edge_Pos_Flux_2]
-    type = ConservativeAdvectionSchmidSSD_12_patternKer
+    type = ConservativeAdvectionSchmidNoSSD_patternKer
     variable = rho_edge_pos_2
     upwinding_type = full
       dislo_sign = positive
@@ -417,7 +413,7 @@
     variable = rho_edge_neg_2
   []
   [Edge_Neg_Flux_2]
-    type = ConservativeAdvectionSchmidSSD_12_patternKer
+    type = ConservativeAdvectionSchmidNoSSD_patternKer
     variable = rho_edge_neg_2
     upwinding_type = full
       dislo_sign = negative
@@ -684,7 +680,8 @@
 [Materials]
   [./elasticity_tensor]
     type = ComputeElasticityTensorCP
-    C_ijkl = '188.555e3 125.967e3 125.967e3 188.555e3 125.967e3 188.555e3 91.504e3 91.504e3 91.504e3'
+    # C_ijkl = '188.555e3 125.967e3 125.967e3 188.555e3 125.967e3 188.555e3 91.504e3 91.504e3 91.504e3' # 527 degree
+    C_ijkl = '175.251e3 122.059e3 122.059e3 175.251e3 122.059e3 175.251e3 81.161e3 81.161e3 81.161e3'  # 227 degree
     fill_method = symmetric9
     euler_angle_1 = 0.0
     euler_angle_2 = 0.0 
@@ -704,7 +701,7 @@
       gdot0             = 1.0e6
       f0                = 2.77e-19
       boltzmann         = 1.38065e-23
-      temperature       = 527.0                                         # 750 - 273.15 in degrees Celsius
+      temperature       = 227.0                                         # 750 - 273.15 in degrees Celsius
       tau_0             = 20.0
       p                 = 0.2
       q                 = 1.2
@@ -713,8 +710,8 @@
       burgers           = 0.257e-6
         w1              = 0.0
         w2              = 0.0
-      scaling_Cb        = 0.2
-      scaling_Cd        = 0.2
+      scaling_Cb        = 0.05
+      scaling_Cd        = 0.05
       tauF_on           = 1.0                                             #ON-1.0, OFF-0.0 (tauF= St*(1 -+ tauF_on*rhoG/rhoT) on or off)
 
     edge_dislo_den_pos_1 = rho_edge_pos_1
@@ -723,25 +720,8 @@
     edge_dislo_den_neg_2 = rho_edge_neg_2
     block = '0'
   [../]
-  #ssd
-  [./ssd]
-    type = SSDUpdate_sim
-    nss = 2
-    Ce = 0.25      # Cu (2004)acta 0.5  
-    ke_b = 55000  # Cu (2004)acta 55000 mm^-1  
-    de = 1.0e-6   # Cu (2004)acta 1nm
-    # Cs = 0.25      # Cu (2004)acta 0.5
-    # ks_b = 110000 # Cu (2004)acta 110000 mm^-1
-    # ds = 5.0e-6   # Cu (2004)acta 5nm
-      dislo_source_edge = 8000.0          #2.77e7 5.e7 1.e8
-    dislo_den_pos_1 = rho_edge_pos_1
-    dislo_den_neg_1 = rho_edge_neg_1
-    dislo_den_pos_2 = rho_edge_pos_2
-    dislo_den_neg_2 = rho_edge_neg_2
-    block = '0'
-  [../]
-[]
 
+[]
 
 [Preconditioning]
   active = 'smp'
@@ -762,14 +742,14 @@
   line_search = 'l2'  #'bt' 'l2' 'basic' 'nleqerr'
   l_max_its = 50
   nl_max_its = 50
-  nl_rel_tol = 1e-3 #1e-5
-  nl_abs_tol = 1e-3
-  l_tol = 1e-3  #1e-5 
+  nl_rel_tol = 1e-3 #1e-3
+  nl_abs_tol = 1e-3 #1e-3
+  l_tol = 1e-3  #1e-3
 
   start_time = 0.0
   end_time = 0.2 #0.01
-  dt = 2.e-6
-  dtmin = 1.e-12
+  dt = 1.e-7
+  dtmin = 1.e-15
 []
 
 [Postprocessors]
@@ -971,10 +951,10 @@
 
 [Outputs]
   exodus = true
-  time_step_interval = 100 #500
-  [csv]
-    type = CSV
-    file_base = rhoe_x_out_h5
-    execute_on = final
-  []
+  time_step_interval = 1000 #500
+  # [csv]
+  #   type = CSV
+  #   file_base = rhoe_x_out_h5
+  #   execute_on = final
+  # []
 []

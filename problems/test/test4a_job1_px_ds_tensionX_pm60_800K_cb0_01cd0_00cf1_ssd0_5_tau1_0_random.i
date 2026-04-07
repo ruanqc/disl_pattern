@@ -146,7 +146,7 @@
     type = Pressure
     variable = disp_x
     boundary = 'right'
-    factor = -0.966
+    factor = -1.0
     function = pressue_piecewise
   []
 
@@ -768,7 +768,7 @@
       gdot0             = 1.0e6
       f0                = 2.77e-19
       boltzmann         = 1.38065e-23
-      temperature       = 527.0                                         # 750 - 273.15 in degrees Celsius
+      temperature       = 527.0                                         # 800 - 273 in degrees Celsius
       tau_0             = 20.0
       p                 = 0.2
       q                 = 1.2
@@ -778,7 +778,7 @@
         w1              = 0.0
         w2              = 0.0
       scaling_Cb        = 0.01
-      scaling_Cd        = 0.01
+      scaling_Cd        = 0.00
       tauF_on           = 1.0                                             #ON-1.0, OFF-0.0 (tauF= St*(1 -+ tauF_on*rhoG/rhoT) on or off)
 
     edge_dislo_den_pos_1 = rho_edge_pos_1
@@ -827,7 +827,7 @@
         w1              = 0.0
         w2              = 0.0
       scaling_Cb        = 0.01
-      scaling_Cd        = 0.01
+      scaling_Cd        = 0.00
       tauF_on           = 1.0                                             #ON-1.0, OFF-0.0 (tauF= St*(1 -+ tauF_on*rhoG/rhoT) on or off)
 
     edge_dislo_den_pos_1 = rho_edge_pos_1
@@ -875,9 +875,9 @@
   line_search = 'NONE'  #'bt' 'l2' 'basic' 'nleqerr'
   l_max_its = 50
   nl_max_its = 50
-  nl_rel_tol = 0.02    #1e-3
-  nl_abs_tol = 0.01   #1e-3
-  l_tol = 0.02      #1e-3
+  nl_rel_tol = 2e-2    #1e-3
+  nl_abs_tol = 1e-2   #1e-3
+  l_tol = 2e-2      #1e-3
 
   start_time = 0.0
   end_time = 0.2 #0.01

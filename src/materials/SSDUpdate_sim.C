@@ -614,7 +614,7 @@ SSDUpdate_sim::computeQpProperties()
       // 1. Compute the value (Existing)
       _edge_dislocation_increment[_qp][i] =
           _edge_dislocation_increment_old[_qp][i] +
-          (_Ce * _ke_b * std::sqrt(TotalDislocationDensity_ALL) * abs_slip_increment -
+          (_Ce * _ke_b * std::sqrt(std::max(TotalDislocationDensity_ALL, 1.e-10)) * abs_slip_increment -
            _Ce / _burgers * 2.0 * _de * _edge_dislocation_increment_old[_qp][i] *
                abs_slip_increment);
 
@@ -630,7 +630,7 @@ SSDUpdate_sim::computeQpProperties()
       if (TotalDislocationDensity_ALL > 1.0e-12)
       {
         _d_edge_dislocation_increment_d_rho[_qp][i] =
-            _Ce * _ke_b * abs_slip_increment * (0.5 / std::sqrt(TotalDislocationDensity_ALL));
+            _Ce * _ke_b * abs_slip_increment * (0.5 / std::sqrt(std::max(TotalDislocationDensity_ALL, 1.e-10)));
         if (abs_slip_increment < 1.e-10)
         {
           _d_edge_dislocation_increment_d_rho[_qp][i] = 0.0;
