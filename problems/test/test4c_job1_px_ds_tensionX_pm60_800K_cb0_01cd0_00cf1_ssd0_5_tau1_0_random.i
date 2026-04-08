@@ -791,7 +791,7 @@
   [./ssd0]
     type = SSDUpdate_sim
     nss = 2
-    Ce = 0.5      # Cu (2004)acta 0.5  
+    Ce = 0.125      # Cu (2004)acta 0.5  
     ke_b = 55000  # Cu (2004)acta 55000 mm^-1  
     de = 0.5e-6   # Cu (2004)acta 1nm
     # Cs = 0.25      # Cu (2004)acta 0.5
@@ -840,7 +840,7 @@
   [./ssd1]
     type = SSDUpdate_sim
     nss = 2
-    Ce = 0.5      # Cu (2004)acta 0.5  
+    Ce = 0.125      # Cu (2004)acta 0.5  
     ke_b = 55000  # Cu (2004)acta 55000 mm^-1  
     de = 0.5e-6   # Cu (2004)acta 1nm
     # Cs = 0.5      # Cu (2004)acta 0.5
