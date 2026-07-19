@@ -520,7 +520,7 @@ CrystalPlasticityBussoUpdate_patternMat::calculateSlipRate()
     }
 
     // total contribution from positive and negative dislocations to slip increment in Lp
-    _slip_increment[_qp][i] = 0.5 * ( _slip_increment_p[_qp][i] +  _slip_increment_m[_qp][i]) ;
+    _slip_increment[_qp][i] =  _slip_increment_p[_qp][i] +  _slip_increment_m[_qp][i] ;
 
     if (std::abs(_slip_increment[_qp][i]) * _substep_dt > _slip_incr_tol)
     {
@@ -676,9 +676,10 @@ CrystalPlasticityBussoUpdate_patternMat::calculateDislocationVelocity()
 
     if (driving_force_p > 1.e-10)
     {  
-          _dislo_velocity_p[_qp][i] =  _slip_increment_p[_qp][i] / _burgers / 
+      _dislo_velocity_p[_qp][i] =  _slip_increment_p[_qp][i] / _burgers / 
                                                                 // (rho_edge_pos[i] + rho_edge_neg[i]);   
-                                                              std::max((rho_edge_pos[i] + rho_edge_neg[i]), 1.e-10); //ruanqc avoid zero division 260330      
+                                                              // std::max((rho_edge_pos[i] + rho_edge_neg[i]), 1.e-10); //ruanqc avoid zero division 260330 
+                                                              std::max(rho_edge_pos[i], 1.e-10);    //ruanqc20260529  only consider particularly positive dislocation density   
     }
     else
     {  
@@ -691,7 +692,8 @@ CrystalPlasticityBussoUpdate_patternMat::calculateDislocationVelocity()
          
         _dislo_velocity_m[_qp][i] = _slip_increment_m[_qp][i] / _burgers / 
                                                               // (rho_edge_pos[i] + rho_edge_neg[i]);   
-                                                            std::max((rho_edge_pos[i] + rho_edge_neg[i]), 1.e-10); //ruanqc avoid zero division 260330
+                                                            // std::max((rho_edge_pos[i] + rho_edge_neg[i]), 1.e-10); //ruanqc avoid zero division 260330
+                                                            std::max(rho_edge_neg[i], 1.e-10);    //ruanqc20260529  only consider particularly positive dislocation density   
     }
     else
     {  
@@ -829,7 +831,7 @@ CrystalPlasticityBussoUpdate_patternMat::calculateConstitutiveSlipDerivative(std
     }
 
     // slip_increment derivative contribution from positive and negative dislocations
-    dslip_dtau[i] = 0.5 * ( dslip_dtau_p + dslip_dtau_m); //ruanqc added
+    dslip_dtau[i] =  dslip_dtau_p + dslip_dtau_m; //ruanqc added
 
     // mooseWarning("tau=",_tau[_qp][i]);
   }
