@@ -11,12 +11,12 @@
   [gen]
     type = GeneratedMeshGenerator
     dim = 2
-    nx = 50
-    ny = 50
+    nx = 100
+    ny = 10
     xmin = 0.0
     ymin = 0.0
-    xmax = 1.011
-    ymax = 1.011
+    xmax = 0.02
+    ymax = 0.02
     elem_type = 'QUAD9'   #QUAD4
   []
 []
@@ -57,74 +57,69 @@
 []
 
 [ICs]
-  [./rho_edge_pos_1]
-    type = FunctionIC
-    variable = 'rho_edge_pos_1'
-    function = Gaussian_mxy
-  []
-  [./rho_edge_neg_1]
-    type = FunctionIC
-    variable = 'rho_edge_neg_1'
-    function = Gaussian_mxy
-  []
-  [./rho_edge_pos_2]
-    type = FunctionIC
-    variable = 'rho_edge_pos_2'
-    function = Gaussian_pxy
-  []
-  [./rho_edge_neg_2]
-    type = FunctionIC
-    variable = 'rho_edge_neg_2'
-    function = Gaussian_pxy
-  []  
-
   # [./rho_edge_pos_1]
-  #   type = RandomIC
+  #   type = FunctionIC
   #   variable = 'rho_edge_pos_1'
-  #   min = ${fparse 4000.0 - 4000.0*1.732*0.01}
-  #   max = ${fparse 4000.0 + 4000.0*1.732*0.01}
-  #   seed = 128
+  #   function = Gaussian_mxy
   # []
   # [./rho_edge_neg_1]
-  #   type = RandomIC
+  #   type = FunctionIC
   #   variable = 'rho_edge_neg_1'
-  #   min = ${fparse 4000.0 - 4000.0*1.732*0.01}
-  #   max = ${fparse 4000.0 + 4000.0*1.732*0.01}
-  #   seed = 128
+  #   function = Gaussian_mxy
   # []
   # [./rho_edge_pos_2]
-  #   type = RandomIC
+  #   type = FunctionIC
   #   variable = 'rho_edge_pos_2'
-  #   min = ${fparse 4000.0 - 4000.0*1.732*0.01}
-  #   max = ${fparse 4000.0 + 4000.0*1.732*0.01}
-  #   seed = 128
+  #   function = Gaussian_pxy
   # []
   # [./rho_edge_neg_2]
-  #   type = RandomIC
+  #   type = FunctionIC
   #   variable = 'rho_edge_neg_2'
-  #   min = ${fparse 4000.0 - 4000.0*1.732*0.01}
-  #   max = ${fparse 4000.0 + 4000.0*1.732*0.01}
-  #   seed = 128
+  #   function = Gaussian_pxy
   # []  
 
+  [./rho_edge_pos_1]
+    type = RandomIC
+    variable = 'rho_edge_pos_1'
+    min = ${fparse 150000.0 - 150000.0*0.005}
+    max = ${fparse 150000.0 + 150000.0*0.005}
+    seed = 42
+  []
+  [./rho_edge_neg_1]
+    type = RandomIC
+    variable = 'rho_edge_neg_1'
+    min = ${fparse 150000.0 - 150000.0*0.005}
+    max = ${fparse 150000.0 + 150000.0*0.005}
+    seed = 42
+  []
+  [./rho_edge_pos_2]
+    type = RandomIC
+    variable = 'rho_edge_pos_2'
+    min = ${fparse 150000.0 - 150000.0*0.005}
+    max = ${fparse 150000.0 + 150000.0*0.005}
+    seed = 42
+  []
+  [./rho_edge_neg_2]
+    type = RandomIC
+    variable = 'rho_edge_neg_2'
+    min = ${fparse 150000.0 - 150000.0*0.005}
+    max = ${fparse 150000.0 + 150000.0*0.005}
+    seed = 42
+  []  
 []
 
 [Functions]
-  [./Gaussian_x]
-    type = ParsedFunction
-    expression = 'if(abs(x - 1.011) < 0.0079, 0.001*16000.0 * exp(-((x - 1.011)^2 / (2.0 * 0.0079^2))) + 4000.0, 4000.0)'
-  [../]
 
   [./Gaussian_pxy]
     type = ParsedFunction
-    #rho0=8000.0, l_md= 1.1um; rho0=16000.0, l_md=7.9um
-    expression = '0.01*8000.0 * exp(-((x - y)^2 / (2*0.0079^2))) + 8000.0'
+    #rho0=150000.0, l_md= 1.1um; rho0=16000.0, l_md=7.9um
+    expression = '0.01*150000.0 * exp(-((x - y)^2 / (2*0.0079^2))) + 150000.0'
   [../]
 
   [./Gaussian_mxy]
     type = ParsedFunction
-    #rho0=8000.0, l_md= 1.1um; rho0=16000.0, l_md=7.9um
-    expression = '0.01*8000.0 * exp(-((x + y - 1.011)^2 / (2*0.0079^2))) + 8000.0'
+    #rho0=150000.0, l_md= 1.1um; rho0=16000.0, l_md=7.9um
+    expression = '0.01*150000.0 * exp(-((x + y - 1.011)^2 / (2*0.0079^2))) + 150000.0'
   [../]
 
   [./disp_load]
@@ -144,7 +139,7 @@
     type = Pressure
     variable = disp_x
     boundary = 'right'
-    factor = -0.966 #-0.683 -0.966
+    factor = -4.8 #-0.683 -0.966
     function = pressue_piecewise
   []
   [left_x]
@@ -685,7 +680,7 @@
 [Materials]
   [./elasticity_tensor]
     type = ComputeElasticityTensorCP
-    C_ijkl = '188.555e3 125.967e3 125.967e3 188.555e3 125.967e3 188.555e3 91.504e3 91.504e3 91.504e3'
+    C_ijkl = '184.33e3 124.70e3 124.70e3 184.33e3 124.70e3 184.33e3 88.23e3 88.23e3 88.23e3' #775K
     fill_method = symmetric9
     euler_angle_1 = 0.0
     euler_angle_2 = 0.0 
@@ -702,10 +697,10 @@
     type = CrystalPlasticityBussoUpdate_patternMat
     number_slip_systems = 2
     slip_sys_file_name  = input_dslip_sys_al_pm45.txt
-      gdot0             = 1.0e6
+      gdot0             = 0.5e6
       f0                = 2.77e-19
       boltzmann         = 1.38065e-23
-      temperature       = 527.0                                         # 750 - 273.15 in degrees Celsius
+      temperature       = 502.0                                         # 750 - 273.15 in degrees Celsius
       tau_0             = 20.0
       p                 = 0.2
       q                 = 1.2
@@ -714,8 +709,8 @@
       burgers           = 0.257e-6
         w1              = 0.0
         w2              = 0.0
-      scaling_Cb        = 0.0
-      scaling_Cd        = 0.15
+      scaling_Cb        = 0.1
+      scaling_Cd        = 0.002
       tauF_on           = 1.0                                             #ON-1.0, OFF-0.0 (tauF= St*(1 -+ tauF_on*rhoG/rhoT) on or off)
 
     edge_dislo_den_pos_1 = rho_edge_pos_1
@@ -955,7 +950,7 @@
 
 [Outputs]
   exodus = true
-  time_step_interval = 500 #500
+  time_step_interval = 50 #500
   [csv]
     type = CSV
     file_base = rhoe_x_out_h5
