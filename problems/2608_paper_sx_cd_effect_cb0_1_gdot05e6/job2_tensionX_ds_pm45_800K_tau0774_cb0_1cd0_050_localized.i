@@ -702,7 +702,7 @@
     type = CrystalPlasticityBussoUpdate_patternMat
     number_slip_systems = 2
     slip_sys_file_name  = input_dslip_sys_al_pm45.txt
-      gdot0             = 1.0e6
+      gdot0             = 0.5e6
       f0                = 2.77e-19
       boltzmann         = 1.38065e-23
       temperature       = 527.0                                         # 750 - 273.15 in degrees Celsius

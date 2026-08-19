@@ -15,8 +15,8 @@
     ny = 50
     xmin = 0.0
     ymin = 0.0
-    xmax = 1.0
-    ymax = 1.0
+    xmax = 1.011
+    ymax = 1.011
     elem_type = 'QUAD9'   #QUAD4
   []
 []
@@ -112,7 +112,7 @@
 [Functions]
   [./Gaussian_x]
     type = ParsedFunction
-    expression = 'if(abs(x - 1.0) < 0.0079, 0.001*16000.0 * exp(-((x - 1.0)^2 / (2.0 * 0.0079^2))) + 4000.0, 4000.0)'
+    expression = 'if(abs(x - 1.011) < 0.0079, 0.001*16000.0 * exp(-((x - 1.011)^2 / (2.0 * 0.0079^2))) + 4000.0, 4000.0)'
   [../]
 
   [./Gaussian_pxy]
@@ -124,12 +124,12 @@
   [./Gaussian_mxy]
     type = ParsedFunction
     #rho0=8000.0, l_md= 1.1um; rho0=16000.0, l_md=7.9um
-    expression = '0.01*8000.0 * exp(-((x + y - 1.0)^2 / (2*0.0079^2))) + 8000.0'
+    expression = '0.01*8000.0 * exp(-((x + y - 1.011)^2 / (2*0.0079^2))) + 8000.0'
   [../]
 
   [./disp_load]
     type = ParsedFunction
-    expression = '0.1*1.0*t'
+    expression = '0.1*1.011*t'
   [../]
 
   [./pressue_piecewise]
@@ -144,7 +144,7 @@
     type = Pressure
     variable = disp_x
     boundary = 'right'
-    factor = -1.0 #-0.980 -1.0 -1.10 -1.5
+    factor = -0.966 #-0.683 -0.966
     function = pressue_piecewise
   []
   [left_x]
@@ -702,7 +702,7 @@
     type = CrystalPlasticityBussoUpdate_patternMat
     number_slip_systems = 2
     slip_sys_file_name  = input_dslip_sys_al_pm45.txt
-      gdot0             = 1.0e6
+      gdot0             = 0.5e6
       f0                = 2.77e-19
       boltzmann         = 1.38065e-23
       temperature       = 527.0                                         # 750 - 273.15 in degrees Celsius
@@ -715,7 +715,7 @@
         w1              = 0.0
         w2              = 0.0
       scaling_Cb        = 0.1
-      scaling_Cd        = 0.1
+      scaling_Cd        = 0.25
       tauF_on           = 1.0                                             #ON-1.0, OFF-0.0 (tauF= St*(1 -+ tauF_on*rhoG/rhoT) on or off)
 
     edge_dislo_den_pos_1 = rho_edge_pos_1
@@ -955,7 +955,7 @@
 
 [Outputs]
   exodus = true
-  time_step_interval = 100 #500
+  time_step_interval = 600 #500
   [csv]
     type = CSV
     file_base = rhoe_x_out_h5
