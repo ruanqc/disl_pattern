@@ -747,8 +747,7 @@
 [Materials]
   [./elasticity_tensor]
     type = ComputeElasticityTensorCP
-    # C_ijkl = '188.555e3 125.967e3 125.967e3 188.555e3 125.967e3 188.555e3 91.504e3 91.504e3 91.504e3'
-    C_ijkl = '184.33e3 124.70e3 124.70e3 184.33e3 124.70e3 184.33e3 88.23e3 88.23e3 88.23e3'
+    C_ijkl = '149.4e3 112.5e3 112.5e3 149.4e3 112.5e3 149.4e3 62.3e3 62.3e3 62.3e3' #800k
     fill_method = symmetric9
     euler_angle_1 = 0.0
     euler_angle_2 = 0.0 
@@ -765,10 +764,10 @@
     type = CrystalPlasticityBussoUpdate_patternMat
     number_slip_systems = 2
     slip_sys_file_name  = input_dslip_sys_al_pm60.txt                   #inner dark
-      gdot0             = 1.0e6
+      gdot0             = 0.5e6
       f0                = 2.77e-19
       boltzmann         = 1.38065e-23
-      temperature       = 527.0                                         # 800 - 273 in degrees Celsius
+      temperature       = 527.0  #800K-273
       tau_0             = 20.0
       p                 = 0.2
       q                 = 1.2
@@ -778,8 +777,8 @@
         w1              = 0.0
         w2              = 0.0
       scaling_Cb        = 0.01
-      scaling_Cd        = 0.00
-      tauF_on           = 0.0                                             #ON-1.0, OFF-0.0 (tauF= St*(1 -+ tauF_on*rhoG/rhoT) on or off)
+      scaling_Cd        = 0.01
+      tauF_on           = 1.0                                             #ON-1.0, OFF-0.0 (tauF= St*(1 -+ tauF_on*rhoG/rhoT) on or off)
 
     edge_dislo_den_pos_1 = rho_edge_pos_1
     edge_dislo_den_neg_1 = rho_edge_neg_1
@@ -814,10 +813,10 @@
     type = CrystalPlasticityBussoUpdate_patternMat
     number_slip_systems = 2
     slip_sys_file_name  = input_dslip_sys_al_pm45.txt
-      gdot0             = 1.0e6
+      gdot0             = 0.5e6
       f0                = 2.77e-19
       boltzmann         = 1.38065e-23
-      temperature       = 527.0                                         # 750 - 273.15 in degrees Celsius
+      temperature       = 527.0  #800K-273
       tau_0             = 20.0
       p                 = 0.2
       q                 = 1.2
@@ -827,8 +826,8 @@
         w1              = 0.0
         w2              = 0.0
       scaling_Cb        = 0.01
-      scaling_Cd        = 0.00
-      tauF_on           = 0.0                                             #ON-1.0, OFF-0.0 (tauF= St*(1 -+ tauF_on*rhoG/rhoT) on or off)
+      scaling_Cd        = 0.01
+      tauF_on           = 1.0                                             #ON-1.0, OFF-0.0 (tauF= St*(1 -+ tauF_on*rhoG/rhoT) on or off)
 
     edge_dislo_den_pos_1 = rho_edge_pos_1
     edge_dislo_den_neg_1 = rho_edge_neg_1
@@ -875,13 +874,13 @@
   line_search = 'NONE'  #'bt' 'l2' 'basic' 'nleqerr'
   l_max_its = 50
   nl_max_its = 50
-  nl_rel_tol = 2e-2    #1e-3
-  nl_abs_tol = 1e-2   #1e-3
-  l_tol = 2e-2      #1e-3
+  nl_rel_tol = 1e-3    #1e-3
+  nl_abs_tol = 1e-3   #1e-3
+  l_tol = 1e-3      #1e-3
 
   start_time = 0.0
   end_time = 0.2 #0.01
-  dt = 1.e-7
+  dt = 2.e-7
   dtmin = 1.e-12
 []
 

@@ -1,3 +1,0 @@
-2026-05-29
-
-Work: recalculate new results based on the discussions with Esteban & Chao, on 29May2026
