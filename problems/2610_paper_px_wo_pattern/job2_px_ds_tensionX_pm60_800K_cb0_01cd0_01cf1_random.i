@@ -840,9 +840,9 @@
   line_search = 'NONE'  #'bt' 'l2' 'basic' 'nleqerr'
   l_max_its = 50
   nl_max_its = 50
-  nl_rel_tol = 1e-3 #1e-5
-  nl_abs_tol = 1e-3
-  l_tol = 1e-3  #1e-5
+  nl_rel_tol = 0.02 #1e-3
+  nl_abs_tol = 0.01 #1e-3
+  l_tol = 0.02  #1e-3
 
   start_time = 0.0
   end_time = 0.2 #0.01
